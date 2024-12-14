@@ -1,33 +1,89 @@
 -- premake5.lua
 workspace "eilig"
-   configurations { "Debug", "Release", "Python" }
-   location "build"
+	configurations { "Debug", "Release", "ReleaseCL", "PythonCL" }
+	location "build"
+
+--rule "PythonModule"
+--	filename "_eilig"
+--	fileextension "pyd"   	
 
 project "eilig"
-   kind "StaticLib"
-   language "C++"
-   cppdialect "C++17"
-   
-   targetdir "build/%{cfg.buildcfg}"
-   includedirs { "../utils/src"}
-   includedirs { "../logger/src"}
-   includedirs { "../opencl/inc"}
+	kind "StaticLib"
+	language "C++"
+	cppdialect "C++17"
 
-   files { "src/**.hpp", "src/**.cpp" }
+	targetdir "build/%{cfg.buildcfg}"
+	includedirs { "../utils/src" }
+	includedirs { "../logger/src" }
+	
+	files "src/eilig.hpp"	
+	files "src/eilig_matrix.hpp"	
+	files "src/eilig_matrix.cpp"	
+	files "src/eilig_matrix_ellpack.hpp"	
+	files "src/eilig_matrix_ellpack.cpp"	
+	files "src/eilig_routines.hpp"	
+	files "src/eilig_routines.cpp"	
+	files "src/eilig_status.hpp"	
+	files "src/eilig_transform.hpp"	
+	files "src/eilig_transform.cpp"	
+	files "src/eilig_types.hpp"	
+	files "src/eilig_vector.hpp"	
+	files "src/eilig_vector.cpp"	
+	
+	filter "configurations:Debug"
+		architecture "x86_64"    
+		defines { "DEBUG" }
+		symbols "On"		
 
-   filter "configurations:Debug"
-	  architecture "x86_64"    
-	  defines { "DEBUG" }
-      symbols "On"
-	  removefiles "eilig_export_python.cpp"
+	filter "configurations:Release"
+		architecture "x86_64" 	  
+		defines { "NDEBUG" }
+		optimize "Speed"
+		
+	filter "configurations:ReleaseCL"	
+		architecture "x86_64"
+		defines { "NDEBUG", "EILIG_ENABLE_OPENCL" }
+		optimize "Speed"		
+		
+		includedirs { "../club/src" }		
+		includedirs { "../opencl/inc" }
 
-   filter "configurations:Release"
-      architecture "x86_64" 	  
-	  defines { "NDEBUG" }
-      optimize "Speed"
-	  removefiles "eilig_export_python.cpp"	  
-	  
-   filter "configurations:Python"
-      architecture "x86_64"  
-	  defines { "NDEBUG" }
-      optimize "Speed"	  
+		files "src/eilig_opencl_entry_proxy.hpp"	
+		files "src/eilig_opencl_entry_proxy.cpp"	
+		files "src/eilig_opencl_kernels.hpp"	
+		files "src/eilig_opencl_kernels.cpp"	
+		files "src/eilig_opencl_matrix_ellpack.hpp"	
+		files "src/eilig_opencl_matrix_ellpack.cpp"	
+		files "src/eilig_opencl_vector.hpp"	
+		files "src/eilig_opencl_vector.cpp"			
+		
+	filter "configurations:PythonCL"
+		kind "SharedLib"
+		architecture "x86_64"
+		defines { "NDEBUG", "EILIG_ENABLE_OPENCL" }
+		optimize "Speed"
+		
+		includedirs { "../club/src" }		
+		includedirs { "../opencl/inc" }
+		includedirs { "../python/inc" }
+		
+		files "src/eilig_opencl_entry_proxy.hpp"	
+		files "src/eilig_opencl_entry_proxy.cpp"	
+		files "src/eilig_opencl_kernels.hpp"	
+		files "src/eilig_opencl_kernels.cpp"	
+		files "src/eilig_opencl_matrix_ellpack.hpp"	
+		files "src/eilig_opencl_matrix_ellpack.cpp"	
+		files "src/eilig_opencl_vector.hpp"	
+		files "src/eilig_opencl_vector.cpp"			
+		
+		files "src/eilig_export_python.cpp"			
+		
+		links { "utils", "logger", "club", "opencl", "python312" }
+		
+		libdirs { "../utils/build/Release" }
+		libdirs { "../logger/build/Release" }
+		libdirs { "../club/build/Release" }
+		libdirs { "../opencl/lib/x86_64" }
+		libdirs { "../python/lib" }
+
+		--rule "PythonModule"		

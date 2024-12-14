@@ -14,8 +14,11 @@ ifeq ($(config),debug)
 else ifeq ($(config),release)
   eilig_config = release
 
-else ifeq ($(config),python)
-  eilig_config = python
+else ifeq ($(config),releasecl)
+  eilig_config = releasecl
+
+else ifeq ($(config),pythoncl)
+  eilig_config = pythoncl
 
 else
   $(error "invalid configuration $(config)")
@@ -42,7 +45,8 @@ help:
 	@echo "CONFIGURATIONS:"
 	@echo "  debug"
 	@echo "  release"
-	@echo "  python"
+	@echo "  releasecl"
+	@echo "  pythoncl"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"

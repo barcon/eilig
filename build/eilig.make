@@ -28,13 +28,10 @@ ifeq ($(origin AR), default)
   AR = ar
 endif
 RESCOMP = windres
-INCLUDES += -I../../utils/src -I../../logger/src -I../../opencl/inc
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS +=
 LDDEPS +=
-LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 define PREBUILDCMDS
 endef
 define PRELINKCMDS
@@ -47,27 +44,48 @@ TARGETDIR = Debug
 TARGET = $(TARGETDIR)/eilig.lib
 OBJDIR = obj/Debug
 DEFINES += -DDEBUG
+INCLUDES += -I../../utils/src -I../../logger/src
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++17
+LIBS +=
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 
 else ifeq ($(config),release)
 TARGETDIR = Release
 TARGET = $(TARGETDIR)/eilig.lib
 OBJDIR = obj/Release
 DEFINES += -DNDEBUG
+INCLUDES += -I../../utils/src -I../../logger/src
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O3
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O3 -std=c++17
+LIBS +=
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
 
-else ifeq ($(config),python)
-TARGETDIR = Python
+else ifeq ($(config),releasecl)
+TARGETDIR = ReleaseCL
 TARGET = $(TARGETDIR)/eilig.lib
-OBJDIR = obj/Python
-DEFINES += -DNDEBUG
+OBJDIR = obj/ReleaseCL
+DEFINES += -DNDEBUG -DEILIG_ENABLE_OPENCL
+INCLUDES += -I../../utils/src -I../../logger/src -I../../club/src -I../../opencl/inc
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O3
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O3 -std=c++17
+LIBS +=
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+
+else ifeq ($(config),pythoncl)
+TARGETDIR = PythonCL
+TARGET = $(TARGETDIR)/eilig.dll
+OBJDIR = obj/PythonCL
+DEFINES += -DNDEBUG -DEILIG_ENABLE_OPENCL
+INCLUDES += -I../../utils/src -I../../logger/src -I../../club/src -I../../opencl/inc -I../../python/inc
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O3
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O3 -std=c++17
+LIBS += -lutils -llogger -lclub -lopencl -lpython312
+ALL_LDFLAGS += $(LDFLAGS) -L../../utils/build/Release -L../../logger/build/Release -L../../club/build/Release -L../../opencl/lib/x86_64 -L../../python/lib -L/usr/lib64 -m64 -shared -Wl,--out-implib="PythonCL/eilig.lib" -s
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 
 endif
 
@@ -81,28 +99,40 @@ endif
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/eilig_export_python.o
 GENERATED += $(OBJDIR)/eilig_matrix.o
 GENERATED += $(OBJDIR)/eilig_matrix_ellpack.o
-GENERATED += $(OBJDIR)/eilig_opencl_ellpack.o
+GENERATED += $(OBJDIR)/eilig_routines.o
+GENERATED += $(OBJDIR)/eilig_transform.o
+GENERATED += $(OBJDIR)/eilig_vector.o
+OBJECTS += $(OBJDIR)/eilig_matrix.o
+OBJECTS += $(OBJDIR)/eilig_matrix_ellpack.o
+OBJECTS += $(OBJDIR)/eilig_routines.o
+OBJECTS += $(OBJDIR)/eilig_transform.o
+OBJECTS += $(OBJDIR)/eilig_vector.o
+
+ifeq ($(config),releasecl)
 GENERATED += $(OBJDIR)/eilig_opencl_entry_proxy.o
 GENERATED += $(OBJDIR)/eilig_opencl_kernels.o
 GENERATED += $(OBJDIR)/eilig_opencl_matrix_ellpack.o
 GENERATED += $(OBJDIR)/eilig_opencl_vector.o
-GENERATED += $(OBJDIR)/eilig_routines.o
-GENERATED += $(OBJDIR)/eilig_transform.o
-GENERATED += $(OBJDIR)/eilig_vector.o
-OBJECTS += $(OBJDIR)/eilig_export_python.o
-OBJECTS += $(OBJDIR)/eilig_matrix.o
-OBJECTS += $(OBJDIR)/eilig_matrix_ellpack.o
-OBJECTS += $(OBJDIR)/eilig_opencl_ellpack.o
 OBJECTS += $(OBJDIR)/eilig_opencl_entry_proxy.o
 OBJECTS += $(OBJDIR)/eilig_opencl_kernels.o
 OBJECTS += $(OBJDIR)/eilig_opencl_matrix_ellpack.o
 OBJECTS += $(OBJDIR)/eilig_opencl_vector.o
-OBJECTS += $(OBJDIR)/eilig_routines.o
-OBJECTS += $(OBJDIR)/eilig_transform.o
-OBJECTS += $(OBJDIR)/eilig_vector.o
+
+else ifeq ($(config),pythoncl)
+GENERATED += $(OBJDIR)/eilig_export_python.o
+GENERATED += $(OBJDIR)/eilig_opencl_entry_proxy.o
+GENERATED += $(OBJDIR)/eilig_opencl_kernels.o
+GENERATED += $(OBJDIR)/eilig_opencl_matrix_ellpack.o
+GENERATED += $(OBJDIR)/eilig_opencl_vector.o
+OBJECTS += $(OBJDIR)/eilig_export_python.o
+OBJECTS += $(OBJDIR)/eilig_opencl_entry_proxy.o
+OBJECTS += $(OBJDIR)/eilig_opencl_kernels.o
+OBJECTS += $(OBJDIR)/eilig_opencl_matrix_ellpack.o
+OBJECTS += $(OBJDIR)/eilig_opencl_vector.o
+
+endif
 
 # Rules
 # #############################################
@@ -166,16 +196,38 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/eilig_export_python.o: ../src/eilig_export_python.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/eilig_matrix.o: ../src/eilig_matrix.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/eilig_matrix_ellpack.o: ../src/eilig_matrix_ellpack.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/eilig_opencl_ellpack.o: ../src/eilig_opencl_ellpack.cpp
+$(OBJDIR)/eilig_routines.o: ../src/eilig_routines.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/eilig_transform.o: ../src/eilig_transform.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/eilig_vector.o: ../src/eilig_vector.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+
+ifeq ($(config),releasecl)
+$(OBJDIR)/eilig_opencl_entry_proxy.o: ../src/eilig_opencl_entry_proxy.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/eilig_opencl_kernels.o: ../src/eilig_opencl_kernels.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/eilig_opencl_matrix_ellpack.o: ../src/eilig_opencl_matrix_ellpack.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/eilig_opencl_vector.o: ../src/eilig_opencl_vector.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+
+else ifeq ($(config),pythoncl)
+$(OBJDIR)/eilig_export_python.o: ../src/eilig_export_python.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/eilig_opencl_entry_proxy.o: ../src/eilig_opencl_entry_proxy.cpp
@@ -190,15 +242,8 @@ $(OBJDIR)/eilig_opencl_matrix_ellpack.o: ../src/eilig_opencl_matrix_ellpack.cpp
 $(OBJDIR)/eilig_opencl_vector.o: ../src/eilig_opencl_vector.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/eilig_routines.o: ../src/eilig_routines.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/eilig_transform.o: ../src/eilig_transform.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/eilig_vector.o: ../src/eilig_vector.cpp
-	@echo "$(notdir $<)"
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+
+endif
 
 -include $(OBJECTS:%.o=%.d)
 ifneq (,$(PCH))
