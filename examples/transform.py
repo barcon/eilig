@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-#Example for turbine distributor pressure field with 24x wicket gates
-#fileIn contains of a pressure field sector (15°): 
-#x1 y1 z1 p1
-#x2 y2 z2 p2
-#.. .. .. ..
-#xi yi zi pi
-#------------------------------------------------------------------------------
+# Example for turbine distributor pressure field with 24x wicket gates
+#
+# fileIn contains a pressure field sector (15°): 
+# x1 y1 z1 p1
+# x2 y2 z2 p2
+# .. .. .. ..
+# xi yi zi pi
+#
+# fileOut contains a pressure field (360°) with pressure clipped 
+# by water vapour pressure and added tailwater pressure
+#----------------------------------------------------------------------------------
 
 import eilig
 import math
@@ -30,7 +34,7 @@ data    = eilig.Matrix()
 status  = eilig.ReadFromFile(data, fileIn)
 
 if status != 0:
-    print("Erro while reading pressure field")
+    print("Errot while reading pressure field")
     quit()
 
 data    = eilig.TableValuesAdd(data, p_TWL )                #Add tail water pressure
