@@ -3,10 +3,6 @@ workspace "eilig"
 	configurations { "Debug", "Release", "ReleaseCL", "PythonCL" }
 	location "build"
 
---rule "PythonModule"
---	filename "_eilig"
---	fileextension "pyd"   	
-
 project "eilig"
 	kind "StaticLib"
 	language "C++"
@@ -85,5 +81,3 @@ project "eilig"
 		libdirs { "../club/build/Release" }
 		libdirs { "../opencl/lib/x86_64" }
 		libdirs { "../python/lib" }
-
-		--rule "PythonModule"		
