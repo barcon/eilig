@@ -1041,14 +1041,17 @@ _eilig.EllpackCL_swigregister(EllpackCL)
 def Cross(in1, in2):
     return _eilig.Cross(in1, in2)
 
-def DetLUP(LU, permutation):
-    return _eilig.DetLUP(LU, permutation)
+def DeterminantLUP(LU, permutation):
+    return _eilig.DeterminantLUP(LU, permutation)
 
-def Det(A):
-    return _eilig.Det(A)
+def Determinant(A):
+    return _eilig.Determinant(A)
 
-def Inv(A):
-    return _eilig.Inv(A)
+def Inverse(A):
+    return _eilig.Inverse(A)
+
+def ScaleByVector(A, alpha):
+    return _eilig.ScaleByVector(A, alpha)
 
 def Solve(A, b):
     return _eilig.Solve(A, b)
@@ -1104,11 +1107,11 @@ def ListVector(*args):
 def ListMatrix(*args):
     return _eilig.ListMatrix(*args)
 
-def RotationMatrix(axis, radians):
-    return _eilig.RotationMatrix(axis, radians)
+def RotationMatrix(*args):
+    return _eilig.RotationMatrix(*args)
 
-def Rotate(point, axis, radians):
-    return _eilig.Rotate(point, axis, radians)
+def Rotate(*args):
+    return _eilig.Rotate(*args)
 
 def Translate(point, axis, value):
     return _eilig.Translate(point, axis, value)
