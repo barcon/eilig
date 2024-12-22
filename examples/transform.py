@@ -34,7 +34,7 @@ data    = eilig.Matrix()
 status  = eilig.ReadFromFile(data, fileIn)
 
 if status != 0:
-    print("Errot while reading pressure field")
+    print("Error while reading pressure field")
     quit()
 
 data    = eilig.TableValuesAdd(data, p_TWL )                #Add tail water pressure
