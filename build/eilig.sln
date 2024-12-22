@@ -6,15 +6,12 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
-		PythonCL|x64 = PythonCL|x64
 		ReleaseCL|x64 = ReleaseCL|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.Debug|x64.ActiveCfg = Debug|x64
 		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.Debug|x64.Build.0 = Debug|x64
-		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.PythonCL|x64.ActiveCfg = PythonCL|x64
-		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.PythonCL|x64.Build.0 = PythonCL|x64
 		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.ReleaseCL|x64.ActiveCfg = ReleaseCL|x64
 		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.ReleaseCL|x64.Build.0 = ReleaseCL|x64
 		{2F185E0F-9B2C-86C0-64AE-2920D08182F1}.Release|x64.ActiveCfg = Release|x64
