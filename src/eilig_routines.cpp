@@ -301,7 +301,7 @@ namespace eilig
             {
                 IA(i, j) = permutation[i] == j ? 1.0 : 0.0;
 
-                for (int k = 0; k < i; k++)
+                for (Index k = 0; k < i; k++)
                 {
                     IA(i, j) -= LU(i, k) * IA(k, j);
                 }

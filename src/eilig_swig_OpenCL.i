@@ -1,4 +1,4 @@
-%module eilig
+%module eiligCL
 
 %{
 	#define SWIG_PYTHON_EXTRA_NATIVE_CONTAINERS 

@@ -3201,16 +3201,16 @@ static swig_module_info swig_module = {swig_types, 34, 0, 0, 0, 0};
 #define SWIG_TypeQuery SWIG_Python_TypeQuery
 
 /*-----------------------------------------------
-              @(target):= _eilig.so
+              @(target):= _eiligCL.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit__eilig
+#  define SWIG_init    PyInit__eiligCL
 
 #else
-#  define SWIG_init    init_eilig
+#  define SWIG_init    init_eiligCL
 
 #endif
-#define SWIG_name    "_eilig"
+#define SWIG_name    "_eiligCL"
 
 #ifdef __cplusplus
 #include <utility>
