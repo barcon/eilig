@@ -12,6 +12,8 @@
 
 namespace eilig
 {
+	using CallbackIterative = Status (*)(Status status, Index iteration, Scalar residual);
+
     Scalar NormMax(const Vector& in);
     Scalar NormP(const Vector& in, Scalar p);
     Scalar NormP(const Matrix& in, Scalar p);
@@ -37,10 +39,11 @@ namespace eilig
 
 	void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b);
 
-	Status IterativJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 0.001, Index itmax = 0);
-	Status IterativGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 0.001, Index itmax = 0);
-	Status IterativCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 0.001, Index itmax = 0);
-	Status IterativBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 0.001, Index itmax = 0);
+	Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0, CallbackIterative = nullptr);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);
@@ -62,8 +65,8 @@ namespace eilig
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
-	Status IterativCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 0.001, Index itmax = 0);
-	Status IterativBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 0.001, Index itmax = 0);
+	Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);

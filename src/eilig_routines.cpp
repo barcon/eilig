@@ -396,7 +396,7 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    Status IterativJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Index numberRows = A.GetRows();
@@ -448,6 +448,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x2;
                 break;
             }
 
@@ -459,16 +460,10 @@ namespace eilig
             logger::Error(headerEilig, "JACOBI solver NOT converged after %d iterations", max);
             return status;
         }
-        else
-        {
-            logger::Info(headerEilig, "JACOBI iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "JACOBI solver converged");
-            x = x2;
-        }
 
         return status;
     }
-    Status IterativGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Index numberRows = A.GetRows();
@@ -520,6 +515,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x2;
                 break;
             }
 
@@ -531,16 +527,10 @@ namespace eilig
             logger::Error(headerEilig, "GAUSS solver NOT converged after %d iterations", max);
             return status;
         }
-        else
-        {
-            logger::Info(headerEilig, "JACOBI iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "GAUSS solver converged");
-            x = x2;
-        }
 
         return status;
     }
-    Status IterativCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Scalar residualNorm;
@@ -595,6 +585,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x1;
                 break;
             }
 
@@ -611,17 +602,10 @@ namespace eilig
             logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
             return status;
         }
-        else
-        {
-            
-            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "CGM solver converged");
-            x = x1;
-        }
 
         return status;
     }
-    Status IterativBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Scalar residualNorm;
@@ -697,6 +681,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x1;
                 break;
             }
 
@@ -716,11 +701,113 @@ namespace eilig
             logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
             return status;
         }
-        else
+
+        return status;
+    }
+    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax, CallbackIterative callback)
+    {
+        Status status = EILIG_RUNNING;
+        Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
+        Scalar alpha{ 0.0 };
+        Scalar beta;
+        Scalar omega;
+        Scalar rho0;
+        Scalar rho1;
+
+        Index numberRows = A.GetRows();
+        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration = { 0 };
+
+        Vector x0(numberRows);
+        Vector r0(numberRows);
+        Vector p0(numberRows);
+        Vector s0(numberRows);
+        Vector t0(numberRows);
+        Vector x1(numberRows);
+        Vector r1(numberRows);
+        Vector p1(numberRows);
+        Vector residual(numberRows);
+        Vector aux(numberRows);
+        Vector aux1(numberRows);
+        Vector aux2(numberRows);
+        Vector aux3(numberRows);
+        Vector aux4(numberRows);
+
+        if (itmax != 0)
         {
-            logger::Info(headerEilig, "BiCGStab iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "BiCGStab solver converged");
-            x = x1;
+            max = itmax;
+        }
+
+        if (rtol <= 0.)
+        {
+            status = EILIG_INVALID_TOLERANCE;
+            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
+            return status;
+        }
+
+        x0 = 0.;
+
+        Mul(aux, -A, x0);
+        Add(r0, aux, b);
+        p0 = r0;
+        aux2 = r0;
+
+        rho0 = Dot(r0, r0);
+
+        for (iteration = 0; iteration < max; ++iteration)
+        {
+            Mul(aux1, A, p0);
+            alpha = rho0 / Dot(aux1, aux2);
+
+            s0 = aux1;
+
+            s0 = s0 * (-alpha) + r0;
+            Mul(t0, A, s0);
+
+            omega = Dot(t0, s0) / Dot(t0, t0);
+
+            aux3 = s0 * omega;
+            aux4 = p0 * alpha;
+
+            x1 = x0 + aux3 + aux4;
+            r1 = (t0 * (-omega)) + s0;
+
+            residualNorm = NormP2(r1);
+
+            if (residualNorm < rtol)
+            {
+                status = EILIG_SUCCESS;
+                x = x1;
+
+                if (callback != nullptr)
+                {
+                    callback(status, iteration, residualNorm);
+                }
+
+                return status;
+            }
+
+            if (callback != nullptr)
+            {
+              auto  = callback(status, iteration, residualNorm);
+            }
+
+            rho1 = Dot(r1, aux2);
+            beta = (rho1 / rho0) * (alpha / omega);
+
+            p1 = (aux1 * (-omega) + p0) * beta + r1;
+
+            p0 = p1;
+            x0 = x1;
+            r0 = r1;
+            rho0 = rho1;
+        }
+
+        status = EILIG_NOT_CONVERGED;
+
+        if (callback != nullptr)
+        {
+            callback(status, max, residualNorm);
         }
 
         return status;
@@ -1236,7 +1323,7 @@ namespace eilig
 
         return res;
     }
-    Status IterativCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
+    Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Scalar residualNorm;
@@ -1291,6 +1378,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x1;
                 break;
             }
 
@@ -1307,16 +1395,10 @@ namespace eilig
             logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
             return status;
         }
-        else
-        {
-            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "CGM solver converged");
-            x = x1;
-        }
 
         return status;
     }
-    Status IterativBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
+    Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
     {
         Status status;
         Scalar residualNorm;
@@ -1392,6 +1474,7 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+                x = x1;
                 break;
             }
 
@@ -1410,12 +1493,6 @@ namespace eilig
         {
             logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
             return status;
-        }
-        else
-        {
-            logger::Info(headerEilig, "BiCGStab iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-            //logger::Info(headerEilig, "BiCGStab solver converged");
-            x = x1;
         }
 
         return status;
