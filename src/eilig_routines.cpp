@@ -398,7 +398,7 @@ namespace eilig
     }
     Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Index numberRows = A.GetRows();
         Index numberCols = A.GetCols();
         Index max = static_cast<Index>(std::pow(numberRows, 1.5));
@@ -431,7 +431,6 @@ namespace eilig
         M = A.Diagonal();
         N = -(A.Lower(false) + A.Upper(false));
 
-        status = EILIG_NOT_CONVERGED;
         for (iteration = 1; iteration < max; ++iteration)
         {
             Mul(aux, N, x1);
@@ -449,23 +448,21 @@ namespace eilig
             {
                 status = EILIG_SUCCESS;
                 x = x2;
-                break;
+                
+                return EILIG_SUCCESS;
             }
 
             x1 = x2;
         }
 
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "JACOBI solver NOT converged after %d iterations", max);
-            return status;
-        }
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "JACOBI solver NOT converged after %d iterations", max);
 
         return status;
     }
     Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Index numberRows = A.GetRows();
         Index numberCols = A.GetCols();
         Index max = static_cast<Index>(std::pow(numberRows, 1.5));
@@ -498,7 +495,6 @@ namespace eilig
         M = A.Lower(true);
         N = -(A.Upper(false));
 
-        status = EILIG_NOT_CONVERGED;
         for (iteration = 1; iteration < max; ++iteration)
         {
             Mul(aux, N, x1);
@@ -516,23 +512,21 @@ namespace eilig
             {
                 status = EILIG_SUCCESS;
                 x = x2;
-                break;
+                
+                return status;
             }
 
             x1 = x2;
         }
 
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "GAUSS solver NOT converged after %d iterations", max);
-            return status;
-        }
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "GAUSS solver NOT converged after %d iterations", max);
 
-        return status;
+        return status
     }
     Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Scalar residualNorm;
         Scalar alpha;
         Scalar beta;
@@ -568,8 +562,6 @@ namespace eilig
         Add(r0, aux, b);
         p0 = r0;
 
-        status = EILIG_NOT_CONVERGED;
-
         for (iteration = 0; iteration < max; ++iteration)
         {
             Mul(aux, A, p0);
@@ -597,17 +589,14 @@ namespace eilig
             r0 = r1;
         }
 
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
-            return status;
-        }
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
 
         return status;
     }
     Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Scalar residualNorm;
         Scalar alpha{ 0.0 };
         Scalar beta;
@@ -655,7 +644,6 @@ namespace eilig
 
         rho0 = Dot(r0, r0);
 
-        status = EILIG_NOT_CONVERGED;
         for (iteration = 0; iteration < max; ++iteration)
         {
             Mul(aux1, A, p0);
@@ -696,15 +684,12 @@ namespace eilig
             rho0 = rho1;
         }
 
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
-            return status;
-        }
-
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
+        
         return status;
     }
-    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax, CallbackIterative callback)
+    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax, CallbackIterative callback)
     {
         Status status = EILIG_RUNNING;
         Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
@@ -733,6 +718,13 @@ namespace eilig
         Vector aux3(numberRows);
         Vector aux4(numberRows);
 
+        if (callback == nullptr)
+        {
+            status = EILIG_NULLPTR;
+            logger::Error(headerEilig, "Invalid callback (null pointer)");
+            return;
+        }
+
         if (itmax != 0)
         {
             max = itmax;
@@ -742,7 +734,7 @@ namespace eilig
         {
             status = EILIG_INVALID_TOLERANCE;
             logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
+            return;
         }
 
         x0 = 0.;
@@ -778,18 +770,19 @@ namespace eilig
             {
                 status = EILIG_SUCCESS;
                 x = x1;
+                
+                callback(status, iteration, residualNorm);
 
-                if (callback != nullptr)
-                {
-                    callback(status, iteration, residualNorm);
-                }
-
-                return status;
+                return;
             }
 
-            if (callback != nullptr)
+            switch (callback(status, iteration, residualNorm))
             {
-              auto  = callback(status, iteration, residualNorm);
+            case EILIG_STOP:
+                x = x1;
+                return;
+            case EILIG_CONTINUE:
+                break;
             }
 
             rho1 = Dot(r1, aux2);
@@ -804,13 +797,7 @@ namespace eilig
         }
 
         status = EILIG_NOT_CONVERGED;
-
-        if (callback != nullptr)
-        {
-            callback(status, max, residualNorm);
-        }
-
-        return status;
+        callback(status, iteration, residualNorm);
     }
     void WriteToFile(const Vector& vec, const String& fileName)
     {
@@ -1325,7 +1312,7 @@ namespace eilig
     }
     Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Scalar residualNorm;
         Scalar alpha;
         Scalar beta;
@@ -1400,7 +1387,7 @@ namespace eilig
     }
     Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
     {
-        Status status;
+        Status status = EILIG_RUNNING;
         Scalar residualNorm;
         Scalar alpha{ 0.0 };
         Scalar beta;

@@ -43,7 +43,7 @@ namespace eilig
 	Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
 	Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
 	Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0, CallbackIterative = nullptr);
+	void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0, CallbackIterative = nullptr);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);
