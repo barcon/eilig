@@ -396,312 +396,19 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
-    {
-        Status status = EILIG_RUNNING;
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
-
-        Scalar residualNorm;
-
-        Vector x1(numberRows);
-        Vector x2(numberRows);
-        Vector u(numberRows);
-        Vector v(numberRows);
-        Vector aux(numberRows);
-        Vector residual(numberRows);
-        Ellpack M;
-        Ellpack N;
-
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
-        }
-
-        x1 = 0.;
-        M = A.Diagonal();
-        N = -(A.Lower(false) + A.Upper(false));
-
-        for (iteration = 1; iteration < max; ++iteration)
-        {
-            Mul(aux, N, x1);
-            Add(u, aux, b);
-            DiagonalLinearSystem(x2, M, u);
-
-            Mul(aux, A, x2);
-            Sub(residual, aux, b);
-
-            residualNorm = NormP2(residual);
-
-            logger::Info(headerEilig, "JACOBI iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
-            if (residualNorm < rtol)
-            {
-                status = EILIG_SUCCESS;
-                x = x2;
-                
-                return EILIG_SUCCESS;
-            }
-
-            x1 = x2;
-        }
-
-        status = EILIG_NOT_CONVERGED;
-        logger::Error(headerEilig, "JACOBI solver NOT converged after %d iterations", max);
-
-        return status;
-    }
-    Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
-    {
-        Status status = EILIG_RUNNING;
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
-
-        Scalar residualNorm;
-
-        Vector x1(numberRows);
-        Vector x2(numberRows);
-        Vector u(numberRows);
-        Vector v(numberRows);
-        Vector aux(numberRows);
-        Vector residual(numberRows);
-        Ellpack M(numberRows, numberCols);
-        Ellpack N(numberRows, numberCols);
-
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
-        }
-
-        x1 = 0.;
-        M = A.Lower(true);
-        N = -(A.Upper(false));
-
-        for (iteration = 1; iteration < max; ++iteration)
-        {
-            Mul(aux, N, x1);
-            Add(u, aux, b);
-            ForwardLinearSystem(x2, M, u);
-
-            Mul(aux, A, x2);
-            Sub(residual, aux, b);
-
-            residualNorm = NormP2(residual);
-
-            logger::Info(headerEilig, "GAUSS iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
-            if (residualNorm < rtol)
-            {
-                status = EILIG_SUCCESS;
-                x = x2;
-                
-                return status;
-            }
-
-            x1 = x2;
-        }
-
-        status = EILIG_NOT_CONVERGED;
-        logger::Error(headerEilig, "GAUSS solver NOT converged after %d iterations", max);
-
-        return status
-    }
-    Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
-    {
-        Status status = EILIG_RUNNING;
-        Scalar residualNorm;
-        Scalar alpha;
-        Scalar beta;
-
-        Index numberRows = A.GetRows();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector x1(numberRows);
-        Vector r1(numberRows);
-        Vector p1(numberRows);
-        Vector aux(numberRows);
-        Vector residual(numberRows);
-
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
-        }
-
-        x0 = 0.;
-
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
-        p0 = r0;
-
-        for (iteration = 0; iteration < max; ++iteration)
-        {
-            Mul(aux, A, p0);
-            alpha = Dot(r0, r0) / Dot(p0, aux);
-
-            r1 = aux * (-alpha) + r0;
-            x1 = p0 * alpha + x0;
-
-            residualNorm = NormP2(r1);
-
-            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
-            if (residualNorm < rtol)
-            {
-                status = EILIG_SUCCESS;
-                x = x1;
-                break;
-            }
-
-            beta = Dot(r1, r1) / Dot(r0, r0);
-
-            p0 = p0 * beta + r1;
-
-            x0 = x1;
-            r0 = r1;
-        }
-
-        status = EILIG_NOT_CONVERGED;
-        logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
-
-        return status;
-    }
-    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
-    {
-        Status status = EILIG_RUNNING;
-        Scalar residualNorm;
-        Scalar alpha{ 0.0 };
-        Scalar beta;
-        Scalar omega;
-        Scalar rho0;
-        Scalar rho1;
-
-        Index numberRows = A.GetRows();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector s0(numberRows);
-        Vector t0(numberRows);
-        Vector x1(numberRows);
-        Vector r1(numberRows);
-        Vector p1(numberRows);
-        Vector residual(numberRows);
-        Vector aux(numberRows);
-        Vector aux1(numberRows);
-        Vector aux2(numberRows);
-        Vector aux3(numberRows);
-        Vector aux4(numberRows);
-
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
-        }
-
-        x0 = 0.;
-
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
-        p0 = r0;
-        aux2 = r0;
-
-        rho0 = Dot(r0, r0);
-
-        for (iteration = 0; iteration < max; ++iteration)
-        {
-            Mul(aux1, A, p0);
-            alpha = rho0 / Dot(aux1, aux2);
-
-            s0 = aux1;
-
-            s0 = s0 * (-alpha) + r0;
-            Mul(t0, A, s0);
-
-            omega = Dot(t0, s0) / Dot(t0, t0);
-
-            aux3 = s0 * omega;
-            aux4 = p0 * alpha;
-
-            x1 = x0 + aux3 + aux4;
-            r1 = (t0 * (-omega)) + s0;
-
-            residualNorm = NormP2(r1);
-
-            logger::Info(headerEilig, "BiCGStab iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
-            if (residualNorm < rtol)
-            {
-                status = EILIG_SUCCESS;
-                x = x1;
-                break;
-            }
-
-            rho1 = Dot(r1, aux2);
-            beta = (rho1 / rho0) * (alpha / omega);
-
-            p1 = (aux1 * (-omega) + p0) * beta + r1;
-
-            p0 = p1;
-            x0 = x1;
-            r0 = r1;
-            rho0 = rho1;
-        }
-
-        status = EILIG_NOT_CONVERGED;
-        logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
-        
-        return status;
-    }
-    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax, CallbackIterative callback)
+    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Status(*callbackIterative)(Status, Index, Scalar))
     {
         Status status = EILIG_RUNNING;
         Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
         Scalar alpha{ 0.0 };
-        Scalar beta;
-        Scalar omega;
-        Scalar rho0;
-        Scalar rho1;
+        Scalar beta{ 0.0 };
+        Scalar omega{ 0.0 };
+        Scalar rho0{ 0.0 };
+        Scalar rho1{ 0.0 };
 
         Index numberRows = A.GetRows();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
+        Index iterationMax = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration { 0 };
 
         Vector x0(numberRows);
         Vector r0(numberRows);
@@ -718,18 +425,13 @@ namespace eilig
         Vector aux3(numberRows);
         Vector aux4(numberRows);
 
-        if (callback == nullptr)
+        if (callbackIterative == nullptr)
         {
             status = EILIG_NULLPTR;
             logger::Error(headerEilig, "Invalid callback (null pointer)");
             return;
         }
 
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
         if (rtol <= 0.)
         {
             status = EILIG_INVALID_TOLERANCE;
@@ -738,7 +440,7 @@ namespace eilig
         }
 
         x0 = 0.;
-
+        
         Mul(aux, -A, x0);
         Add(r0, aux, b);
         p0 = r0;
@@ -746,7 +448,7 @@ namespace eilig
 
         rho0 = Dot(r0, r0);
 
-        for (iteration = 0; iteration < max; ++iteration)
+        for (iteration = 0; iteration < iterationMax; ++iteration)
         {
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
@@ -769,14 +471,9 @@ namespace eilig
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
-                x = x1;
-                
-                callback(status, iteration, residualNorm);
-
-                return;
             }
 
-            switch (callback(status, iteration, residualNorm))
+            switch (callbackIterative(status, iteration, residualNorm))
             {
             case EILIG_STOP:
                 x = x1;
@@ -797,7 +494,7 @@ namespace eilig
         }
 
         status = EILIG_NOT_CONVERGED;
-        callback(status, iteration, residualNorm);
+        callbackIterative(status, iteration, residualNorm);
     }
     void WriteToFile(const Vector& vec, const String& fileName)
     {
@@ -1310,85 +1007,10 @@ namespace eilig
 
         return res;
     }
-    Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
+    void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Status(*callbackIterative)(Status, Index, Scalar))
     {
         Status status = EILIG_RUNNING;
-        Scalar residualNorm;
-        Scalar alpha;
-        Scalar beta;
-
-        Index numberRows = A.GetRows();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
-        Index iteration = { 0 };
-
-        opencl::Vector x0(b.GetKernels(), numberRows);
-        opencl::Vector r0(b.GetKernels(), numberRows);
-        opencl::Vector p0(b.GetKernels(), numberRows);
-        opencl::Vector x1(b.GetKernels(), numberRows);
-        opencl::Vector r1(b.GetKernels(), numberRows);
-        opencl::Vector p1(b.GetKernels(), numberRows);
-        opencl::Vector aux(b.GetKernels(), numberRows);
-        opencl::Vector residual(b.GetKernels(), numberRows);
-
-        if (itmax != 0)
-        {
-            max = itmax;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
-        }
-
-        x0 = 0.;
-
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
-        p0 = r0;
-
-        status = EILIG_NOT_CONVERGED;
-
-        for (iteration = 0; iteration < max; ++iteration)
-        {
-            Mul(aux, A, p0);
-            alpha = Dot(r0, r0) / Dot(p0, aux);
-
-            r1 = aux * (-alpha) + r0;
-            x1 = p0 * alpha + x0;
-
-            residualNorm = NormP2(r1);
-
-            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
-            if (residualNorm < rtol)
-            {
-                status = EILIG_SUCCESS;
-                x = x1;
-                break;
-            }
-
-            beta = Dot(r1, r1) / Dot(r0, r0);
-
-            p0 = p0 * beta + r1;
-
-            x0 = x1;
-            r0 = r1;
-        }
-
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
-            return status;
-        }
-
-        return status;
-    }
-    Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
-    {
-        Status status = EILIG_RUNNING;
-        Scalar residualNorm;
+        Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
         Scalar alpha{ 0.0 };
         Scalar beta;
         Scalar omega;
@@ -1396,7 +1018,7 @@ namespace eilig
         Scalar rho1;
 
         Index numberRows = A.GetRows();
-        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iterationMax = static_cast<Index>(std::pow(numberRows, 1.5));
         Index iteration = { 0 };
 
         opencl::Vector x0(b.GetKernels(), numberRows);
@@ -1414,16 +1036,18 @@ namespace eilig
         opencl::Vector aux3(b.GetKernels(), numberRows);
         opencl::Vector aux4(b.GetKernels(), numberRows);
 
-        if (itmax != 0)
+        if (callbackIterative == nullptr)
         {
-            max = itmax;
+            status = EILIG_NULLPTR;
+            logger::Error(headerEilig, "Invalid callback (null pointer)");
+            return;
         }
 
         if (rtol <= 0.)
         {
             status = EILIG_INVALID_TOLERANCE;
             logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return status;
+            return;
         }
 
         x0 = 0.;
@@ -1435,8 +1059,7 @@ namespace eilig
 
         rho0 = Dot(r0, r0);
 
-        status = EILIG_NOT_CONVERGED;
-        for (iteration = 0; iteration < max; ++iteration)
+        for (iteration = 0; iteration < iterationMax; ++iteration)
         {
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
@@ -1456,12 +1079,17 @@ namespace eilig
 
             residualNorm = NormP2(r1);
 
-            logger::Info(headerEilig, "BiCGStab iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
-
             if (residualNorm < rtol)
             {
                 status = EILIG_SUCCESS;
+            }
+
+            switch (callbackIterative(status, iteration, residualNorm))
+            {
+            case EILIG_STOP:
                 x = x1;
+                return;
+            case EILIG_CONTINUE:
                 break;
             }
 
@@ -1476,13 +1104,8 @@ namespace eilig
             rho0 = rho1;
         }
 
-        if (status != EILIG_SUCCESS)
-        {
-            logger::Error(headerEilig, "BiCGStab solver NOT converged after %d iterations", max);
-            return status;
-        }
-
-        return status;
+        status = EILIG_NOT_CONVERGED;
+        callbackIterative(status, iteration, residualNorm);
     }
     void WriteToFile(const opencl::Vector& vec, const String& fileName)
     {
@@ -1666,3 +1289,280 @@ namespace eilig
 #endif    
 
 } /* namespace eilig */
+
+/*
+    Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    {
+        Status status = EILIG_RUNNING;
+        Index numberRows = A.GetRows();
+        Index numberCols = A.GetCols();
+        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration = { 0 };
+
+        Scalar residualNorm;
+
+        Vector x1(numberRows);
+        Vector x2(numberRows);
+        Vector u(numberRows);
+        Vector v(numberRows);
+        Vector aux(numberRows);
+        Vector residual(numberRows);
+        Ellpack M;
+        Ellpack N;
+
+        if (itmax != 0)
+        {
+            max = itmax;
+        }
+
+        if (rtol <= 0.)
+        {
+            status = EILIG_INVALID_TOLERANCE;
+            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
+            return status;
+        }
+
+        x1 = 0.;
+        M = A.Diagonal();
+        N = -(A.Lower(false) + A.Upper(false));
+
+        for (iteration = 1; iteration < max; ++iteration)
+        {
+            Mul(aux, N, x1);
+            Add(u, aux, b);
+            DiagonalLinearSystem(x2, M, u);
+
+            Mul(aux, A, x2);
+            Sub(residual, aux, b);
+
+            residualNorm = NormP2(residual);
+
+            logger::Info(headerEilig, "JACOBI iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
+
+            if (residualNorm < rtol)
+            {
+                status = EILIG_SUCCESS;
+                x = x2;
+
+                return EILIG_SUCCESS;
+            }
+
+            x1 = x2;
+        }
+
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "JACOBI solver NOT converged after %d iterations", max);
+
+        return status;
+    }
+    Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    {
+        Status status = EILIG_RUNNING;
+        Index numberRows = A.GetRows();
+        Index numberCols = A.GetCols();
+        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration = { 0 };
+
+        Scalar residualNorm;
+
+        Vector x1(numberRows);
+        Vector x2(numberRows);
+        Vector u(numberRows);
+        Vector v(numberRows);
+        Vector aux(numberRows);
+        Vector residual(numberRows);
+        Ellpack M(numberRows, numberCols);
+        Ellpack N(numberRows, numberCols);
+
+        if (itmax != 0)
+        {
+            max = itmax;
+        }
+
+        if (rtol <= 0.)
+        {
+            status = EILIG_INVALID_TOLERANCE;
+            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
+            return status;
+        }
+
+        x1 = 0.;
+        M = A.Lower(true);
+        N = -(A.Upper(false));
+
+        for (iteration = 1; iteration < max; ++iteration)
+        {
+            Mul(aux, N, x1);
+            Add(u, aux, b);
+            ForwardLinearSystem(x2, M, u);
+
+            Mul(aux, A, x2);
+            Sub(residual, aux, b);
+
+            residualNorm = NormP2(residual);
+
+            logger::Info(headerEilig, "GAUSS iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
+
+            if (residualNorm < rtol)
+            {
+                status = EILIG_SUCCESS;
+                x = x2;
+
+                return status;
+            }
+
+            x1 = x2;
+        }
+
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "GAUSS solver NOT converged after %d iterations", max);
+
+        return status;
+    }
+    Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Index itmax)
+    {
+        Status status = EILIG_RUNNING;
+        Scalar residualNorm;
+        Scalar alpha;
+        Scalar beta;
+
+        Index numberRows = A.GetRows();
+        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration = { 0 };
+
+        Vector x0(numberRows);
+        Vector r0(numberRows);
+        Vector p0(numberRows);
+        Vector x1(numberRows);
+        Vector r1(numberRows);
+        Vector p1(numberRows);
+        Vector aux(numberRows);
+        Vector residual(numberRows);
+
+        if (itmax != 0)
+        {
+            max = itmax;
+        }
+
+        if (rtol <= 0.)
+        {
+            status = EILIG_INVALID_TOLERANCE;
+            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
+            return status;
+        }
+
+        x0 = 0.;
+
+        Mul(aux, -A, x0);
+        Add(r0, aux, b);
+        p0 = r0;
+
+        for (iteration = 0; iteration < max; ++iteration)
+        {
+            Mul(aux, A, p0);
+            alpha = Dot(r0, r0) / Dot(p0, aux);
+
+            r1 = aux * (-alpha) + r0;
+            x1 = p0 * alpha + x0;
+
+            residualNorm = NormP2(r1);
+
+            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
+
+            if (residualNorm < rtol)
+            {
+                status = EILIG_SUCCESS;
+                x = x1;
+                break;
+            }
+
+            beta = Dot(r1, r1) / Dot(r0, r0);
+
+            p0 = p0 * beta + r1;
+
+            x0 = x1;
+            r0 = r1;
+        }
+
+        status = EILIG_NOT_CONVERGED;
+        logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
+
+        return status;
+    }
+
+    Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Index itmax)
+    {
+        Status status = EILIG_RUNNING;
+        Scalar residualNorm;
+        Scalar alpha;
+        Scalar beta;
+
+        Index numberRows = A.GetRows();
+        Index max = static_cast<Index>(std::pow(numberRows, 1.5));
+        Index iteration = { 0 };
+
+        opencl::Vector x0(b.GetKernels(), numberRows);
+        opencl::Vector r0(b.GetKernels(), numberRows);
+        opencl::Vector p0(b.GetKernels(), numberRows);
+        opencl::Vector x1(b.GetKernels(), numberRows);
+        opencl::Vector r1(b.GetKernels(), numberRows);
+        opencl::Vector p1(b.GetKernels(), numberRows);
+        opencl::Vector aux(b.GetKernels(), numberRows);
+        opencl::Vector residual(b.GetKernels(), numberRows);
+
+        if (itmax != 0)
+        {
+            max = itmax;
+        }
+
+        if (rtol <= 0.)
+        {
+            status = EILIG_INVALID_TOLERANCE;
+            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
+            return status;
+        }
+
+        x0 = 0.;
+
+        Mul(aux, -A, x0);
+        Add(r0, aux, b);
+        p0 = r0;
+
+        status = EILIG_NOT_CONVERGED;
+
+        for (iteration = 0; iteration < max; ++iteration)
+        {
+            Mul(aux, A, p0);
+            alpha = Dot(r0, r0) / Dot(p0, aux);
+
+            r1 = aux * (-alpha) + r0;
+            x1 = p0 * alpha + x0;
+
+            residualNorm = NormP2(r1);
+
+            logger::Info(headerEilig, "CGM iteration = %4u | residual = %10.4e | tol = %10.4e", iteration, residualNorm, rtol);
+
+            if (residualNorm < rtol)
+            {
+                status = EILIG_SUCCESS;
+                x = x1;
+                break;
+            }
+
+            beta = Dot(r1, r1) / Dot(r0, r0);
+
+            p0 = p0 * beta + r1;
+
+            x0 = x1;
+            r0 = r1;
+        }
+
+        if (status != EILIG_SUCCESS)
+        {
+            logger::Error(headerEilig, "CGM solver NOT converged after %d iterations", max);
+            return status;
+        }
+
+        return status;
+    }
+*/

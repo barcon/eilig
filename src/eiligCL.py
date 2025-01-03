@@ -1071,12 +1071,6 @@ def ForwardLinearSystem(*args):
 def DirectLUP(x, LU, permutation, b):
     return _eiligCL.DirectLUP(x, LU, permutation, b)
 
-def IterativJacobi(x, A, b, rtol=0.001, itmax=0):
-    return _eiligCL.IterativJacobi(x, A, b, rtol, itmax)
-
-def IterativGauss(x, A, b, rtol=0.001, itmax=0):
-    return _eiligCL.IterativGauss(x, A, b, rtol, itmax)
-
 def NormMax(*args):
     return _eiligCL.NormMax(*args)
 
@@ -1089,11 +1083,8 @@ def NormP2(*args):
 def Dot(*args):
     return _eiligCL.Dot(*args)
 
-def IterativCG(*args):
-    return _eiligCL.IterativCG(*args)
-
-def IterativBiCGStab(*args):
-    return _eiligCL.IterativBiCGStab(*args)
+def IterativeBiCGStab(*args):
+    return _eiligCL.IterativeBiCGStab(*args)
 
 def WriteToFile(*args):
     return _eiligCL.WriteToFile(*args)
@@ -1195,5 +1186,29 @@ def SetItemEllpackCL(self, index, value):
 EllpackCL.__getitem__ = GetItemEllpackCL
 EllpackCL.__setitem__ = SetItemEllpackCL
 
+import ctypes
 
+py_callback_iterative = ctypes.CFUNCTYPE(ctypes.c_longlong, ctypes.c_longlong, ctypes.c_size_t, ctypes.c_double)
+
+def IterativeBiCGStab(x, A, b, rtol, callback):
+
+# wrap the python callback with a ctypes function pointer
+    f = py_callback_iterative(callback)
+
+# get the function pointer of the ctypes wrapper by casting it to void* and taking its value
+    f_ptr = ctypes.cast(f, ctypes.c_void_p).value
+
+    _dive.IterativeBiCGStab(x, A, b, rtol, f_ptr)
+
+
+
+EILIG_STOP = cvar.EILIG_STOP
+EILIG_CONTINUE = cvar.EILIG_CONTINUE
+EILIG_RUNNING = cvar.EILIG_RUNNING
+EILIG_SUCCESS = cvar.EILIG_SUCCESS
+EILIG_NOT_CONVERGED = cvar.EILIG_NOT_CONVERGED
+EILIG_INVALID_TOLERANCE = cvar.EILIG_INVALID_TOLERANCE
+EILIG_INVALID_FILE = cvar.EILIG_INVALID_FILE
+EILIG_NULLPTR = cvar.EILIG_NULLPTR
+messages = cvar.messages
 

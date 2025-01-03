@@ -12,8 +12,6 @@
 
 namespace eilig
 {
-	using CallbackIterative = Status (*)(Status status, Index iteration, Scalar residual);
-
     Scalar NormMax(const Vector& in);
     Scalar NormP(const Vector& in, Scalar p);
     Scalar NormP(const Matrix& in, Scalar p);
@@ -36,14 +34,8 @@ namespace eilig
 	void DiagonalLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
 	void ForwardLinearSystem(Vector& x, const Matrix& A, const Vector& b);
 	void ForwardLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
-
 	void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b);
-
-	Status IterativeJacobi(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	Status IterativeGauss(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	Status IterativeCG(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0, CallbackIterative = nullptr);
+	void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Status (*callbackIterative)(Status, Index, Scalar));
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);
@@ -65,8 +57,7 @@ namespace eilig
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
-	Status IterativeCG(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
-	Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol = 1.0e-6, Index itmax = 0);
+	void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Status (*callbackIterative)(Status, Index, Scalar));
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);

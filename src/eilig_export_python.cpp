@@ -3161,26 +3161,28 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_eilig__Ellpack swig_types[4]
 #define SWIGTYPE_p_eilig__Matrix swig_types[5]
 #define SWIGTYPE_p_eilig__Vector swig_types[6]
-#define SWIGTYPE_p_long_long swig_types[7]
-#define SWIGTYPE_p_p_PyObject swig_types[8]
-#define SWIGTYPE_p_size_t swig_types[9]
-#define SWIGTYPE_p_size_type swig_types[10]
-#define SWIGTYPE_p_std__allocatorT_double_t swig_types[11]
-#define SWIGTYPE_p_std__allocatorT_std__size_t_t swig_types[12]
-#define SWIGTYPE_p_std__allocatorT_std__vectorT_double_t_t swig_types[13]
-#define SWIGTYPE_p_std__invalid_argument swig_types[14]
-#define SWIGTYPE_p_std__string swig_types[15]
-#define SWIGTYPE_p_std__vectorT_double_t swig_types[16]
-#define SWIGTYPE_p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t swig_types[17]
-#define SWIGTYPE_p_std__vectorT_eilig__Matrix_std__allocatorT_eilig__Matrix_t_t swig_types[18]
-#define SWIGTYPE_p_std__vectorT_eilig__Vector_std__allocatorT_eilig__Vector_t_t swig_types[19]
-#define SWIGTYPE_p_std__vectorT_std__size_t_t swig_types[20]
-#define SWIGTYPE_p_std__vectorT_std__vectorT_double_t_t swig_types[21]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[22]
-#define SWIGTYPE_p_utils__file__Text swig_types[23]
-#define SWIGTYPE_p_value_type swig_types[24]
-static swig_type_info *swig_types[26];
-static swig_module_info swig_module = {swig_types, 25, 0, 0, 0, 0};
+#define SWIGTYPE_p_f_long_long___size_t_double__long_long swig_types[7]
+#define SWIGTYPE_p_long_long swig_types[8]
+#define SWIGTYPE_p_p_PyObject swig_types[9]
+#define SWIGTYPE_p_size_t swig_types[10]
+#define SWIGTYPE_p_size_type swig_types[11]
+#define SWIGTYPE_p_std__allocatorT_double_t swig_types[12]
+#define SWIGTYPE_p_std__allocatorT_std__size_t_t swig_types[13]
+#define SWIGTYPE_p_std__allocatorT_std__vectorT_double_t_t swig_types[14]
+#define SWIGTYPE_p_std__invalid_argument swig_types[15]
+#define SWIGTYPE_p_std__mapT_long_long_std__string_t swig_types[16]
+#define SWIGTYPE_p_std__string swig_types[17]
+#define SWIGTYPE_p_std__vectorT_double_t swig_types[18]
+#define SWIGTYPE_p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t swig_types[19]
+#define SWIGTYPE_p_std__vectorT_eilig__Matrix_std__allocatorT_eilig__Matrix_t_t swig_types[20]
+#define SWIGTYPE_p_std__vectorT_eilig__Vector_std__allocatorT_eilig__Vector_t_t swig_types[21]
+#define SWIGTYPE_p_std__vectorT_std__size_t_t swig_types[22]
+#define SWIGTYPE_p_std__vectorT_std__vectorT_double_t_t swig_types[23]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[24]
+#define SWIGTYPE_p_utils__file__Text swig_types[25]
+#define SWIGTYPE_p_value_type swig_types[26]
+static swig_type_info *swig_types[28];
+static swig_module_info swig_module = {swig_types, 27, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3869,6 +3871,7 @@ SWIG_AsVal_ptrdiff_t (PyObject * obj, ptrdiff_t *val)
 	#include "eilig_matrix_ellpack.hpp"
 	#include "eilig_routines.hpp"
 	#include "eilig_transform.hpp"
+	#include "eilig_status.hpp"
 
 	using Scalar = double;
 	using Status = long long int;
@@ -3879,7 +3882,7 @@ SWIG_AsVal_ptrdiff_t (PyObject * obj, ptrdiff_t *val)
 	using Axis = std::size_t;
 	
 	using Indices = std::vector<Index>;
-	using Scalars = std::vector<Scalar>;
+	using Scalars = std::vector<Scalar>;		
 
 
 namespace swig {
@@ -18416,13 +18419,13 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_IterativJacobi__SWIG_0(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
+SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
   eilig::Vector *arg1 = 0 ;
   eilig::Ellpack *arg2 = 0 ;
   eilig::Vector *arg3 = 0 ;
   eilig::Scalar arg4 ;
-  eilig::Index arg5 ;
+  eilig::Status (*arg5)(eilig::Status,eilig::Index,eilig::Scalar) = (eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18431,1000 +18434,50 @@ SWIGINTERN PyObject *_wrap_IterativJacobi__SWIG_0(PyObject *self, Py_ssize_t nob
   int res3 = 0 ;
   double val4 ;
   int ecode4 = 0 ;
-  size_t val5 ;
-  int ecode5 = 0 ;
-  eilig::Status result;
+  PyObject *swig_obj[5] ;
   
   (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "IterativeBiCGStab", 5, 5, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
   }
   if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
   }
   arg1 = reinterpret_cast< eilig::Vector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
   }
   arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativeBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
   }
   arg3 = reinterpret_cast< eilig::Vector * >(argp3);
   ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativJacobi" "', argument " "4"" of type '" "eilig::Scalar""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "eilig::Scalar""'");
   } 
   arg4 = static_cast< eilig::Scalar >(val4);
-  ecode5 = SWIG_AsVal_size_t(swig_obj[4], &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "IterativJacobi" "', argument " "5"" of type '" "eilig::Index""'");
-  } 
-  arg5 = static_cast< eilig::Index >(val5);
-  result = (eilig::Status)eilig::IterativJacobi(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,SWIG_STD_MOVE(arg5));
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
+  {
+    int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
+    if (!SWIG_IsOK(res)) {
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)""'"); 
+    }
+  }
+  eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativJacobi__SWIG_1(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativJacobi" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  result = (eilig::Status)eilig::IterativJacobi(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativJacobi__SWIG_2(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativJacobi" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  result = (eilig::Status)eilig::IterativJacobi(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativJacobi(PyObject *self, PyObject *args) {
-  Py_ssize_t argc;
-  PyObject *argv[6] = {
-    0
-  };
-  
-  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativJacobi", 0, 5, argv))) SWIG_fail;
-  --argc;
-  if (argc == 3) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          return _wrap_IterativJacobi__SWIG_2(self, argc, argv);
-        }
-      }
-    }
-  }
-  if (argc == 4) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            return _wrap_IterativJacobi__SWIG_1(self, argc, argv);
-          }
-        }
-      }
-    }
-  }
-  if (argc == 5) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            {
-              int res = SWIG_AsVal_size_t(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
-            if (_v) {
-              return _wrap_IterativJacobi__SWIG_0(self, argc, argv);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativJacobi'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativJacobi(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,eilig::Index)\n"
-    "    eilig::IterativJacobi(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar)\n"
-    "    eilig::IterativJacobi(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &)\n");
-  return 0;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativGauss__SWIG_0(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  eilig::Index arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  size_t val5 ;
-  int ecode5 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativGauss" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  ecode5 = SWIG_AsVal_size_t(swig_obj[4], &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "IterativGauss" "', argument " "5"" of type '" "eilig::Index""'");
-  } 
-  arg5 = static_cast< eilig::Index >(val5);
-  result = (eilig::Status)eilig::IterativGauss(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,SWIG_STD_MOVE(arg5));
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativGauss__SWIG_1(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativGauss" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  result = (eilig::Status)eilig::IterativGauss(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativGauss__SWIG_2(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativGauss" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  result = (eilig::Status)eilig::IterativGauss(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativGauss(PyObject *self, PyObject *args) {
-  Py_ssize_t argc;
-  PyObject *argv[6] = {
-    0
-  };
-  
-  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativGauss", 0, 5, argv))) SWIG_fail;
-  --argc;
-  if (argc == 3) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          return _wrap_IterativGauss__SWIG_2(self, argc, argv);
-        }
-      }
-    }
-  }
-  if (argc == 4) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            return _wrap_IterativGauss__SWIG_1(self, argc, argv);
-          }
-        }
-      }
-    }
-  }
-  if (argc == 5) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            {
-              int res = SWIG_AsVal_size_t(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
-            if (_v) {
-              return _wrap_IterativGauss__SWIG_0(self, argc, argv);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativGauss'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativGauss(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,eilig::Index)\n"
-    "    eilig::IterativGauss(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar)\n"
-    "    eilig::IterativGauss(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &)\n");
-  return 0;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativCG__SWIG_0(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  eilig::Index arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  size_t val5 ;
-  int ecode5 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativCG" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  ecode5 = SWIG_AsVal_size_t(swig_obj[4], &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "IterativCG" "', argument " "5"" of type '" "eilig::Index""'");
-  } 
-  arg5 = static_cast< eilig::Index >(val5);
-  result = (eilig::Status)eilig::IterativCG(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,SWIG_STD_MOVE(arg5));
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativCG__SWIG_1(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativCG" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  result = (eilig::Status)eilig::IterativCG(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativCG__SWIG_2(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativCG" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  result = (eilig::Status)eilig::IterativCG(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativCG(PyObject *self, PyObject *args) {
-  Py_ssize_t argc;
-  PyObject *argv[6] = {
-    0
-  };
-  
-  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativCG", 0, 5, argv))) SWIG_fail;
-  --argc;
-  if (argc == 3) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          return _wrap_IterativCG__SWIG_2(self, argc, argv);
-        }
-      }
-    }
-  }
-  if (argc == 4) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            return _wrap_IterativCG__SWIG_1(self, argc, argv);
-          }
-        }
-      }
-    }
-  }
-  if (argc == 5) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            {
-              int res = SWIG_AsVal_size_t(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
-            if (_v) {
-              return _wrap_IterativCG__SWIG_0(self, argc, argv);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativCG'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativCG(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,eilig::Index)\n"
-    "    eilig::IterativCG(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar)\n"
-    "    eilig::IterativCG(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &)\n");
-  return 0;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativBiCGStab__SWIG_0(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  eilig::Index arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  size_t val5 ;
-  int ecode5 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativBiCGStab" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  ecode5 = SWIG_AsVal_size_t(swig_obj[4], &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "IterativBiCGStab" "', argument " "5"" of type '" "eilig::Index""'");
-  } 
-  arg5 = static_cast< eilig::Index >(val5);
-  result = (eilig::Status)eilig::IterativBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,SWIG_STD_MOVE(arg5));
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativBiCGStab__SWIG_1(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativBiCGStab" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
-  result = (eilig::Status)eilig::IterativBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativBiCGStab__SWIG_2(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
-  PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
-  eilig::Vector *arg3 = 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  void *argp3 = 0 ;
-  int res3 = 0 ;
-  eilig::Status result;
-  
-  (void)self;
-  if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
-  }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
-  }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
-  if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
-  }
-  arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  result = (eilig::Status)eilig::IterativBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3);
-  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_IterativBiCGStab(PyObject *self, PyObject *args) {
-  Py_ssize_t argc;
-  PyObject *argv[6] = {
-    0
-  };
-  
-  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativBiCGStab", 0, 5, argv))) SWIG_fail;
-  --argc;
-  if (argc == 3) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          return _wrap_IterativBiCGStab__SWIG_2(self, argc, argv);
-        }
-      }
-    }
-  }
-  if (argc == 4) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            return _wrap_IterativBiCGStab__SWIG_1(self, argc, argv);
-          }
-        }
-      }
-    }
-  }
-  if (argc == 5) {
-    int _v = 0;
-    void *vptr = 0;
-    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_eilig__Ellpack, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
-        if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
-          if (_v) {
-            {
-              int res = SWIG_AsVal_size_t(argv[4], NULL);
-              _v = SWIG_CheckState(res);
-            }
-            if (_v) {
-              return _wrap_IterativBiCGStab__SWIG_0(self, argc, argv);
-            }
-          }
-        }
-      }
-    }
-  }
-  
-fail:
-  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativBiCGStab'.\n"
-    "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,eilig::Index)\n"
-    "    eilig::IterativBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar)\n"
-    "    eilig::IterativBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &)\n");
-  return 0;
 }
 
 
@@ -20592,6 +19645,132 @@ fail:
 }
 
 
+SWIGINTERN int Swig_var_EILIG_STOP_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_STOP is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_STOP_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_STOP));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_CONTINUE_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_CONTINUE is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_CONTINUE_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_CONTINUE));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_RUNNING_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_RUNNING is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_RUNNING_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_RUNNING));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_SUCCESS_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_SUCCESS is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_SUCCESS_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_SUCCESS));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_NOT_CONVERGED_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_NOT_CONVERGED is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_NOT_CONVERGED_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_NOT_CONVERGED));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_INVALID_TOLERANCE_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_INVALID_TOLERANCE is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_INVALID_TOLERANCE_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_INVALID_TOLERANCE));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_INVALID_FILE_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_INVALID_FILE is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_INVALID_FILE_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_INVALID_FILE));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_EILIG_NULLPTR_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable EILIG_NULLPTR is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_EILIG_NULLPTR_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_NULLPTR));
+  return pyobj;
+}
+
+
+SWIGINTERN int Swig_var_messages_set(PyObject *) {
+  SWIG_Error(SWIG_AttributeError,"Variable messages is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_messages_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_NewPointerObj(SWIG_as_voidptr(&eilig::messages), SWIGTYPE_p_std__mapT_long_long_std__string_t,  0 );
+  return pyobj;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { "delete_SwigPyIterator", _wrap_delete_SwigPyIterator, METH_O, NULL},
 	 { "SwigPyIterator_value", _wrap_SwigPyIterator_value, METH_O, NULL},
@@ -20825,10 +20004,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "DiagonalLinearSystem", _wrap_DiagonalLinearSystem, METH_VARARGS, NULL},
 	 { "ForwardLinearSystem", _wrap_ForwardLinearSystem, METH_VARARGS, NULL},
 	 { "DirectLUP", _wrap_DirectLUP, METH_VARARGS, NULL},
-	 { "IterativJacobi", _wrap_IterativJacobi, METH_VARARGS, NULL},
-	 { "IterativGauss", _wrap_IterativGauss, METH_VARARGS, NULL},
-	 { "IterativCG", _wrap_IterativCG, METH_VARARGS, NULL},
-	 { "IterativBiCGStab", _wrap_IterativBiCGStab, METH_VARARGS, NULL},
+	 { "IterativeBiCGStab", _wrap_IterativeBiCGStab, METH_VARARGS, NULL},
 	 { "WriteToFile", _wrap_WriteToFile, METH_VARARGS, NULL},
 	 { "ReadFromFile", _wrap_ReadFromFile, METH_VARARGS, NULL},
 	 { "ListVector", _wrap_ListVector, METH_O, NULL},
@@ -20860,6 +20036,7 @@ static swig_type_info _swigt__p_double = {"_p_double", "Scalar *|eilig::Scalar *
 static swig_type_info _swigt__p_eilig__Ellpack = {"_p_eilig__Ellpack", "eilig::Ellpack *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__Matrix = {"_p_eilig__Matrix", "eilig::Matrix *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__Vector = {"_p_eilig__Vector", "eilig::Vector *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "Status *|eilig::Status *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "Axis *|Index *|NumberCols *|NumberRows *|eilig::Axis *|eilig::Index *|eilig::NumberCols *|eilig::NumberRows *|std::size_t *|::size_t *", 0, 0, (void*)0, 0};
@@ -20868,6 +20045,7 @@ static swig_type_info _swigt__p_std__allocatorT_double_t = {"_p_std__allocatorT_
 static swig_type_info _swigt__p_std__allocatorT_std__size_t_t = {"_p_std__allocatorT_std__size_t_t", "std::vector< ::size_t >::allocator_type *|std::allocator< ::size_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__allocatorT_std__vectorT_double_t_t = {"_p_std__allocatorT_std__vectorT_double_t_t", "std::vector< std::vector< double > >::allocator_type *|std::allocator< std::vector< double,std::allocator< double > > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__invalid_argument = {"_p_std__invalid_argument", "std::invalid_argument *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__mapT_long_long_std__string_t = {"_p_std__mapT_long_long_std__string_t", "std::map< eilig::Status,eilig::String > *|std::map< long long,std::string > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__string = {"_p_std__string", "String *|eilig::String *|std::string *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_double_t = {"_p_std__vectorT_double_t", "Scalars *|eilig::Scalars *|std::vector< double,std::allocator< double > > *|std::vector< double > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t = {"_p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t", "eilig::Ellpacks *|std::vector< eilig::Ellpack,std::allocator< eilig::Ellpack > > *", 0, 0, (void*)0, 0};
@@ -20887,6 +20065,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_eilig__Ellpack,
   &_swigt__p_eilig__Matrix,
   &_swigt__p_eilig__Vector,
+  &_swigt__p_f_long_long___size_t_double__long_long,
   &_swigt__p_long_long,
   &_swigt__p_p_PyObject,
   &_swigt__p_size_t,
@@ -20895,6 +20074,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__allocatorT_std__size_t_t,
   &_swigt__p_std__allocatorT_std__vectorT_double_t_t,
   &_swigt__p_std__invalid_argument,
+  &_swigt__p_std__mapT_long_long_std__string_t,
   &_swigt__p_std__string,
   &_swigt__p_std__vectorT_double_t,
   &_swigt__p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t,
@@ -20914,6 +20094,7 @@ static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p_eilig__Ellpack[] = {  {&_swigt__p_eilig__Ellpack, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_eilig__Matrix[] = {  {&_swigt__p_eilig__Matrix, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_eilig__Vector[] = {  {&_swigt__p_eilig__Vector, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_long_long___size_t_double__long_long[] = {  {&_swigt__p_f_long_long___size_t_double__long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -20922,6 +20103,7 @@ static swig_cast_info _swigc__p_std__allocatorT_double_t[] = {  {&_swigt__p_std_
 static swig_cast_info _swigc__p_std__allocatorT_std__size_t_t[] = {  {&_swigt__p_std__allocatorT_std__size_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__allocatorT_std__vectorT_double_t_t[] = {  {&_swigt__p_std__allocatorT_std__vectorT_double_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__invalid_argument[] = {  {&_swigt__p_std__invalid_argument, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__mapT_long_long_std__string_t[] = {  {&_swigt__p_std__mapT_long_long_std__string_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__string[] = {  {&_swigt__p_std__string, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_double_t[] = {  {&_swigt__p_std__vectorT_double_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t[] = {  {&_swigt__p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -20941,6 +20123,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_eilig__Ellpack,
   _swigc__p_eilig__Matrix,
   _swigc__p_eilig__Vector,
+  _swigc__p_f_long_long___size_t_double__long_long,
   _swigc__p_long_long,
   _swigc__p_p_PyObject,
   _swigc__p_size_t,
@@ -20949,6 +20132,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__allocatorT_std__size_t_t,
   _swigc__p_std__allocatorT_std__vectorT_double_t_t,
   _swigc__p_std__invalid_argument,
+  _swigc__p_std__mapT_long_long_std__string_t,
   _swigc__p_std__string,
   _swigc__p_std__vectorT_double_t,
   _swigc__p_std__vectorT_eilig__Ellpack_std__allocatorT_eilig__Ellpack_t_t,
@@ -21444,6 +20628,15 @@ SWIG_init(void) {
   SWIG_addvarlink(globals, "axis_x", Swig_var_axis_x_get, Swig_var_axis_x_set);
   SWIG_addvarlink(globals, "axis_y", Swig_var_axis_y_get, Swig_var_axis_y_set);
   SWIG_addvarlink(globals, "axis_z", Swig_var_axis_z_get, Swig_var_axis_z_set);
+  SWIG_addvarlink(globals, "EILIG_STOP", Swig_var_EILIG_STOP_get, Swig_var_EILIG_STOP_set);
+  SWIG_addvarlink(globals, "EILIG_CONTINUE", Swig_var_EILIG_CONTINUE_get, Swig_var_EILIG_CONTINUE_set);
+  SWIG_addvarlink(globals, "EILIG_RUNNING", Swig_var_EILIG_RUNNING_get, Swig_var_EILIG_RUNNING_set);
+  SWIG_addvarlink(globals, "EILIG_SUCCESS", Swig_var_EILIG_SUCCESS_get, Swig_var_EILIG_SUCCESS_set);
+  SWIG_addvarlink(globals, "EILIG_NOT_CONVERGED", Swig_var_EILIG_NOT_CONVERGED_get, Swig_var_EILIG_NOT_CONVERGED_set);
+  SWIG_addvarlink(globals, "EILIG_INVALID_TOLERANCE", Swig_var_EILIG_INVALID_TOLERANCE_get, Swig_var_EILIG_INVALID_TOLERANCE_set);
+  SWIG_addvarlink(globals, "EILIG_INVALID_FILE", Swig_var_EILIG_INVALID_FILE_get, Swig_var_EILIG_INVALID_FILE_set);
+  SWIG_addvarlink(globals, "EILIG_NULLPTR", Swig_var_EILIG_NULLPTR_get, Swig_var_EILIG_NULLPTR_set);
+  SWIG_addvarlink(globals, "messages", Swig_var_messages_get, Swig_var_messages_set);
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else
