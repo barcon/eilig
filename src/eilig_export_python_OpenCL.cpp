@@ -25602,7 +25602,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_0(PyObject *self, Py_ssize_t 
   eilig::Ellpack *arg2 = 0 ;
   eilig::Vector *arg3 = 0 ;
   eilig::Scalar arg4 ;
-  eilig::Status (*arg5)(eilig::Status,eilig::Index,eilig::Scalar) = (eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)) 0 ;
+  CallbackIterative arg5 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -25646,7 +25646,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_0(PyObject *self, Py_ssize_t 
   {
     int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "CallbackIterative""'"); 
     }
   }
   eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,arg5);
@@ -26380,7 +26380,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_1(PyObject *self, Py_ssize_t 
   eilig::opencl::Ellpack *arg2 = 0 ;
   eilig::opencl::Vector *arg3 = 0 ;
   eilig::Scalar arg4 ;
-  eilig::Status (*arg5)(eilig::Status,eilig::Index,eilig::Scalar) = (eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)) 0 ;
+  CallbackIterative arg5 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -26424,7 +26424,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_1(PyObject *self, Py_ssize_t 
   {
     int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "CallbackIterative""'"); 
     }
   }
   eilig::IterativeBiCGStab(*arg1,(eilig::opencl::Ellpack const &)*arg2,(eilig::opencl::Vector const &)*arg3,arg4,arg5);
@@ -26503,8 +26503,8 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativeBiCGStab'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativeBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar))\n"
-    "    eilig::IterativeBiCGStab(eilig::opencl::Vector &,eilig::opencl::Ellpack const &,eilig::opencl::Vector const &,eilig::Scalar,eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar))\n");
+    "    eilig::IterativeBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,CallbackIterative)\n"
+    "    eilig::IterativeBiCGStab(eilig::opencl::Vector &,eilig::opencl::Ellpack const &,eilig::opencl::Vector const &,eilig::Scalar,CallbackIterative)\n");
   return 0;
 }
 
@@ -28233,7 +28233,7 @@ static swig_type_info _swigt__p_eilig__opencl__Ellpack = {"_p_eilig__opencl__Ell
 static swig_type_info _swigt__p_eilig__opencl__EntryProxy = {"_p_eilig__opencl__EntryProxy", "eilig::opencl::EntryProxy *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__opencl__Kernels = {"_p_eilig__opencl__Kernels", "eilig::opencl::KernelsPtr|eilig::opencl::Kernels *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__opencl__Vector = {"_p_eilig__opencl__Vector", "eilig::opencl::Vector *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "CallbackIterative|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "Status *|eilig::Status *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "::size_t *|Axis *|Index *|NumberCols *|NumberRows *|club::DeviceNumber *|club::PlatformNumber *|eilig::Axis *|eilig::Index *|eilig::NumberCols *|eilig::NumberRows *|std::size_t *|size_t *", 0, 0, (void*)0, 0};

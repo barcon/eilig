@@ -29,7 +29,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PythonCL|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>PythonCL\</OutDir>
-    <IntDir>obj\</IntDir>
+    <IntDir>obj\_PythonCL\</IntDir>
     <TargetName>_eiligCL</TargetName>
     <TargetExt>.pyd</TargetExt>
   </PropertyGroup>

@@ -30,7 +30,7 @@ endif
 RESCOMP = windres
 TARGETDIR = Python
 TARGET = $(TARGETDIR)/_eilig.pyd
-OBJDIR = obj
+OBJDIR = obj/_Python
 DEFINES += -DNDEBUG
 INCLUDES += -I../../utils/src -I../../logger/src -I../../python/inc
 FORCE_INCLUDE +=

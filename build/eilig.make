@@ -43,7 +43,7 @@ endef
 ifeq ($(config),debug)
 TARGETDIR = Debug
 TARGET = $(TARGETDIR)/eilig.lib
-OBJDIR = obj/Debug
+OBJDIR = obj/_Debug
 DEFINES += -DDEBUG
 INCLUDES += -I../../utils/src -I../../logger/src
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
@@ -54,7 +54,7 @@ ALL_LDFLAGS += $(LDFLAGS) -L../../utils/build/Debug -L../../logger/build/Debug -
 else ifeq ($(config),release)
 TARGETDIR = Release
 TARGET = $(TARGETDIR)/eilig.lib
-OBJDIR = obj/Release
+OBJDIR = obj/_Release
 DEFINES += -DNDEBUG
 INCLUDES += -I../../utils/src -I../../logger/src
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O3
@@ -65,7 +65,7 @@ ALL_LDFLAGS += $(LDFLAGS) -L../../utils/build/Release -L../../logger/build/Relea
 else ifeq ($(config),releasecl)
 TARGETDIR = ReleaseCL
 TARGET = $(TARGETDIR)/eilig.lib
-OBJDIR = obj/ReleaseCL
+OBJDIR = obj/_ReleaseCL
 DEFINES += -DNDEBUG -DEILIG_ENABLE_OPENCL
 INCLUDES += -I../../utils/src -I../../logger/src -I../../club/src -I../../opencl/inc
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O3

@@ -10,6 +10,8 @@
 #include "eilig_opencl_matrix_ellpack.hpp"
 #endif
 
+using CallbackIterative = long long int (*)(long long int, std::size_t, double);
+
 namespace eilig
 {
     Scalar NormMax(const Vector& in);
@@ -35,7 +37,7 @@ namespace eilig
 	void ForwardLinearSystem(Vector& x, const Matrix& A, const Vector& b);
 	void ForwardLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
 	void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b);
-	void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Status (*callbackIterative)(Status, Index, Scalar));
+	void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, CallbackIterative callbackIterative);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);
@@ -57,7 +59,7 @@ namespace eilig
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
-	void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Status (*callbackIterative)(Status, Index, Scalar));
+	void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, CallbackIterative callbackIterative);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);

@@ -396,7 +396,7 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, Status(*callbackIterative)(Status, Index, Scalar))
+    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, CallbackIterative callbackIterative)
     {
         Status status = EILIG_RUNNING;
         Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
@@ -1007,7 +1007,7 @@ namespace eilig
 
         return res;
     }
-    void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, Status(*callbackIterative)(Status, Index, Scalar))
+    void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, CallbackIterative callbackIterative)
     {
         Status status = EILIG_RUNNING;
         Scalar residualNorm = std::numeric_limits<Scalar>::infinity();

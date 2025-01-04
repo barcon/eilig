@@ -54,19 +54,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>Debug\</OutDir>
-    <IntDir>obj\Debug\</IntDir>
+    <IntDir>obj\_Debug\</IntDir>
     <TargetName>eilig</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Release\</OutDir>
-    <IntDir>obj\Release\</IntDir>
+    <IntDir>obj\_Release\</IntDir>
     <TargetName>eilig</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCL|x64'">
     <OutDir>ReleaseCL\</OutDir>
-    <IntDir>obj\ReleaseCL\</IntDir>
+    <IntDir>obj\_ReleaseCL\</IntDir>
     <TargetName>eilig</TargetName>
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>

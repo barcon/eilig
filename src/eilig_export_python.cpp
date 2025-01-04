@@ -18425,7 +18425,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   eilig::Ellpack *arg2 = 0 ;
   eilig::Vector *arg3 = 0 ;
   eilig::Scalar arg4 ;
-  eilig::Status (*arg5)(eilig::Status,eilig::Index,eilig::Scalar) = (eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)) 0 ;
+  CallbackIterative arg5 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18470,7 +18470,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   {
     int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "CallbackIterative""'"); 
     }
   }
   eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,arg5);
@@ -20036,7 +20036,7 @@ static swig_type_info _swigt__p_double = {"_p_double", "Scalar *|eilig::Scalar *
 static swig_type_info _swigt__p_eilig__Ellpack = {"_p_eilig__Ellpack", "eilig::Ellpack *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__Matrix = {"_p_eilig__Matrix", "eilig::Matrix *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__Vector = {"_p_eilig__Vector", "eilig::Vector *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "eilig::Status (*)(eilig::Status,eilig::Index,eilig::Scalar)|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "CallbackIterative|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "Status *|eilig::Status *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "Axis *|Index *|NumberCols *|NumberRows *|eilig::Axis *|eilig::Index *|eilig::NumberCols *|eilig::NumberRows *|std::size_t *|::size_t *", 0, 0, (void*)0, 0};
