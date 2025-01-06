@@ -154,7 +154,7 @@ Ellpack.__setitem__ = SetItemEllpack
 
 import ctypes
 
-py_callback_iterative = ctypes.CFUNCTYPE(ctypes.c_longlong, ctypes.c_longlong, ctypes.c_size_t, ctypes.c_double)
+py_callback_iterative = ctypes.CFUNCTYPE(ctypes.c_longlong, ctypes.c_size_t, ctypes.c_double)
 
 def IterativeBiCGStab(x, A, b, callback):
 
