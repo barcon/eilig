@@ -3170,7 +3170,7 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_eilig__opencl__EntryProxy swig_types[13]
 #define SWIGTYPE_p_eilig__opencl__Kernels swig_types[14]
 #define SWIGTYPE_p_eilig__opencl__Vector swig_types[15]
-#define SWIGTYPE_p_f_long_long___size_t_double__long_long swig_types[16]
+#define SWIGTYPE_p_f_size_t_double__long_long swig_types[16]
 #define SWIGTYPE_p_long_long swig_types[17]
 #define SWIGTYPE_p_p_PyObject swig_types[18]
 #define SWIGTYPE_p_size_t swig_types[19]
@@ -25601,19 +25601,17 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_0(PyObject *self, Py_ssize_t 
   eilig::Vector *arg1 = 0 ;
   eilig::Ellpack *arg2 = 0 ;
   eilig::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  CallbackIterative arg5 = (CallbackIterative) 0 ;
+  CallbackIterative arg4 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
+  eilig::Status result;
   
   (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
+  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
@@ -25638,19 +25636,14 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_0(PyObject *self, Py_ssize_t 
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
   }
   arg3 = reinterpret_cast< eilig::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
   {
-    int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
+    int res = SWIG_ConvertFunctionPtr(swig_obj[3], (void**)(&arg4), SWIGTYPE_p_f_size_t_double__long_long);
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "CallbackIterative""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "CallbackIterative""'"); 
     }
   }
-  eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
+  result = (eilig::Status)eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
+  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26379,19 +26372,17 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_1(PyObject *self, Py_ssize_t 
   eilig::opencl::Vector *arg1 = 0 ;
   eilig::opencl::Ellpack *arg2 = 0 ;
   eilig::opencl::Vector *arg3 = 0 ;
-  eilig::Scalar arg4 ;
-  CallbackIterative arg5 = (CallbackIterative) 0 ;
+  CallbackIterative arg4 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  double val4 ;
-  int ecode4 = 0 ;
+  eilig::Status result;
   
   (void)self;
-  if ((nobjs < 5) || (nobjs > 5)) SWIG_fail;
+  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__opencl__Vector,  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::opencl::Vector &""'"); 
@@ -26416,19 +26407,14 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab__SWIG_1(PyObject *self, Py_ssize_t 
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "3"" of type '" "eilig::opencl::Vector const &""'"); 
   }
   arg3 = reinterpret_cast< eilig::opencl::Vector * >(argp3);
-  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "eilig::Scalar""'");
-  } 
-  arg4 = static_cast< eilig::Scalar >(val4);
   {
-    int res = SWIG_ConvertFunctionPtr(swig_obj[4], (void**)(&arg5), SWIGTYPE_p_f_long_long___size_t_double__long_long);
+    int res = SWIG_ConvertFunctionPtr(swig_obj[3], (void**)(&arg4), SWIGTYPE_p_f_size_t_double__long_long);
     if (!SWIG_IsOK(res)) {
-      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "5"" of type '" "CallbackIterative""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "CallbackIterative""'"); 
     }
   }
-  eilig::IterativeBiCGStab(*arg1,(eilig::opencl::Ellpack const &)*arg2,(eilig::opencl::Vector const &)*arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
+  result = (eilig::Status)eilig::IterativeBiCGStab(*arg1,(eilig::opencl::Ellpack const &)*arg2,(eilig::opencl::Vector const &)*arg3,arg4);
+  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26437,13 +26423,13 @@ fail:
 
 SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   Py_ssize_t argc;
-  PyObject *argv[6] = {
+  PyObject *argv[5] = {
     0
   };
   
-  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativeBiCGStab", 0, 5, argv))) SWIG_fail;
+  if (!(argc = SWIG_Python_UnpackTuple(args, "IterativeBiCGStab", 0, 4, argv))) SWIG_fail;
   --argc;
-  if (argc == 5) {
+  if (argc == 4) {
     int _v = 0;
     void *vptr = 0;
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL);
@@ -26455,23 +26441,17 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__Vector, SWIG_POINTER_NO_NULL | 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          void *ptr = 0;
+          int res = SWIG_ConvertFunctionPtr(argv[3], &ptr, SWIGTYPE_p_f_size_t_double__long_long);
+          _v = SWIG_CheckState(res);
           if (_v) {
-            void *ptr = 0;
-            int res = SWIG_ConvertFunctionPtr(argv[4], &ptr, SWIGTYPE_p_f_long_long___size_t_double__long_long);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              return _wrap_IterativeBiCGStab__SWIG_0(self, argc, argv);
-            }
+            return _wrap_IterativeBiCGStab__SWIG_0(self, argc, argv);
           }
         }
       }
     }
   }
-  if (argc == 5) {
+  if (argc == 4) {
     int _v = 0;
     void *vptr = 0;
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_eilig__opencl__Vector, SWIG_POINTER_NO_NULL);
@@ -26483,17 +26463,11 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
         int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_eilig__opencl__Vector, SWIG_POINTER_NO_NULL | 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          {
-            int res = SWIG_AsVal_double(argv[3], NULL);
-            _v = SWIG_CheckState(res);
-          }
+          void *ptr = 0;
+          int res = SWIG_ConvertFunctionPtr(argv[3], &ptr, SWIGTYPE_p_f_size_t_double__long_long);
+          _v = SWIG_CheckState(res);
           if (_v) {
-            void *ptr = 0;
-            int res = SWIG_ConvertFunctionPtr(argv[4], &ptr, SWIGTYPE_p_f_long_long___size_t_double__long_long);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              return _wrap_IterativeBiCGStab__SWIG_1(self, argc, argv);
-            }
+            return _wrap_IterativeBiCGStab__SWIG_1(self, argc, argv);
           }
         }
       }
@@ -26503,8 +26477,8 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'IterativeBiCGStab'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    eilig::IterativeBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,eilig::Scalar,CallbackIterative)\n"
-    "    eilig::IterativeBiCGStab(eilig::opencl::Vector &,eilig::opencl::Ellpack const &,eilig::opencl::Vector const &,eilig::Scalar,CallbackIterative)\n");
+    "    eilig::IterativeBiCGStab(eilig::Vector &,eilig::Ellpack const &,eilig::Vector const &,CallbackIterative)\n"
+    "    eilig::IterativeBiCGStab(eilig::opencl::Vector &,eilig::opencl::Ellpack const &,eilig::opencl::Vector const &,CallbackIterative)\n");
   return 0;
 }
 
@@ -27692,20 +27666,6 @@ SWIGINTERN PyObject *Swig_var_EILIG_CONTINUE_get(void) {
 }
 
 
-SWIGINTERN int Swig_var_EILIG_RUNNING_set(PyObject *) {
-  SWIG_Error(SWIG_AttributeError,"Variable EILIG_RUNNING is read-only.");
-  return 1;
-}
-
-
-SWIGINTERN PyObject *Swig_var_EILIG_RUNNING_get(void) {
-  PyObject *pyobj = 0;
-  
-  pyobj = SWIG_From_long_SS_long(static_cast< long long >(eilig::EILIG_RUNNING));
-  return pyobj;
-}
-
-
 SWIGINTERN int Swig_var_EILIG_SUCCESS_set(PyObject *) {
   SWIG_Error(SWIG_AttributeError,"Variable EILIG_SUCCESS is read-only.");
   return 1;
@@ -28233,7 +28193,7 @@ static swig_type_info _swigt__p_eilig__opencl__Ellpack = {"_p_eilig__opencl__Ell
 static swig_type_info _swigt__p_eilig__opencl__EntryProxy = {"_p_eilig__opencl__EntryProxy", "eilig::opencl::EntryProxy *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__opencl__Kernels = {"_p_eilig__opencl__Kernels", "eilig::opencl::KernelsPtr|eilig::opencl::Kernels *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_eilig__opencl__Vector = {"_p_eilig__opencl__Vector", "eilig::opencl::Vector *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_f_long_long___size_t_double__long_long = {"_p_f_long_long___size_t_double__long_long", "CallbackIterative|long long (*)(long long,::size_t,double)", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_size_t_double__long_long = {"_p_f_size_t_double__long_long", "CallbackIterative|long long (*)(::size_t,double)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_long_long = {"_p_long_long", "Status *|eilig::Status *|long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_PyObject = {"_p_p_PyObject", "PyObject **", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_size_t = {"_p_size_t", "::size_t *|Axis *|Index *|NumberCols *|NumberRows *|club::DeviceNumber *|club::PlatformNumber *|eilig::Axis *|eilig::Index *|eilig::NumberCols *|eilig::NumberRows *|std::size_t *|size_t *", 0, 0, (void*)0, 0};
@@ -28271,7 +28231,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_eilig__opencl__EntryProxy,
   &_swigt__p_eilig__opencl__Kernels,
   &_swigt__p_eilig__opencl__Vector,
-  &_swigt__p_f_long_long___size_t_double__long_long,
+  &_swigt__p_f_size_t_double__long_long,
   &_swigt__p_long_long,
   &_swigt__p_p_PyObject,
   &_swigt__p_size_t,
@@ -28309,7 +28269,7 @@ static swig_cast_info _swigc__p_eilig__opencl__Ellpack[] = {  {&_swigt__p_eilig_
 static swig_cast_info _swigc__p_eilig__opencl__EntryProxy[] = {  {&_swigt__p_eilig__opencl__EntryProxy, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_eilig__opencl__Kernels[] = {  {&_swigt__p_eilig__opencl__Kernels, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_eilig__opencl__Vector[] = {  {&_swigt__p_eilig__opencl__Vector, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_f_long_long___size_t_double__long_long[] = {  {&_swigt__p_f_long_long___size_t_double__long_long, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_size_t_double__long_long[] = {  {&_swigt__p_f_size_t_double__long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_PyObject[] = {  {&_swigt__p_p_PyObject, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_size_t[] = {  {&_swigt__p_size_t, 0, 0, 0},{0, 0, 0, 0}};
@@ -28347,7 +28307,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_eilig__opencl__EntryProxy,
   _swigc__p_eilig__opencl__Kernels,
   _swigc__p_eilig__opencl__Vector,
-  _swigc__p_f_long_long___size_t_double__long_long,
+  _swigc__p_f_size_t_double__long_long,
   _swigc__p_long_long,
   _swigc__p_p_PyObject,
   _swigc__p_size_t,
@@ -28895,7 +28855,6 @@ SWIG_init(void) {
   SWIG_addvarlink(globals, "kEllpackUpper2", Swig_var_kEllpackUpper2_get, Swig_var_kEllpackUpper2_set);
   SWIG_addvarlink(globals, "EILIG_STOP", Swig_var_EILIG_STOP_get, Swig_var_EILIG_STOP_set);
   SWIG_addvarlink(globals, "EILIG_CONTINUE", Swig_var_EILIG_CONTINUE_get, Swig_var_EILIG_CONTINUE_set);
-  SWIG_addvarlink(globals, "EILIG_RUNNING", Swig_var_EILIG_RUNNING_get, Swig_var_EILIG_RUNNING_set);
   SWIG_addvarlink(globals, "EILIG_SUCCESS", Swig_var_EILIG_SUCCESS_get, Swig_var_EILIG_SUCCESS_set);
   SWIG_addvarlink(globals, "EILIG_NOT_CONVERGED", Swig_var_EILIG_NOT_CONVERGED_get, Swig_var_EILIG_NOT_CONVERGED_set);
   SWIG_addvarlink(globals, "EILIG_INVALID_TOLERANCE", Swig_var_EILIG_INVALID_TOLERANCE_get, Swig_var_EILIG_INVALID_TOLERANCE_set);

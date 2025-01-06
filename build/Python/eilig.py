@@ -762,8 +762,8 @@ def ForwardLinearSystem(*args):
 def DirectLUP(x, LU, permutation, b):
     return _eilig.DirectLUP(x, LU, permutation, b)
 
-def IterativeBiCGStab(x, A, b, rtol, callbackIterative):
-    return _eilig.IterativeBiCGStab(x, A, b, rtol, callbackIterative)
+def IterativeBiCGStab(x, A, b, callbackIterative):
+    return _eilig.IterativeBiCGStab(x, A, b, callbackIterative)
 
 def WriteToFile(*args):
     return _eilig.WriteToFile(*args)
@@ -851,7 +851,7 @@ import ctypes
 
 py_callback_iterative = ctypes.CFUNCTYPE(ctypes.c_longlong, ctypes.c_longlong, ctypes.c_size_t, ctypes.c_double)
 
-def IterativeBiCGStab(x, A, b, rtol, callback):
+def IterativeBiCGStab(x, A, b, callback):
 
 # wrap the python callback with a ctypes function pointer
     f = py_callback_iterative(callback)
@@ -859,13 +859,12 @@ def IterativeBiCGStab(x, A, b, rtol, callback):
 # get the function pointer of the ctypes wrapper by casting it to void* and taking its value
     f_ptr = ctypes.cast(f, ctypes.c_void_p).value
 
-    _dive.IterativeBiCGStab(x, A, b, rtol, f_ptr)
+    _dive.IterativeBiCGStab(x, A, b, f_ptr)
 
 
 
 EILIG_STOP = cvar.EILIG_STOP
 EILIG_CONTINUE = cvar.EILIG_CONTINUE
-EILIG_RUNNING = cvar.EILIG_RUNNING
 EILIG_SUCCESS = cvar.EILIG_SUCCESS
 EILIG_NOT_CONVERGED = cvar.EILIG_NOT_CONVERGED
 EILIG_INVALID_TOLERANCE = cvar.EILIG_INVALID_TOLERANCE

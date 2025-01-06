@@ -6,9 +6,8 @@
 
 namespace eilig
 {
-	static const Status EILIG_STOP				= 3;
-	static const Status EILIG_CONTINUE			= 2;
-	static const Status EILIG_RUNNING			= 1;
+	static const Status EILIG_STOP				= 2;
+	static const Status EILIG_CONTINUE			= 1;
 	static const Status EILIG_SUCCESS			= 0;
 	static const Status EILIG_NOT_CONVERGED		= -1;
 	static const Status EILIG_INVALID_TOLERANCE = -2;
@@ -17,9 +16,8 @@ namespace eilig
 
 	static const std::map<Status, String> messages =
 	{
-		{  3, "EILIG_STOP"},
-		{  2, "EILIG_CONTINUE"},
-		{  1, "EILIG_RUNNING"},
+		{  2, "EILIG_STOP"},
+		{  1, "EILIG_CONTINUE"},
 		{  0, "EILIG_SUCCESS"},
 		{ -1, "EILIG_NOT_CONVERGED"},
 		{ -2, "EILIG_INVALID_TOLERANCE"},

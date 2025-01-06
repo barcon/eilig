@@ -434,9 +434,6 @@ class arrDouble(object):
 
 # Register arrDouble in _eilig:
 _eilig.arrDouble_swigregister(arrDouble)
-
-def GlobalSize(num1, num2):
-    return _eilig.GlobalSize(num1, num2)
 class Vector(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
@@ -719,324 +716,18 @@ class Ellpack(object):
 
 # Register Ellpack in _eilig:
 _eilig.Ellpack_swigregister(Ellpack)
-class EntryProxy(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
 
-    def __init__(self, buffer, offset):
-        _eilig.EntryProxy_swiginit(self, _eilig.new_EntryProxy(buffer, offset))
+def NormMax(_in):
+    return _eilig.NormMax(_in)
 
-    def SetBuffer(self, buffer):
-        return _eilig.EntryProxy_SetBuffer(self, buffer)
+def NormP(*args):
+    return _eilig.NormP(*args)
 
-    def SetIndex(self, index):
-        return _eilig.EntryProxy_SetIndex(self, index)
+def NormP2(*args):
+    return _eilig.NormP2(*args)
 
-    def __call__(self):
-        return _eilig.EntryProxy___call__(self)
-
-    def __iadd__(self, rhs):
-        return _eilig.EntryProxy___iadd__(self, rhs)
-
-    def __isub__(self, rhs):
-        return _eilig.EntryProxy___isub__(self, rhs)
-    __swig_destroy__ = _eilig.delete_EntryProxy
-
-# Register EntryProxy in _eilig:
-_eilig.EntryProxy_swigregister(EntryProxy)
-
-def CreateKernels(fileName, platformNumber, deviceNumber):
-    return _eilig.CreateKernels(fileName, platformNumber, deviceNumber)
-class Kernels(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _eilig.Kernels_swiginit(self, _eilig.new_Kernels())
-    __swig_destroy__ = _eilig.delete_Kernels
-
-    def Init(self, fileName, platformNumber, deviceNumber):
-        return _eilig.Kernels_Init(self, fileName, platformNumber, deviceNumber)
-    platform_ = property(_eilig.Kernels_platform__get, _eilig.Kernels_platform__set)
-    context_ = property(_eilig.Kernels_context__get, _eilig.Kernels_context__set)
-    program_ = property(_eilig.Kernels_program__get, _eilig.Kernels_program__set)
-    kVectorCopyS_ = property(_eilig.Kernels_kVectorCopyS__get, _eilig.Kernels_kVectorCopyS__set)
-    kVectorAddS_ = property(_eilig.Kernels_kVectorAddS__get, _eilig.Kernels_kVectorAddS__set)
-    kVectorAddSl_ = property(_eilig.Kernels_kVectorAddSl__get, _eilig.Kernels_kVectorAddSl__set)
-    kVectorAddV_ = property(_eilig.Kernels_kVectorAddV__get, _eilig.Kernels_kVectorAddV__set)
-    kVectorPlus_ = property(_eilig.Kernels_kVectorPlus__get, _eilig.Kernels_kVectorPlus__set)
-    kVectorSubS_ = property(_eilig.Kernels_kVectorSubS__get, _eilig.Kernels_kVectorSubS__set)
-    kVectorSubSl_ = property(_eilig.Kernels_kVectorSubSl__get, _eilig.Kernels_kVectorSubSl__set)
-    kVectorSubV_ = property(_eilig.Kernels_kVectorSubV__get, _eilig.Kernels_kVectorSubV__set)
-    kVectorMinus_ = property(_eilig.Kernels_kVectorMinus__get, _eilig.Kernels_kVectorMinus__set)
-    kVectorMulS_ = property(_eilig.Kernels_kVectorMulS__get, _eilig.Kernels_kVectorMulS__set)
-    kVectorDot_ = property(_eilig.Kernels_kVectorDot__get, _eilig.Kernels_kVectorDot__set)
-    kVectorNormMax_ = property(_eilig.Kernels_kVectorNormMax__get, _eilig.Kernels_kVectorNormMax__set)
-    kVectorNormP_ = property(_eilig.Kernels_kVectorNormP__get, _eilig.Kernels_kVectorNormP__set)
-    kVectorNormP2_ = property(_eilig.Kernels_kVectorNormP2__get, _eilig.Kernels_kVectorNormP2__set)
-    kEllpackNormP_ = property(_eilig.Kernels_kEllpackNormP__get, _eilig.Kernels_kEllpackNormP__set)
-    kEllpackNormP2_ = property(_eilig.Kernels_kEllpackNormP2__get, _eilig.Kernels_kEllpackNormP2__set)
-    kEllpackMaxCount_ = property(_eilig.Kernels_kEllpackMaxCount__get, _eilig.Kernels_kEllpackMaxCount__set)
-    kEllpackExpandPosition_ = property(_eilig.Kernels_kEllpackExpandPosition__get, _eilig.Kernels_kEllpackExpandPosition__set)
-    kEllpackExpandData_ = property(_eilig.Kernels_kEllpackExpandData__get, _eilig.Kernels_kEllpackExpandData__set)
-    kEllpackShrinkPosition_ = property(_eilig.Kernels_kEllpackShrinkPosition__get, _eilig.Kernels_kEllpackShrinkPosition__set)
-    kEllpackShrinkData_ = property(_eilig.Kernels_kEllpackShrinkData__get, _eilig.Kernels_kEllpackShrinkData__set)
-    kEllpackCopyS_ = property(_eilig.Kernels_kEllpackCopyS__get, _eilig.Kernels_kEllpackCopyS__set)
-    kEllpackAddS_ = property(_eilig.Kernels_kEllpackAddS__get, _eilig.Kernels_kEllpackAddS__set)
-    kEllpackAddSl_ = property(_eilig.Kernels_kEllpackAddSl__get, _eilig.Kernels_kEllpackAddSl__set)
-    kEllpackPlus_ = property(_eilig.Kernels_kEllpackPlus__get, _eilig.Kernels_kEllpackPlus__set)
-    kEllpackSubS_ = property(_eilig.Kernels_kEllpackSubS__get, _eilig.Kernels_kEllpackSubS__set)
-    kEllpackSubSl_ = property(_eilig.Kernels_kEllpackSubSl__get, _eilig.Kernels_kEllpackSubSl__set)
-    kEllpackMinus_ = property(_eilig.Kernels_kEllpackMinus__get, _eilig.Kernels_kEllpackMinus__set)
-    kEllpackMulS_ = property(_eilig.Kernels_kEllpackMulS__get, _eilig.Kernels_kEllpackMulS__set)
-    kEllpackMulV_ = property(_eilig.Kernels_kEllpackMulV__get, _eilig.Kernels_kEllpackMulV__set)
-    kEllpackMulM_ = property(_eilig.Kernels_kEllpackMulM__get, _eilig.Kernels_kEllpackMulM__set)
-    kEllpackSwapRows_ = property(_eilig.Kernels_kEllpackSwapRows__get, _eilig.Kernels_kEllpackSwapRows__set)
-    kEllpackSwapCols_ = property(_eilig.Kernels_kEllpackSwapCols__get, _eilig.Kernels_kEllpackSwapCols__set)
-    kEllpackTranspose_ = property(_eilig.Kernels_kEllpackTranspose__get, _eilig.Kernels_kEllpackTranspose__set)
-    kEllpackFindWidthTranspose_ = property(_eilig.Kernels_kEllpackFindWidthTranspose__get, _eilig.Kernels_kEllpackFindWidthTranspose__set)
-    kEllpackDiagonal_ = property(_eilig.Kernels_kEllpackDiagonal__get, _eilig.Kernels_kEllpackDiagonal__set)
-    kEllpackRegion_ = property(_eilig.Kernels_kEllpackRegion__get, _eilig.Kernels_kEllpackRegion__set)
-    kEllpackLower1_ = property(_eilig.Kernels_kEllpackLower1__get, _eilig.Kernels_kEllpackLower1__set)
-    kEllpackLower2_ = property(_eilig.Kernels_kEllpackLower2__get, _eilig.Kernels_kEllpackLower2__set)
-    kEllpackUpper1_ = property(_eilig.Kernels_kEllpackUpper1__get, _eilig.Kernels_kEllpackUpper1__set)
-    kEllpackUpper2_ = property(_eilig.Kernels_kEllpackUpper2__get, _eilig.Kernels_kEllpackUpper2__set)
-
-# Register Kernels in _eilig:
-_eilig.Kernels_swigregister(Kernels)
-kVectorCopyS = cvar.kVectorCopyS
-kVectorAddS = cvar.kVectorAddS
-kVectorAddSl = cvar.kVectorAddSl
-kVectorAddV = cvar.kVectorAddV
-kVectorPlus = cvar.kVectorPlus
-kVectorSubS = cvar.kVectorSubS
-kVectorSubSl = cvar.kVectorSubSl
-kVectorSubV = cvar.kVectorSubV
-kVectorMinus = cvar.kVectorMinus
-kVectorMulS = cvar.kVectorMulS
-kVectorDot = cvar.kVectorDot
-kVectorNormMax = cvar.kVectorNormMax
-kVectorNormP = cvar.kVectorNormP
-kVectorNormP2 = cvar.kVectorNormP2
-kEllpackNormP = cvar.kEllpackNormP
-kEllpackNormP2 = cvar.kEllpackNormP2
-kEllpackMaxCount = cvar.kEllpackMaxCount
-kEllpackExpandPosition = cvar.kEllpackExpandPosition
-kEllpackExpandData = cvar.kEllpackExpandData
-kEllpackShrinkPosition = cvar.kEllpackShrinkPosition
-kEllpackShrinkData = cvar.kEllpackShrinkData
-kEllpackCopyS = cvar.kEllpackCopyS
-kEllpackAddS = cvar.kEllpackAddS
-kEllpackAddSl = cvar.kEllpackAddSl
-kEllpackPlus = cvar.kEllpackPlus
-kEllpackSubS = cvar.kEllpackSubS
-kEllpackSubSl = cvar.kEllpackSubSl
-kEllpackMinus = cvar.kEllpackMinus
-kEllpackMulS = cvar.kEllpackMulS
-kEllpackMulV = cvar.kEllpackMulV
-kEllpackMulM = cvar.kEllpackMulM
-kEllpackSwapRows = cvar.kEllpackSwapRows
-kEllpackSwapCols = cvar.kEllpackSwapCols
-kEllpackTranspose = cvar.kEllpackTranspose
-kEllpackFindWidthTranspose = cvar.kEllpackFindWidthTranspose
-kEllpackDiagonal = cvar.kEllpackDiagonal
-kEllpackRegion = cvar.kEllpackRegion
-kEllpackLower1 = cvar.kEllpackLower1
-kEllpackLower2 = cvar.kEllpackLower2
-kEllpackUpper1 = cvar.kEllpackUpper1
-kEllpackUpper2 = cvar.kEllpackUpper2
-
-class VectorCL(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, *args):
-        _eilig.VectorCL_swiginit(self, _eilig.new_VectorCL(*args))
-    __swig_destroy__ = _eilig.delete_VectorCL
-
-    def Resize(self, *args):
-        return _eilig.VectorCL_Resize(self, *args)
-
-    def Fill(self, value):
-        return _eilig.VectorCL_Fill(self, value)
-
-    def __call__(self, row):
-        return _eilig.VectorCL___call__(self, row)
-
-    def __add__(self, *args):
-        return _eilig.VectorCL___add__(self, *args)
-
-    def __pos__(self):
-        return _eilig.VectorCL___pos__(self)
-
-    def __sub__(self, *args):
-        return _eilig.VectorCL___sub__(self, *args)
-
-    def __neg__(self):
-        return _eilig.VectorCL___neg__(self)
-
-    def __mul__(self, rhs):
-        return _eilig.VectorCL___mul__(self, rhs)
-
-    def SwapRows(self, row1, row2):
-        return _eilig.VectorCL_SwapRows(self, row1, row2)
-
-    def Region(self, *args):
-        return _eilig.VectorCL_Region(self, *args)
-
-    def GetRows(self):
-        return _eilig.VectorCL_GetRows(self)
-
-    def GetCols(self):
-        return _eilig.VectorCL_GetCols(self)
-
-    def GetValue(self, row):
-        return _eilig.VectorCL_GetValue(self, row)
-
-    def GetKernels(self):
-        return _eilig.VectorCL_GetKernels(self)
-
-    def GetDataGPU(self):
-        return _eilig.VectorCL_GetDataGPU(self)
-
-    def SetValue(self, row, value):
-        return _eilig.VectorCL_SetValue(self, row, value)
-
-    def __str__(self):
-        return _eilig.VectorCL___str__(self)
-
-    def __radd__(self, value):
-        return _eilig.VectorCL___radd__(self, value)
-
-    def __rsub__(self, value):
-        return _eilig.VectorCL___rsub__(self, value)
-
-    def __rmul__(self, value):
-        return _eilig.VectorCL___rmul__(self, value)
-
-# Register VectorCL in _eilig:
-_eilig.VectorCL_swigregister(VectorCL)
-class EllpackCL(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, *args):
-        _eilig.EllpackCL_swiginit(self, _eilig.new_EllpackCL(*args))
-    __swig_destroy__ = _eilig.delete_EllpackCL
-
-    def IsUsed(self, *args):
-        return _eilig.EllpackCL_IsUsed(self, *args)
-
-    def Add(self, row, col):
-        return _eilig.EllpackCL_Add(self, row, col)
-
-    def Remove(self, row, col):
-        return _eilig.EllpackCL_Remove(self, row, col)
-
-    def Resize(self, *args):
-        return _eilig.EllpackCL_Resize(self, *args)
-
-    def Fill(self, value):
-        return _eilig.EllpackCL_Fill(self, value)
-
-    def Init(self, input):
-        return _eilig.EllpackCL_Init(self, input)
-
-    def Dump(self):
-        return _eilig.EllpackCL_Dump(self)
-
-    def __call__(self, row, col):
-        return _eilig.EllpackCL___call__(self, row, col)
-
-    def __add__(self, *args):
-        return _eilig.EllpackCL___add__(self, *args)
-
-    def __pos__(self):
-        return _eilig.EllpackCL___pos__(self)
-
-    def __sub__(self, *args):
-        return _eilig.EllpackCL___sub__(self, *args)
-
-    def __neg__(self):
-        return _eilig.EllpackCL___neg__(self)
-
-    def __mul__(self, *args):
-        return _eilig.EllpackCL___mul__(self, *args)
-
-    def SwapRows(self, row1, row2):
-        return _eilig.EllpackCL_SwapRows(self, row1, row2)
-
-    def SwapCols(self, col1, col2):
-        return _eilig.EllpackCL_SwapCols(self, col1, col2)
-
-    def Transpose(self):
-        return _eilig.EllpackCL_Transpose(self)
-
-    def Diagonal(self):
-        return _eilig.EllpackCL_Diagonal(self)
-
-    def Lower(self, diag):
-        return _eilig.EllpackCL_Lower(self, diag)
-
-    def LowerWithDiagonal(self):
-        return _eilig.EllpackCL_LowerWithDiagonal(self)
-
-    def LowerWithoutDiagonal(self):
-        return _eilig.EllpackCL_LowerWithoutDiagonal(self)
-
-    def Upper(self, diag):
-        return _eilig.EllpackCL_Upper(self, diag)
-
-    def UpperWithDiagonal(self):
-        return _eilig.EllpackCL_UpperWithDiagonal(self)
-
-    def UpperWithoutDiagonal(self):
-        return _eilig.EllpackCL_UpperWithoutDiagonal(self)
-
-    def Region(self, *args):
-        return _eilig.EllpackCL_Region(self, *args)
-
-    def GetRows(self):
-        return _eilig.EllpackCL_GetRows(self)
-
-    def GetCols(self):
-        return _eilig.EllpackCL_GetCols(self)
-
-    def GetWidth(self):
-        return _eilig.EllpackCL_GetWidth(self)
-
-    def GetValue(self, row, col):
-        return _eilig.EllpackCL_GetValue(self, row, col)
-
-    def GetKernels(self):
-        return _eilig.EllpackCL_GetKernels(self)
-
-    def GetCountGPU(self):
-        return _eilig.EllpackCL_GetCountGPU(self)
-
-    def GetPositionGPU(self):
-        return _eilig.EllpackCL_GetPositionGPU(self)
-
-    def GetDataGPU(self):
-        return _eilig.EllpackCL_GetDataGPU(self)
-
-    def SetValue(self, row, col, value):
-        return _eilig.EllpackCL_SetValue(self, row, col, value)
-
-    def __str__(self):
-        return _eilig.EllpackCL___str__(self)
-
-    def __radd__(self, value):
-        return _eilig.EllpackCL___radd__(self, value)
-
-    def __rsub__(self, value):
-        return _eilig.EllpackCL___rsub__(self, value)
-
-    def __rmul__(self, value):
-        return _eilig.EllpackCL___rmul__(self, value)
-
-# Register EllpackCL in _eilig:
-_eilig.EllpackCL_swigregister(EllpackCL)
+def Dot(in1, in2):
+    return _eilig.Dot(in1, in2)
 
 def Cross(in1, in2):
     return _eilig.Cross(in1, in2)
@@ -1071,29 +762,8 @@ def ForwardLinearSystem(*args):
 def DirectLUP(x, LU, permutation, b):
     return _eilig.DirectLUP(x, LU, permutation, b)
 
-def IterativJacobi(x, A, b, rtol=0.001, itmax=0):
-    return _eilig.IterativJacobi(x, A, b, rtol, itmax)
-
-def IterativGauss(x, A, b, rtol=0.001, itmax=0):
-    return _eilig.IterativGauss(x, A, b, rtol, itmax)
-
-def NormMax(*args):
-    return _eilig.NormMax(*args)
-
-def NormP(*args):
-    return _eilig.NormP(*args)
-
-def NormP2(*args):
-    return _eilig.NormP2(*args)
-
-def Dot(*args):
-    return _eilig.Dot(*args)
-
-def IterativCG(*args):
-    return _eilig.IterativCG(*args)
-
-def IterativBiCGStab(*args):
-    return _eilig.IterativBiCGStab(*args)
+def IterativeBiCGStab(x, A, b, callbackIterative):
+    return _eilig.IterativeBiCGStab(x, A, b, callbackIterative)
 
 def WriteToFile(*args):
     return _eilig.WriteToFile(*args)
@@ -1101,8 +771,8 @@ def WriteToFile(*args):
 def ReadFromFile(*args):
     return _eilig.ReadFromFile(*args)
 
-def ListVector(*args):
-    return _eilig.ListVector(*args)
+def ListVector(vector):
+    return _eilig.ListVector(vector)
 
 def ListMatrix(*args):
     return _eilig.ListMatrix(*args)
@@ -1177,23 +847,29 @@ def SetItemEllpack(self, index, value):
 Ellpack.__getitem__ = GetItemEllpack
 Ellpack.__setitem__ = SetItemEllpack
 
-def GetItemVectorCL(self, index):
-    return self.GetValue(index)
+import ctypes
 
-def SetItemVectorCL(self, index, value):
-    return self.SetValue(index, value)
+py_callback_iterative = ctypes.CFUNCTYPE(ctypes.c_longlong, ctypes.c_longlong, ctypes.c_size_t, ctypes.c_double)
 
-VectorCL.__getitem__ = GetItemVectorCL
-VectorCL.__setitem__ = SetItemVectorCL
+def IterativeBiCGStab(x, A, b, callback):
 
-def GetItemEllpackCL(self, index):
-    return self.GetValue(index[0], index[1])
+# wrap the python callback with a ctypes function pointer
+    f = py_callback_iterative(callback)
 
-def SetItemEllpackCL(self, index, value):
-    return self.SetValue(index[0], index[1], value)
+# get the function pointer of the ctypes wrapper by casting it to void* and taking its value
+    f_ptr = ctypes.cast(f, ctypes.c_void_p).value
 
-EllpackCL.__getitem__ = GetItemEllpackCL
-EllpackCL.__setitem__ = SetItemEllpackCL
+    _dive.IterativeBiCGStab(x, A, b, f_ptr)
 
 
+
+EILIG_STOP = cvar.EILIG_STOP
+EILIG_CONTINUE = cvar.EILIG_CONTINUE
+EILIG_RUNNING = cvar.EILIG_RUNNING
+EILIG_SUCCESS = cvar.EILIG_SUCCESS
+EILIG_NOT_CONVERGED = cvar.EILIG_NOT_CONVERGED
+EILIG_INVALID_TOLERANCE = cvar.EILIG_INVALID_TOLERANCE
+EILIG_INVALID_FILE = cvar.EILIG_INVALID_FILE
+EILIG_NULLPTR = cvar.EILIG_NULLPTR
+messages = cvar.messages
 

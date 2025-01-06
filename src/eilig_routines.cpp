@@ -396,10 +396,8 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    void IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, Scalar rtol, CallbackIterative callbackIterative)
+    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, CallbackIterative callbackIterative)
     {
-        Status status = EILIG_RUNNING;
-        Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
         Scalar omega{ 0.0 };
@@ -407,7 +405,6 @@ namespace eilig
         Scalar rho1{ 0.0 };
 
         Index numberRows = A.GetRows();
-        Index iterationMax = static_cast<Index>(std::pow(numberRows, 1.5));
         Index iteration { 0 };
 
         Vector x0(numberRows);
@@ -427,16 +424,8 @@ namespace eilig
 
         if (callbackIterative == nullptr)
         {
-            status = EILIG_NULLPTR;
             logger::Error(headerEilig, "Invalid callback (null pointer)");
-            return;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return;
+            return EILIG_NULLPTR;
         }
 
         x0 = 0.;
@@ -448,8 +437,10 @@ namespace eilig
 
         rho0 = Dot(r0, r0);
 
-        for (iteration = 0; iteration < iterationMax; ++iteration)
+        for (;;)
         {
+            iteration++;
+
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
 
@@ -466,18 +457,20 @@ namespace eilig
             x1 = x0 + aux3 + aux4;
             r1 = (t0 * (-omega)) + s0;
 
-            residualNorm = NormP2(r1);
+            auto residual = NormP2(r1);
+            auto status = callbackIterative(iteration, residual);
 
-            if (residualNorm < rtol)
+            switch (status)
             {
-                status = EILIG_SUCCESS;
-            }
-
-            switch (callbackIterative(status, iteration, residualNorm))
-            {
+            case EILIG_SUCCESS:
+                x = x1;
+                return status;
+            case EILIG_NOT_CONVERGED:
+                x = x1;
+                return status;
             case EILIG_STOP:
                 x = x1;
-                return;
+                return status;
             case EILIG_CONTINUE:
                 break;
             }
@@ -493,8 +486,7 @@ namespace eilig
             rho0 = rho1;
         }
 
-        status = EILIG_NOT_CONVERGED;
-        callbackIterative(status, iteration, residualNorm);
+        return EILIG_NOT_CONVERGED;
     }
     void WriteToFile(const Vector& vec, const String& fileName)
     {
@@ -1007,10 +999,8 @@ namespace eilig
 
         return res;
     }
-    void IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, Scalar rtol, CallbackIterative callbackIterative)
+    Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, CallbackIterative callbackIterative)
     {
-        Status status = EILIG_RUNNING;
-        Scalar residualNorm = std::numeric_limits<Scalar>::infinity();
         Scalar alpha{ 0.0 };
         Scalar beta;
         Scalar omega;
@@ -1018,7 +1008,6 @@ namespace eilig
         Scalar rho1;
 
         Index numberRows = A.GetRows();
-        Index iterationMax = static_cast<Index>(std::pow(numberRows, 1.5));
         Index iteration = { 0 };
 
         opencl::Vector x0(b.GetKernels(), numberRows);
@@ -1038,16 +1027,8 @@ namespace eilig
 
         if (callbackIterative == nullptr)
         {
-            status = EILIG_NULLPTR;
             logger::Error(headerEilig, "Invalid callback (null pointer)");
-            return;
-        }
-
-        if (rtol <= 0.)
-        {
-            status = EILIG_INVALID_TOLERANCE;
-            logger::Error(headerEilig, "Convergence tolerance must be a positive real number");
-            return;
+            return EILIG_NULLPTR;
         }
 
         x0 = 0.;
@@ -1059,8 +1040,10 @@ namespace eilig
 
         rho0 = Dot(r0, r0);
 
-        for (iteration = 0; iteration < iterationMax; ++iteration)
+        for (;;)
         {
+            iteration++;
+
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
 
@@ -1077,18 +1060,20 @@ namespace eilig
             x1 = x0 + aux3 + aux4;
             r1 = (t0 * (-omega)) + s0;
 
-            residualNorm = NormP2(r1);
+            auto residual = NormP2(r1);
+            auto status = callbackIterative(iteration, residual);
 
-            if (residualNorm < rtol)
+            switch (status)
             {
-                status = EILIG_SUCCESS;
-            }
-
-            switch (callbackIterative(status, iteration, residualNorm))
-            {
+            case EILIG_SUCCESS:
+                x = x1;
+                return status;
+            case EILIG_NOT_CONVERGED:
+                x = x1;
+                return status;
             case EILIG_STOP:
                 x = x1;
-                return;
+                return status;
             case EILIG_CONTINUE:
                 break;
             }
@@ -1104,8 +1089,7 @@ namespace eilig
             rho0 = rho1;
         }
 
-        status = EILIG_NOT_CONVERGED;
-        callbackIterative(status, iteration, residualNorm);
+        return EILIG_NOT_CONVERGED;
     }
     void WriteToFile(const opencl::Vector& vec, const String& fileName)
     {
