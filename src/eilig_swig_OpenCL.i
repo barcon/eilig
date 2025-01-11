@@ -250,6 +250,6 @@ def IterativeBiCGStab(x, A, b, callback):
     # get the function pointer of the ctypes wrapper by casting it to void* and taking its value
     f_ptr = ctypes.cast(f, ctypes.c_void_p).value
 
-    _dive.IterativeBiCGStab(x, A, b, f_ptr)
+    return _dive.IterativeBiCGStab(x, A, b, f_ptr)
 
 %}
