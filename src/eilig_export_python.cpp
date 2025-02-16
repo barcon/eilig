@@ -18421,8 +18421,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
-  eilig::Vector *arg1 = 0 ;
-  eilig::Ellpack *arg2 = 0 ;
+  eilig::Ellpack *arg1 = 0 ;
+  eilig::Vector *arg2 = 0 ;
   eilig::Vector *arg3 = 0 ;
   CallbackIterative arg4 = (CallbackIterative) 0 ;
   void *argp1 = 0 ;
@@ -18436,22 +18436,22 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
   
   (void)self;
   if (!SWIG_Python_UnpackTuple(args, "IterativeBiCGStab", 4, 4, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Vector,  0 );
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Ellpack const &""'"); 
   }
   if (!argp1) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Vector &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "1"" of type '" "eilig::Ellpack const &""'"); 
   }
-  arg1 = reinterpret_cast< eilig::Vector * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Ellpack,  0  | 0);
+  arg1 = reinterpret_cast< eilig::Ellpack * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_eilig__Vector,  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Vector &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Ellpack const &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "IterativeBiCGStab" "', argument " "2"" of type '" "eilig::Vector &""'"); 
   }
-  arg2 = reinterpret_cast< eilig::Ellpack * >(argp2);
+  arg2 = reinterpret_cast< eilig::Vector * >(argp2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_eilig__Vector,  0  | 0);
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "IterativeBiCGStab" "', argument " "3"" of type '" "eilig::Vector const &""'"); 
@@ -18466,7 +18466,7 @@ SWIGINTERN PyObject *_wrap_IterativeBiCGStab(PyObject *self, PyObject *args) {
       SWIG_exception_fail(SWIG_ArgError(res), "in method '" "IterativeBiCGStab" "', argument " "4"" of type '" "CallbackIterative""'"); 
     }
   }
-  result = (eilig::Status)eilig::IterativeBiCGStab(*arg1,(eilig::Ellpack const &)*arg2,(eilig::Vector const &)*arg3,arg4);
+  result = (eilig::Status)eilig::IterativeBiCGStab((eilig::Ellpack const &)*arg1,*arg2,(eilig::Vector const &)*arg3,arg4);
   resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
   return resultobj;
 fail:

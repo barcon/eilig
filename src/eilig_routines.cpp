@@ -396,7 +396,7 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    Status IterativeBiCGStab(Vector& x, const Ellpack& A, const Vector& b, CallbackIterative callbackIterative)
+    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -428,7 +428,7 @@ namespace eilig
             return EILIG_NULLPTR;
         }
 
-        x0 = 0.;
+        x0 = x;
         
         Mul(aux, -A, x0);
         Add(r0, aux, b);
@@ -999,7 +999,7 @@ namespace eilig
 
         return res;
     }
-    Status IterativeBiCGStab(opencl::Vector& x, const opencl::Ellpack& A, const opencl::Vector& b, CallbackIterative callbackIterative)
+    Status IterativeBiCGStab(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
     {
         Scalar alpha{ 0.0 };
         Scalar beta;
@@ -1031,7 +1031,7 @@ namespace eilig
             return EILIG_NULLPTR;
         }
 
-        x0 = 0.;
+        x0 = x;
 
         Mul(aux, -A, x0);
         Add(r0, aux, b);
