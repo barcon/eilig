@@ -1,2 +1,2 @@
 # eilig
-C++ Matrix and Vector manipulation
+C++ Matrix and Vector manipulation library
