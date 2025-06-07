@@ -398,8 +398,9 @@ namespace eilig
     }
     Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
     {
-        Scalar alpha;
-        Scalar beta;
+        Scalar alpha{ 0.0 };
+        Scalar beta{ 0.0 };
+        Scalar rho0{ 0.0 };
 
         Index numberRows = A.GetRows();
         Index iteration = { 0 };
@@ -426,8 +427,12 @@ namespace eilig
 
         for (;;)
         {
+            iteration++;
+
+            rho0 = Dot(r0, r0);
+
             Mul(aux, A, p0);
-            alpha = Dot(r0, r0) / Dot(p0, aux);
+            alpha = rho0 / Dot(p0, aux);
 
             r1 = aux * (-alpha) + r0;
             x1 = p0 * alpha + x0;
@@ -499,11 +504,11 @@ namespace eilig
         p0 = r0;
         aux2 = r0;
 
-        rho0 = Dot(r0, r0);
-
-        for (;;)
+         for (;;)
         {
             iteration++;
+
+            rho0 = Dot(r0, r0);
 
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
@@ -1066,8 +1071,9 @@ namespace eilig
     }
     Status IterativeCG(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
     {
-        Scalar alpha;
-        Scalar beta;
+        Scalar alpha{ 0.0 };
+        Scalar beta{ 0.0 };
+        Scalar rho0{ 0.0 };
 
         Index numberRows = A.GetRows();
         Index iteration = { 0 };
@@ -1094,8 +1100,12 @@ namespace eilig
 
         for (;;)
         {
+            iteration++;
+
+            rho0 = Dot(r0, r0);
+
             Mul(aux, A, p0);
-            alpha = Dot(r0, r0) / Dot(p0, aux);
+            alpha = rho0 / Dot(p0, aux);
 
             r1 = aux * (-alpha) + r0;
             x1 = p0 * alpha + x0;
@@ -1133,8 +1143,8 @@ namespace eilig
         Scalar alpha{ 0.0 };
         Scalar beta;
         Scalar omega;
-        Scalar rho0;
-        Scalar rho1;
+        Scalar rho0{ 0.0 };
+        Scalar rho1{ 0.0 };
 
         Index numberRows = A.GetRows();
         Index iteration = { 0 };
@@ -1167,11 +1177,11 @@ namespace eilig
         p0 = r0;
         aux2 = r0;
 
-        rho0 = Dot(r0, r0);
-
         for (;;)
         {
             iteration++;
+
+            rho0 = Dot(r0, r0);
 
             Mul(aux1, A, p0);
             alpha = rho0 / Dot(aux1, aux2);
