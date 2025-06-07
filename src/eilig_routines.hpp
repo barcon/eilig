@@ -37,6 +37,7 @@ namespace eilig
 	void ForwardLinearSystem(Vector& x, const Matrix& A, const Vector& b);
 	void ForwardLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
 	void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b);
+	Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative);
 	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
@@ -58,7 +59,7 @@ namespace eilig
 	Scalar NormP2(const opencl::Vector& in);
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
-
+	Status IterativeCG(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
 	Status IterativeBiCGStab(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);

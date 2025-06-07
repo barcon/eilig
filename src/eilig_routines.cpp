@@ -396,6 +396,70 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
+    Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
+    {
+        Scalar alpha;
+        Scalar beta;
+
+        Index numberRows = A.GetRows();
+        Index iteration = { 0 };
+
+        Vector x0(numberRows);
+        Vector r0(numberRows);
+        Vector p0(numberRows);
+        Vector x1(numberRows);
+        Vector r1(numberRows);
+        Vector p1(numberRows);
+        Vector aux(numberRows);
+
+        if (callbackIterative == nullptr)
+        {
+            logger::Error(headerEilig, "Invalid callback (null pointer)");
+            return EILIG_NULLPTR;
+        }
+
+        x0 = x;
+
+        Mul(aux, -A, x0);
+        Add(r0, aux, b);
+        p0 = r0;
+
+        for (;;)
+        {
+            Mul(aux, A, p0);
+            alpha = Dot(r0, r0) / Dot(p0, aux);
+
+            r1 = aux * (-alpha) + r0;
+            x1 = p0 * alpha + x0;
+
+            auto residual = NormP2(r1);
+            auto status = callbackIterative(iteration, residual);
+
+            switch (status)
+            {
+            case EILIG_SUCCESS:
+                x = x1;
+                return status;
+            case EILIG_NOT_CONVERGED:
+                x = x1;
+                return status;
+            case EILIG_STOP:
+                x = x1;
+                return status;
+            case EILIG_CONTINUE:
+                break;
+            }
+
+            beta = Dot(r1, r1) / Dot(r0, r0);
+
+            p0 = p0 * beta + r1;
+
+            x0 = x1;
+            r0 = r1;
+        }
+
+        return EILIG_NOT_CONVERGED;
+    }
     Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
     {
         Scalar alpha{ 0.0 };
@@ -488,6 +552,7 @@ namespace eilig
 
         return EILIG_NOT_CONVERGED;
     }
+
     void WriteToFile(const Vector& vec, const String& fileName)
     {
         File file;
@@ -998,6 +1063,70 @@ namespace eilig
         }
 
         return res;
+    }
+    Status IterativeCG(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
+    {
+        Scalar alpha;
+        Scalar beta;
+
+        Index numberRows = A.GetRows();
+        Index iteration = { 0 };
+
+        opencl::Vector x0(b.GetKernels(), numberRows);
+        opencl::Vector r0(b.GetKernels(), numberRows);
+        opencl::Vector p0(b.GetKernels(), numberRows);
+        opencl::Vector x1(b.GetKernels(), numberRows);
+        opencl::Vector r1(b.GetKernels(), numberRows);
+        opencl::Vector p1(b.GetKernels(), numberRows);
+        opencl::Vector aux(b.GetKernels(), numberRows);
+
+        if (callbackIterative == nullptr)
+        {
+            logger::Error(headerEilig, "Invalid callback (null pointer)");
+            return EILIG_NULLPTR;
+        }
+
+        x0 = x;
+
+        Mul(aux, -A, x0);
+        Add(r0, aux, b);
+        p0 = r0;
+
+        for (;;)
+        {
+            Mul(aux, A, p0);
+            alpha = Dot(r0, r0) / Dot(p0, aux);
+
+            r1 = aux * (-alpha) + r0;
+            x1 = p0 * alpha + x0;
+
+            auto residual = NormP2(r1);
+            auto status = callbackIterative(iteration, residual);
+
+            switch (status)
+            {
+            case EILIG_SUCCESS:
+                x = x1;
+                return status;
+            case EILIG_NOT_CONVERGED:
+                x = x1;
+                return status;
+            case EILIG_STOP:
+                x = x1;
+                return status;
+            case EILIG_CONTINUE:
+                break;
+            }
+
+            beta = Dot(r1, r1) / Dot(r0, r0);
+
+            p0 = p0 * beta + r1;
+
+            x0 = x1;
+            r0 = r1;
+        }
+
+        return EILIG_NOT_CONVERGED;
     }
     Status IterativeBiCGStab(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
     {
