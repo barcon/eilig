@@ -410,8 +410,6 @@ namespace eilig
         Vector p0(numberRows);
         Vector x1(numberRows);
         Vector r1(numberRows);
-        Vector p1(numberRows);
-        Vector aux(numberRows);
 
         if (callbackIterative == nullptr)
         {
@@ -420,22 +418,17 @@ namespace eilig
         }
 
         x0 = x;
-
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
+        r0 = b - A * x0;
         p0 = r0;
 
         for (;;)
         {
             iteration++;
 
-            rho0 = Dot(r0, r0);
+            alpha = Dot(r0, r0) / Dot(p0, A * p0);
 
-            Mul(aux, A, p0);
-            alpha = rho0 / Dot(p0, aux);
-
-            r1 = aux * (-alpha) + r0;
-            x1 = p0 * alpha + x0;
+            x1 = x0 + p0 * alpha;
+            r1 = r0 + (A * p0) * (-alpha);
 
             auto residual = NormP2(r1);
             auto status = callbackIterative(iteration, residual);
@@ -456,8 +449,7 @@ namespace eilig
             }
 
             beta = Dot(r1, r1) / Dot(r0, r0);
-
-            p0 = p0 * beta + r1;
+            p0 = r1 + p0 * beta;
 
             x0 = x1;
             r0 = r1;
@@ -470,8 +462,6 @@ namespace eilig
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
         Scalar omega{ 0.0 };
-        Scalar rho0{ 0.0 };
-        Scalar rho1{ 0.0 };
 
         Index numberRows = A.GetRows();
         Index iteration { 0 };
@@ -480,16 +470,14 @@ namespace eilig
         Vector r0(numberRows);
         Vector p0(numberRows);
         Vector s0(numberRows);
+        Vector h0(numberRows);
         Vector t0(numberRows);
+        Vector v0(numberRows);
         Vector x1(numberRows);
-        Vector r1(numberRows);
         Vector p1(numberRows);
+        Vector r1(numberRows);
+        Vector r2(numberRows);
         Vector residual(numberRows);
-        Vector aux(numberRows);
-        Vector aux1(numberRows);
-        Vector aux2(numberRows);
-        Vector aux3(numberRows);
-        Vector aux4(numberRows);
 
         if (callbackIterative == nullptr)
         {
@@ -497,37 +485,38 @@ namespace eilig
             return EILIG_NULLPTR;
         }
 
-        x0 = x;
-        
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
+        x0 = x;       
+        r0 = b - A * x0;
         p0 = r0;
-        aux2 = r0;
-
-         for (;;)
+        r1 = r0;
+        
+        for (;;)
         {
             iteration++;
 
-            rho0 = Dot(r0, r0);
+            v0 = A * p0;
+            alpha = Dot(r1, r0) / Dot(v0, r0);            
+            h0 = x0 + alpha * p0;
+            s0 = r1 - alpha * v0;
 
-            Mul(aux1, A, p0);
-            alpha = rho0 / Dot(aux1, aux2);
-
-            s0 = aux1;
-
-            s0 = s0 * (-alpha) + r0;
-            Mul(t0, A, s0);
-
-            omega = Dot(t0, s0) / Dot(t0, t0);
-
-            aux3 = s0 * omega;
-            aux4 = p0 * alpha;
-
-            x1 = x0 + aux3 + aux4;
-            r1 = (t0 * (-omega)) + s0;
-
-            auto residual = NormP2(r1);
+            auto residual = NormP2(s0);
             auto status = callbackIterative(iteration, residual);
+
+            switch (status)
+            {
+            case EILIG_SUCCESS:
+                x = h0;
+                return status;
+            }
+
+            t0 = A * s0;
+            omega = Dot(t0, s0) / Dot(t0, t0);
+            
+            x1 = x0 + alpha * p0 + omega * s0;
+            r2 = s0 - omega * t0;
+
+            residual = NormP2(r2);
+            status = callbackIterative(iteration, residual);
 
             switch (status)
             {
@@ -544,15 +533,12 @@ namespace eilig
                 break;
             }
 
-            rho1 = Dot(r1, aux2);
-            beta = (rho1 / rho0) * (alpha / omega);
-
-            p1 = (aux1 * (-omega) + p0) * beta + r1;
+            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);            
+            p1 = r2 + beta * (p0 - omega * v0);
+            r1 = r2;
 
             p0 = p1;
             x0 = x1;
-            r0 = r1;
-            rho0 = rho1;
         }
 
         return EILIG_NOT_CONVERGED;
@@ -1084,8 +1070,7 @@ namespace eilig
         opencl::Vector x1(b.GetKernels(), numberRows);
         opencl::Vector r1(b.GetKernels(), numberRows);
         opencl::Vector p1(b.GetKernels(), numberRows);
-        opencl::Vector aux(b.GetKernels(), numberRows);
-
+    
         if (callbackIterative == nullptr)
         {
             logger::Error(headerEilig, "Invalid callback (null pointer)");
@@ -1093,22 +1078,17 @@ namespace eilig
         }
 
         x0 = x;
-
-        Mul(aux, -A, x0);
-        Add(r0, aux, b);
+        r0 = b - A * x0;
         p0 = r0;
 
         for (;;)
         {
             iteration++;
 
-            rho0 = Dot(r0, r0);
+            alpha = Dot(r0, r0) / Dot(p0, A * p0);
 
-            Mul(aux, A, p0);
-            alpha = rho0 / Dot(p0, aux);
-
-            r1 = aux * (-alpha) + r0;
-            x1 = p0 * alpha + x0;
+            x1 = x0 + p0 * alpha;
+            r1 = r0 + (A * p0) * (-alpha);
 
             auto residual = NormP2(r1);
             auto status = callbackIterative(iteration, residual);
@@ -1129,8 +1109,7 @@ namespace eilig
             }
 
             beta = Dot(r1, r1) / Dot(r0, r0);
-
-            p0 = p0 * beta + r1;
+            p0 = r1 + p0 * beta;
 
             x0 = x1;
             r0 = r1;
