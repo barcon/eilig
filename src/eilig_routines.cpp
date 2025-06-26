@@ -420,7 +420,7 @@ namespace eilig
         x0 = x;
         r0 = b - A * x0;
 
-        if (utils::math::IsAlmostEqual(Dot(r0, r0), 0.0, 5))
+        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
         {
             x0 = x + 1.0;
             r0 = b - A * x0;
@@ -484,7 +484,6 @@ namespace eilig
         Vector p1(numberRows);
         Vector r1(numberRows);
         Vector r2(numberRows);
-        Vector residual(numberRows);
 
         if (callbackIterative == nullptr)
         {
@@ -495,7 +494,7 @@ namespace eilig
         x0 = x;       
         r0 = b - A * x0;
 
-        if (utils::math::IsAlmostEqual(Dot(r0, r0), 0.0, 5))
+        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
         {
             x0 = x + 1.0;
             r0 = b - A * x0;
@@ -509,7 +508,7 @@ namespace eilig
             iteration++;
 
             v0 = A * p0;
-            alpha = Dot(r1, r0) / Dot(v0, r0);            
+            alpha = Dot(r1, r0) / Dot(v0, r0);
             h0 = x0 + alpha * p0;
             s0 = r1 - alpha * v0;
 
@@ -1093,7 +1092,7 @@ namespace eilig
         x0 = x;
         r0 = b - A * x0;
 
-        if (utils::math::IsAlmostEqual(Dot(r0, r0), 0.0, 5))
+        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
         {
             x0 = x + 1.0;
             r0 = b - A * x0;
@@ -1157,7 +1156,6 @@ namespace eilig
         opencl::Vector p1(b.GetKernels(), numberRows);
         opencl::Vector r1(b.GetKernels(), numberRows);
         opencl::Vector r2(b.GetKernels(), numberRows);
-        opencl::Vector residual(b.GetKernels(), numberRows);
 
         if (callbackIterative == nullptr)
         {
@@ -1168,7 +1166,7 @@ namespace eilig
         x0 = x;
         r0 = b - A * x0;
 
-        if (utils::math::IsAlmostEqual(Dot(r0, r0), 0.0, 5))
+        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
         {
             x0 = x + 1.0;
             r0 = b - A * x0;
