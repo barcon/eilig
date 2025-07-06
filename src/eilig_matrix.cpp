@@ -14,6 +14,23 @@ namespace eilig
     {
         (*this) = input;
     }
+    Matrix::Matrix(const Ellpack& input)
+    {
+		Resize(input.GetRows(), input.GetCols());
+
+        const auto& count = input.GetCount();
+        const auto& position = input.GetPosition();
+        const auto& data = input.GetData();
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index k = 0; k < count[i]; ++k)
+            {
+                auto j = position[];
+                (*this)(i, j) = data[i][j];
+            }
+		}   
+    }
     Matrix::Matrix(const Vector& input)
     {
         numberRows_ = input.GetRows();
@@ -24,9 +41,25 @@ namespace eilig
     {
         Resize(numberRows, numberCols);
     }
-    Matrix::Matrix(NumberRows numberRows, NumberRows numberCols, Scalar value)
+    Matrix::Matrix(NumberRows numberRows, NumberRows numberCols, Type type)
     {
-        Resize(numberRows, numberCols, value);
+        switch (type)
+        {
+        case matrix_ones:
+            Resize(numberRows, numberCols, 1.0);
+            break;
+        case matrix_diagonal:
+            Resize(numberRows, numberCols, 0.0);
+
+            for (Index i = 0; (i < numberRows) && (i < numberCols); ++i)
+            {
+                (*this)(i, i) = 1.0;
+            }
+            break;
+        case matrix_zeros:
+        default:
+            Resize(numberRows, numberCols, 0.0);
+        }
     }
     void Matrix::Resize(NumberRows numberRows, NumberRows numberCols)
     {

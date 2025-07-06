@@ -14,6 +14,8 @@ using CallbackIterative = long long int (*)(std::size_t, double);
 
 namespace eilig
 {
+	Indices CreateIndices();
+
     Scalar NormMax(const Vector& in);
     Scalar NormP(const Vector& in, Scalar p);
     Scalar NormP(const Matrix& in, Scalar p);
@@ -30,13 +32,13 @@ namespace eilig
 	Matrix ScaleByVector(const Matrix& A, const Vector& alpha);
 	Vector Solve(const Matrix& A, const Vector& b);
 	
-	void DecomposeLUP(Matrix& LU, Indices& permutation, const Matrix& A);
+	void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);
+	void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
+	void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b);
+	void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
+	void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation);
 	void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation);
-	void DiagonalLinearSystem(Vector& x, const Matrix& A, const Vector& b);
-	void DiagonalLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
-	void ForwardLinearSystem(Vector& x, const Matrix& A, const Vector& b);
-	void ForwardLinearSystem(Vector& x, const Ellpack& A, const Vector& b);
-	void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b);
+	void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
 	Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative);
 	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative);
 

@@ -5,6 +5,10 @@
 
 namespace eilig
 {
+    Indices CreateIndices()
+    {
+        return Indices();
+    }
     Scalar NormMax(const Vector& in)
     {
         Scalar res{ std::abs(in(0)) };
@@ -192,7 +196,7 @@ namespace eilig
         Matrix LU(numberRows, numberCols);
         Indices permutation(numberRows + 1 );
 
-        DecomposeLUP(LU, permutation, A);
+        DecomposeLUP(LU, A, permutation);
 
         return DeterminantLUP(LU, permutation);
     }
@@ -205,7 +209,7 @@ namespace eilig
         Matrix IA(numberRows, numberCols);
         Indices permutation(numberRows + 1);
 
-        DecomposeLUP(LU, permutation, A);
+        DecomposeLUP(LU, A, permutation);
         InverseLUP(IA, LU, permutation);
 
         return IA;
@@ -233,12 +237,66 @@ namespace eilig
         Matrix LU(numberRows, numberCols);
         Indices permutation(numberRows + 1);
 
-        DecomposeLUP(LU, permutation, A);
-        DirectLUP(x, LU, permutation, b);
+        DecomposeLUP(LU, A, permutation);
+        DirectLUP(LU, x, b, permutation);
     
         return x;
     }
-    void DecomposeLUP(Matrix& LU, Indices& permutation, const Matrix& A)
+    void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
+    {
+        Index numberRows = A.GetRows();
+
+        for (Index i = 0; i < numberRows; ++i)
+        {
+            x(i) = b(i) / A(i, i);
+        }
+    }
+    void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
+    {
+        Index numberRows = A.GetRows();
+
+        for (Index i = 0; i < numberRows; ++i)
+        {
+            x(i) = b(i) / A(i, i);
+        }
+    }
+    void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b)
+    {
+        Index numberRows = A.GetRows();
+        Index numberCols = A.GetCols();
+        Scalar dot;
+
+        for (Index i = 0; i < numberRows; ++i)
+        {
+            dot = 0.0;
+
+            for (Index j = 0; j < numberCols; ++j)
+            {
+                dot += A(i, j) * x(j);
+            }
+
+            x(i) = (b(i) - dot) / A(i, i);
+        }
+    }
+    void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
+    {
+        Index numberRows = A.GetRows();
+        Index numberCols = A.GetCols();
+        Scalar dot;
+
+        for (Index i = 0; i < numberRows; ++i)
+        {
+            dot = 0.0;
+
+            for (Index j = 0; j < numberCols; ++j)
+            {
+                dot += A(i, j) * x(j);
+            }
+
+            x(i) = (b(i) - dot) / A(i, i);
+        }
+    }
+    void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation)
     {
         Index numberRows{ A.GetRows() };
         Scalar maxA;
@@ -248,8 +306,9 @@ namespace eilig
         Index temp{ 0 };
         
         LU = A;
+		permutation.resize(numberRows);
 
-        for (Index i = 0; i <= numberRows; i++)
+        for (Index i = 0; i < numberRows; i++)
         {
             permutation[i] = i;
         }
@@ -318,61 +377,7 @@ namespace eilig
             }
         }
     }
-    void DiagonalLinearSystem(Vector& x, const Ellpack& A, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            x(i) = b(i) / A(i, i);
-        }
-    }
-    void DiagonalLinearSystem(Vector& x, const Matrix& A, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            x(i) = b(i) / A(i, i);
-        }
-    }
-    void ForwardLinearSystem(Vector& x, const Ellpack& A, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Scalar dot;
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            dot = 0.0;
-
-            for (Index j = 0; j < numberCols; ++j)
-            {
-                dot += A(i, j) * x(j);
-            }
-
-            x(i) = (b(i) - dot) / A(i, i);
-        }
-    }
-    void ForwardLinearSystem(Vector& x, const Matrix& A, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Scalar dot;
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            dot = 0.0;
-
-            for (Index j = 0; j < numberCols; ++j)
-            {
-                dot += A(i, j) * x(j);
-            }
-
-            x(i) = (b(i) - dot) / A(i, i);
-        }
-    }
-    void DirectLUP(Vector& x, const Matrix& LU, const Indices& permutation, const Vector& b)
+    void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation)
     {
         Index numberRows = LU.GetRows();
 
@@ -434,8 +439,8 @@ namespace eilig
 
             alpha = Dot(r0, r0) / Dot(p0, A * p0);
 
-            x1 = x0 + p0 * alpha;
-            r1 = r0 + (A * p0) * (-alpha);
+            x1 = x0 + alpha * p0 ;
+            r1 = r0 - alpha * (A * p0);
 
             auto residual = NormP2(r1);
             auto status = callbackIterative(iteration, residual);
@@ -456,12 +461,12 @@ namespace eilig
             }
 
             beta = Dot(r1, r1) / Dot(r0, r0);
-            p0 = r1 + p0 * beta;
+            p0 = r1 + beta * p0;
 
             x0 = x1;
             r0 = r1;
         }
-
+        
         return EILIG_NOT_CONVERGED;
     }
     Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
@@ -1106,8 +1111,8 @@ namespace eilig
 
             alpha = Dot(r0, r0) / Dot(p0, A * p0);
 
-            x1 = x0 + p0 * alpha;
-            r1 = r0 + (A * p0) * (-alpha);
+            x1 = x0 + alpha * p0;
+            r1 = r0 - alpha * (A * p0);
 
             auto residual = NormP2(r1);
             auto status = callbackIterative(iteration, residual);
@@ -1128,7 +1133,7 @@ namespace eilig
             }
 
             beta = Dot(r1, r1) / Dot(r0, r0);
-            p0 = r1 + p0 * beta;
+            p0 = r1 + beta * p0;
 
             x0 = x1;
             r0 = r1;

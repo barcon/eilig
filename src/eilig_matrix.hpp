@@ -3,6 +3,7 @@
 
 #include "eilig_types.hpp"
 #include "eilig_vector.hpp"
+#include "eilig_matrix_ellpack.hpp"
 
 namespace eilig
 {
@@ -11,9 +12,10 @@ namespace eilig
     public:
         Matrix();
         Matrix(const Matrix& input);
+        Matrix(const Ellpack& input);
         Matrix(const Vector& input);
         Matrix(NumberRows numberRows, NumberCols numberCols);
-        Matrix(NumberRows numberRows, NumberCols numberCols, Scalar value );
+        Matrix(NumberRows numberRows, NumberCols numberCols, Type type);
         Matrix(Matrix&& input) noexcept;
 
         ~Matrix() = default;

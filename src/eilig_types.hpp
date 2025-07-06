@@ -20,11 +20,16 @@ namespace eilig
 	using Index = std::size_t;
 	using Indices = std::vector<Index>;
 	using String = std::string;
-	using File = utils::file::Text;
+	using File = utils::file::Text;	
 	using Status = long long int;
-
+	
 	static const String headerEilig = "EILIG";
 
+	using Type = std::size_t;
+	static const Type matrix_ones		= 1;
+	static const Type matrix_zeros		= 2;
+	static const Type matrix_diagonal	= 3;
+	
 	using Axis = std::size_t;
 	static const Axis axis_x{ 0 };
 	static const Axis axis_y{ 1 };
