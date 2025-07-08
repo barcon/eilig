@@ -427,7 +427,7 @@ namespace eilig
 
         if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
         {
-            x0 = x + 1.0;
+            x0 = 1.0;
             r0 = b - A * x0;
         }
 

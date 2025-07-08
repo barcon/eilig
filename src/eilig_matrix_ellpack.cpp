@@ -35,9 +35,25 @@ namespace eilig
     {
         Resize(numberRows, numberCols);
     }
-    Ellpack::Ellpack(NumberRows numberRows, NumberCols numberCols, Scalar value)
+    Ellpack::Ellpack(NumberRows numberRows, NumberCols numberCols, Type type)
     {
-        Resize(numberRows, numberCols, value);
+        switch (type)
+        {
+        case matrix_ones:
+            Resize(numberRows, numberCols, 1.0);
+            break;
+        case matrix_diagonal:
+            Resize(numberRows, numberCols, 0.0);
+
+            for (Index i = 0; (i < numberRows) && (i < numberCols); ++i)
+            {
+                (*this)(i, i) = 1.0;
+            }
+            break;
+        case matrix_zeros:
+        default:
+            Resize(numberRows, numberCols, 0.0);
+        }
     }
     bool Ellpack::IsUsed(Index row, Index col) const
     {

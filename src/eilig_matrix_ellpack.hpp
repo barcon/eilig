@@ -14,7 +14,7 @@ namespace eilig
         Ellpack(const Ellpack& input);
         Ellpack(const eilig::Matrix& input);
         Ellpack(NumberRows numberRows, NumberCols numberCols);
-        Ellpack(NumberRows numberRows, NumberCols numberCols, Scalar value);
+        Ellpack(NumberRows numberRows, NumberCols numberCols, Type type);
         Ellpack(Ellpack&& input) noexcept;
 
         ~Ellpack() = default;

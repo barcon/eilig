@@ -21,13 +21,14 @@ namespace eilig
         const auto& count = input.GetCount();
         const auto& position = input.GetPosition();
         const auto& data = input.GetData();
+		const auto& width = input.GetWidth();
 
         for (Index i = 0; i < numberRows_; ++i)
         {
             for (Index k = 0; k < count[i]; ++k)
             {
-                auto j = position[];
-                (*this)(i, j) = data[i][j];
+                auto j = position[i * width + k];
+                (*this)(i, j) = data[i * width + k];
             }
 		}   
     }
@@ -213,7 +214,7 @@ namespace eilig
     }
     Matrix Matrix::operator*(const Matrix& rhs) const
     {
-        Matrix res(numberRows_, rhs.numberCols_, 0.0);
+        Matrix res(numberRows_, rhs.numberCols_, matrix_zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -290,7 +291,7 @@ namespace eilig
     }
     Matrix Matrix::Diagonal() const
     {
-        Matrix res(numberRows_, numberCols_, 0.0);
+        Matrix res(numberRows_, numberCols_, matrix_zeros);
 
         for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
         {
@@ -312,7 +313,7 @@ namespace eilig
     }
     Matrix Matrix::LowerWithDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, 0.0);
+        Matrix res(numberRows_, numberCols_, matrix_zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -333,7 +334,7 @@ namespace eilig
     }
     Matrix Matrix::LowerWithoutDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, 0.0);
+        Matrix res(numberRows_, numberCols_, matrix_zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -365,7 +366,7 @@ namespace eilig
     }
     Matrix Matrix::UpperWithDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, 0.0);
+        Matrix res(numberRows_, numberCols_, matrix_zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -386,7 +387,7 @@ namespace eilig
     }
     Matrix Matrix::UpperWithoutDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, 0.0);
+        Matrix res(numberRows_, numberCols_, matrix_zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {

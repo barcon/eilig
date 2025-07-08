@@ -20,7 +20,7 @@ namespace eilig
             Ellpack(KernelsPtr kernels, const eilig::Matrix& input);
             Ellpack(KernelsPtr kernels, const eilig::Ellpack& input);
             Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols);
-            Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols, Scalar value);
+            Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols, Type type);
             Ellpack(Ellpack&& input) noexcept;
 
             ~Ellpack() = default;

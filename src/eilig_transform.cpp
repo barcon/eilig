@@ -24,7 +24,7 @@ namespace eilig
 		}
 		Matrix RotationMatrix(Axis axis, Scalar radians)
 		{
-			Matrix rot(3, 3, 0.0);
+			Matrix rot(3, 3, matrix_zeros);
 
 			switch (axis)
 			{
