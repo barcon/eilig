@@ -306,9 +306,9 @@ namespace eilig
         Index temp{ 0 };
         
         LU = A;
-		permutation.resize(numberRows);
+		permutation.resize(numberRows + 1);
 
-        for (Index i = 0; i < numberRows; i++)
+        for (Index i = 0; i <= numberRows; i++)
         {
             permutation[i] = i;
         }
