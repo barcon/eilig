@@ -210,6 +210,10 @@ namespace eilig
     {
         (*this)(i) = value;
     }
+} /* namespace eilig */
+
+/*
+
     void Add(Vector& out, const Vector& in, Scalar value)
     {
         auto rows = in.GetRows();
@@ -255,4 +259,5 @@ namespace eilig
             out(i) = in(i) * value;
         }
     }
-} /* namespace eilig */
+
+*/

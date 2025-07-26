@@ -364,6 +364,13 @@ namespace eilig
         {
             (*this)(row) = value;
         }
+    }
+} /* namespace eilig */
+
+#endif
+
+/*
+
         void Add(Vector& out, const Vector& in, Scalar value)
         {
             out = in + value;
@@ -384,7 +391,5 @@ namespace eilig
         {
             out = in * value;
         }
-    }
-} /* namespace eilig */
 
-#endif
+*/

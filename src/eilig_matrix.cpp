@@ -501,6 +501,9 @@ namespace eilig
     {
         (*this)(row, col) = value;
     }
+} /* namespace eilig */
+
+/*
     void Add(Matrix& out, const Matrix& in, Scalar value)
     {
         auto rows = in.GetRows();
@@ -603,4 +606,4 @@ namespace eilig
             }
         }
     }
-} /* namespace eilig */
+*/

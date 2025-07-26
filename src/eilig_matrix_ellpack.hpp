@@ -74,13 +74,13 @@ namespace eilig
 
         void SetValue(Index row, Index col, Scalar value);
 
-        friend void Add(Ellpack& out, const Ellpack& in, Scalar value);
-        friend void Add(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        friend void Sub(Ellpack& out, const Ellpack& in, Scalar value);
-        friend void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        friend void Mul(Ellpack& out, const Ellpack& in, Scalar value);
-        friend void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        friend void Mul(Vector& out, const Ellpack& in, const Vector& value);
+        //friend void Add(Ellpack& out, const Ellpack& in, Scalar value);
+        //friend void Add(Ellpack& out, const Ellpack& in, const Ellpack& value);
+        //friend void Sub(Ellpack& out, const Ellpack& in, Scalar value);
+        //friend void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value);
+        //friend void Mul(Ellpack& out, const Ellpack& in, Scalar value);
+        //friend void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value);
+        //friend void Mul(Vector& out, const Ellpack& in, const Vector& value);
 
 #ifdef EILIG_ENABLE_OPENCL
         friend opencl::Ellpack;

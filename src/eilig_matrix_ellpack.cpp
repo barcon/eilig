@@ -835,6 +835,10 @@ namespace eilig
             (*this)(i, j) = value;
         }
     }
+} /* namespace eilig */
+
+/*
+
     void Add(Ellpack& out, const Ellpack& in, Scalar value)
     {
         out = in + value;
@@ -863,4 +867,5 @@ namespace eilig
     {
         out = in * value;
     }
-} /* namespace eilig */
+
+*/
