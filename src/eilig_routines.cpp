@@ -613,11 +613,9 @@ namespace eilig
     Status ReadFromFile(Vector& output, const String& fileName)
     {
         File file;
-        String input;
         String line;
         Status status;
-        std::vector<String> table;
-        std::istringstream stream;
+        Strings table;
 
         file.SetName(fileName);
         file.SetMode(utils::file::Read);
@@ -629,9 +627,7 @@ namespace eilig
             return EILIG_INVALID_FILE;
         }
 
-        input = file.GetFull();
-        stream = static_cast<std::istringstream>(input);
-
+        auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
             if (!utils::string::IsEmpty(line))
@@ -652,12 +648,10 @@ namespace eilig
     Status ReadFromFile(Matrix& output, const String& fileName)
     {
         File file;
-        String input;
         String line;
         Status status;
-        std::vector<std::vector<String>> table;
-        std::vector<String> split;
-        std::istringstream stream;
+        Strings split;
+        std::vector<Strings> table;
 
         file.SetName(fileName);
         file.SetMode(utils::file::Read);
@@ -668,15 +662,13 @@ namespace eilig
             logger::Error(headerEilig, "File could not be opened");
             return EILIG_INVALID_FILE;
         }
-
-        input = file.GetFull();
-        stream = static_cast<std::istringstream>(input);
-
+        
+        auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
             if (!utils::string::IsEmpty(line))
             {
-                split = utils::string::Split(line);
+                split = utils::string::Split(line, {' ', ';', '\t'});
                 table.push_back(split);
             }
         }
@@ -696,12 +688,10 @@ namespace eilig
     Status ReadFromFile(Ellpack& output, const String& fileName)
     {
         File file;
-        String input;
         String line;
         Status status;
-        std::vector<std::vector<String>> table;
-        std::vector<String> split;
-        std::istringstream stream;
+        std::vector<Strings> table;
+        Strings split;
 
         file.SetName(fileName);
         file.SetMode(utils::file::Read);
@@ -713,14 +703,12 @@ namespace eilig
             return EILIG_INVALID_FILE;
         }
 
-        input = file.GetFull();
-        stream = static_cast<std::istringstream>(input);
-
+        auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
             if (!utils::string::IsEmpty(line))
             {
-                split = utils::string::Split(line);
+                split = utils::string::Split(line, { ' ', ';', '\t' });
                 table.push_back(split);
             }
         }
@@ -1268,11 +1256,9 @@ namespace eilig
     Status ReadFromFile(opencl::Vector& output, const String& fileName)
     {
         File file;
-        String input;
         String line;
         Status status;
-        std::vector<String> table;
-        std::istringstream stream;
+        Strings table;
 
         file.SetName(fileName);
         file.SetMode(utils::file::Read);
@@ -1284,9 +1270,7 @@ namespace eilig
             return EILIG_INVALID_FILE;
         }
 
-        input = file.GetFull();
-        stream = static_cast<std::istringstream>(input);
-
+        auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
             if (!utils::string::IsEmpty(line))
@@ -1307,12 +1291,10 @@ namespace eilig
     Status ReadFromFile(opencl::Ellpack& output, const String& fileName)
     {
         File file;
-        String input;
         String line;
         Status status;
-        std::vector<std::vector<String>> table;
-        std::vector<String> split;
-        std::istringstream stream;
+        std::vector<Strings> table;
+        Strings split;
 
         file.SetName(fileName);
         file.SetMode(utils::file::Read);
@@ -1323,15 +1305,13 @@ namespace eilig
             logger::Error(headerEilig, "File could not be opened");
             return EILIG_INVALID_FILE;
         }
-
-        input = file.GetFull();
-        stream = static_cast<std::istringstream>(input);
-
+     
+        auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
             if (!utils::string::IsEmpty(line))
             {
-                split = utils::string::Split(line);
+                split = utils::string::Split(line, { ' ', ';', '\t' });
                 table.push_back(split);
             }
         }

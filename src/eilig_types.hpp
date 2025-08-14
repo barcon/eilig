@@ -19,7 +19,8 @@ namespace eilig
 	using NumberCols = std::size_t;
 	using Index = std::size_t;
 	using Indices = std::vector<Index>;
-	using String = std::string;
+	using String = utils::String;
+	using Strings = utils::Strings;
 	using File = utils::file::Text;	
 	using Status = long long int;
 	
