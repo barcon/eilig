@@ -11,6 +11,7 @@ namespace eilig
     {
     public:
         Matrix();
+        Matrix(const std::vector<Scalars>& values);
         Matrix(const Matrix& input);
         Matrix(const Ellpack& input);
         Matrix(const Vector& input);

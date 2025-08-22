@@ -6,6 +6,18 @@ namespace eilig
     {
         Resize(1, 1);
     }
+    Matrix::Matrix(const std::vector<Scalars>& values)
+    {
+        Resize(values.size(), values[0].size());
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] = values[i][j];
+            }
+        }
+    }
     Matrix::Matrix(Matrix&& input) noexcept
     {
         (*this) = std::move(input);

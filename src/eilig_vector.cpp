@@ -6,6 +6,11 @@ namespace eilig
     {
         Resize(1);
     }
+    Vector::Vector(const Scalars& values)
+    {
+		data_ = values;
+		numberRows_ = data_.size();
+    }
     Vector::Vector(Vector&& input) noexcept
     {
         (*this) = std::move(input);

@@ -11,6 +11,23 @@ namespace eilig
             kernels_ = kernels;
             Resize(1);
         }
+        Vector::Vector(KernelsPtr kernels, const Scalars& values)
+        {
+            club::Error error;
+            club::Events events(1);
+
+            kernels_ = kernels;
+            Resize(values.size());
+
+            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), CL_FALSE, 0, sizeof(Scalar) * numberRows_, &values[0], 0, NULL, &events[0]);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            }
+
+            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+        }
         Vector::Vector(Vector&& input) noexcept
         {
             (*this) = std::move(input);
