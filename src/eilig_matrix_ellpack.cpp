@@ -14,6 +14,23 @@ namespace eilig
     {
         (*this) = input;
     }
+    Ellpack::Ellpack(const std::vector<Scalars>& values)
+    {
+        Resize(values.size(), values[0].size());
+
+        for (Index i = 0; i < numberRows_; i++)
+        {
+            for (Index j = 0; j < numberCols_; j++)
+            {
+                if (utils::math::IsAlmostEqual(values[i][j], 0.0, 5))
+                {
+                    continue;
+                }
+
+                (*this)(i, j) = values[i][j];
+            }
+        }
+    }
     Ellpack::Ellpack(const eilig::Matrix& input)
     {
         Resize(input.GetRows(), input.GetCols());

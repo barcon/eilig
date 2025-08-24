@@ -70,14 +70,6 @@ namespace eilig
 
         void SetValue(Index row, Index col, Scalar value);
 
-        //friend void Add(Matrix& out, const Matrix& in, Scalar value);
-        //friend void Add(Matrix& out, const Matrix& in, const Matrix& value);
-        //friend void Sub(Matrix& out, const Matrix& in, Scalar value);
-        //friend void Sub(Matrix& out, const Matrix& in, const Matrix& value);
-        //friend void Mul(Matrix& out, const Matrix& in, Scalar value);
-        //friend void Mul(Matrix& out, const Matrix& in, const Matrix& value);
-        //friend void Mul(Vector& out, const Matrix& in, const Vector& value);
-
     private:
         NumberRows numberRows_{ 0 };
         NumberCols numberCols_{ 0 };

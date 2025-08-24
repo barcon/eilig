@@ -12,6 +12,7 @@ namespace eilig
     public:
         Ellpack();
         Ellpack(const Ellpack& input);
+        Ellpack(const std::vector<Scalars>& values);
         Ellpack(const eilig::Matrix& input);
         Ellpack(NumberRows numberRows, NumberCols numberCols);
         Ellpack(NumberRows numberRows, NumberCols numberCols, Type type);
@@ -73,14 +74,6 @@ namespace eilig
         const Scalars& GetData() const;
 
         void SetValue(Index row, Index col, Scalar value);
-
-        //friend void Add(Ellpack& out, const Ellpack& in, Scalar value);
-        //friend void Add(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        //friend void Sub(Ellpack& out, const Ellpack& in, Scalar value);
-        //friend void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        //friend void Mul(Ellpack& out, const Ellpack& in, Scalar value);
-        //friend void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value);
-        //friend void Mul(Vector& out, const Ellpack& in, const Vector& value);
 
 #ifdef EILIG_ENABLE_OPENCL
         friend opencl::Ellpack;

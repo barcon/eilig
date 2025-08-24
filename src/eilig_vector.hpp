@@ -54,12 +54,6 @@ namespace eilig
 
         void SetValue(Index row, Scalar value);
 
-        //friend void Add(Vector& out, const Vector& in, Scalar value);
-        //friend void Add(Vector& out, const Vector& in, const Vector& value);
-        //friend void Sub(Vector& out, const Vector& in, Scalar value);
-        //friend void Sub(Vector& out, const Vector& in, const Vector& value);
-        //friend void Mul(Vector& out, const Vector& in, Scalar value);
-
     private:
         NumberRows numberRows_{ 0 };
 

@@ -61,12 +61,6 @@ namespace eilig
 
             void SetValue(Index row, Scalar value);
 
-            //friend void Add(opencl::Vector& out, const opencl::Vector& in, Scalar value);
-            //friend void Add(opencl::Vector& out, const opencl::Vector& in, const opencl::Vector& value);
-            //friend void Sub(opencl::Vector& out, const opencl::Vector& in, Scalar value);
-            //friend void Sub(opencl::Vector& out, const opencl::Vector& in, const opencl::Vector& value);
-            //friend void Mul(opencl::Vector& out, const opencl::Vector& in, Scalar value);
-
         private:
             NumberRows numberRows_{ 0 };
             

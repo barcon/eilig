@@ -17,6 +17,7 @@ namespace eilig
         public:
             Ellpack(KernelsPtr kernels);
             Ellpack(const Ellpack& input);
+            Ellpack(KernelsPtr kernels, const std::vector<Scalars>& values);
             Ellpack(KernelsPtr kernels, const eilig::Matrix& input);
             Ellpack(KernelsPtr kernels, const eilig::Ellpack& input);
             Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols);
@@ -80,14 +81,6 @@ namespace eilig
             BufferPtr GetDataGPU() const;
 
             void SetValue(Index row, Index col, Scalar value);
-
-            friend void Add(Ellpack& out, const Ellpack& in, Scalar value);
-            friend void Add(Ellpack& out, const Ellpack& in, const Ellpack& value);
-            friend void Sub(Ellpack& out, const Ellpack& in, Scalar value);
-            friend void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value);
-            friend void Mul(Ellpack& out, const Ellpack& in, Scalar value);
-            friend void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value);
-            friend void Mul(Vector& out, const Ellpack& in, const Vector& value);
 
         private:
 
