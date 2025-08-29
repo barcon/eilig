@@ -24,6 +24,8 @@ namespace eilig
 
             ~Vector() = default;
 
+            eilig::Vector Convert() const;
+
             void Resize(NumberRows numberRows);
             void Resize(NumberRows numberRows, Scalar value);
             void Fill(Scalar value);

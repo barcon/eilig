@@ -26,6 +26,8 @@ namespace eilig
 
             ~Ellpack() = default;
 
+            eilig::Ellpack Convert() const;
+
             bool IsUsed(Index row, Index col) const;
             bool IsUsed(Index row, Index col, Index& position) const;
             Index Add(Index row, Index col);

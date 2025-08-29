@@ -59,30 +59,15 @@ namespace eilig
         }
         Ellpack::Ellpack(KernelsPtr kernels, const eilig::Ellpack& input)
         {
-            club::Error error;
-            club::Events events(3);
+            club::Events events;
 
             kernels_ = kernels;
             Resize(input.GetRows(), input.GetCols());
             Expand(input.GetWidth());
 
-            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), countGPU_->Get(), CL_FALSE, 0, sizeof(Index) * numberRows_, &input.count_[0], 0, NULL, &events[0]);
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
-            }
-
-            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), CL_FALSE, 0, sizeof(Index) * numberRows_ * width_, &input.position_[0], 0, NULL, &events[1]);
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
-            }
-
-            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), CL_FALSE, 0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], 0, NULL, &events[2]);
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
-            }
+			events.push_back(countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_FALSE)->Get());
+			events.push_back(positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_FALSE)->Get());
+			events.push_back(dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_FALSE)->Get());
 
             clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
         }
@@ -112,6 +97,22 @@ namespace eilig
             default:
                 Resize(numberRows, numberCols, 0.0);
             }
+        }
+        eilig::Ellpack Ellpack::Convert() const
+        {
+            club::Events events;
+
+			auto res = eilig::Ellpack(numberRows_, numberCols_);
+
+            res.Expand(width_);
+            
+            events.push_back(countGPU_->Read(0, sizeof(Index) * numberRows_, &res.count_[0], CL_FALSE)->Get());
+            events.push_back(positionGPU_->Read(0, sizeof(Index) * numberRows_ * width_, &res.position_[0], CL_FALSE)->Get());
+            events.push_back(dataGPU_->Read(0, sizeof(Scalar) * numberRows_ * width_, &res.data_[0], CL_FALSE)->Get());
+
+            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+
+            return res;
         }
         bool Ellpack::IsUsed(Index row, Index col) const
         {
@@ -1452,36 +1453,3 @@ namespace eilig
 } /* namespace eilig */
 
 #endif
-
-/*
-
-        void Add(Ellpack& out, const Ellpack& in, Scalar value)
-        {
-            out = in + value;
-        }
-        void Add(Ellpack& out, const Ellpack& in, const Ellpack& value)
-        {
-            out = in + value;
-        }
-        void Sub(Ellpack& out, const Ellpack& in, Scalar value)
-        {
-            out = in - value;
-        }
-        void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value)
-        {
-            out = in - value;
-        }
-        void Mul(Ellpack& out, const Ellpack& in, Scalar value)
-        {
-            out = in * value;
-        }
-        void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value)
-        {
-            out = in * value;
-        }
-        void Mul(Vector& out, const Ellpack& in, const Vector& value)
-        {
-            out = in * value;
-        }
-
-*/

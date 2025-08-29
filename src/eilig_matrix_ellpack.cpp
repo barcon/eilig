@@ -853,36 +853,3 @@ namespace eilig
         }
     }
 } /* namespace eilig */
-
-/*
-
-    void Add(Ellpack& out, const Ellpack& in, Scalar value)
-    {
-        out = in + value;
-    }
-    void Add(Ellpack& out, const Ellpack& in, const Ellpack& value)
-    {
-        out = in + value;
-    }
-    void Sub(Ellpack& out, const Ellpack& in, Scalar value)
-    {
-        out = in - value;
-    }
-    void Sub(Ellpack& out, const Ellpack& in, const Ellpack& value)
-    {
-        out = in - value;
-    }
-    void Mul(Ellpack& out, const Ellpack& in, Scalar value)
-    {
-        out = in * value;
-    }
-    void Mul(Ellpack& out, const Ellpack& in, const Ellpack& value)
-    {
-        out = in * value;
-    }
-    void Mul(Vector& out, const Ellpack& in, const Vector& value)
-    {
-        out = in * value;
-    }
-
-*/

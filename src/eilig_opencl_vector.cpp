@@ -13,20 +13,12 @@ namespace eilig
         }
         Vector::Vector(KernelsPtr kernels, const Scalars& values)
         {
-            club::Error error;
-            club::Events events(1);
-
             kernels_ = kernels;
             Resize(values.size());
 
-            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), CL_FALSE, 0, sizeof(Scalar) * numberRows_, &values[0], 0, NULL, &events[0]);
+			auto event = dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &values[0], CL_FALSE);
 
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
-            }
-
-            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
         }
         Vector::Vector(Vector&& input) noexcept
         {
@@ -38,20 +30,12 @@ namespace eilig
         }
         Vector::Vector(KernelsPtr kernels, const eilig::Vector& input)
         {
-            club::Error error;
-            club::Events events(1);
-
             kernels_ = kernels;
             Resize(input.GetRows());
 
-            error = clEnqueueWriteBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), CL_FALSE, 0, sizeof(Scalar) * numberRows_, &input.GetData()[0], 0, NULL, &events[0]);
+            auto event = dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &input.GetData()[0], CL_FALSE);
 
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
-            }
-
-            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
         }
         Vector::Vector(KernelsPtr kernels, NumberRows numberRows)
         {
@@ -62,6 +46,16 @@ namespace eilig
         {
             kernels_ = kernels;
             Resize(numberRows, value);
+        }
+        eilig::Vector Vector::Convert() const
+        {
+			auto res = eilig::Vector(numberRows_);
+            
+			auto event = dataGPU_->Read(0, sizeof(Scalar) * numberRows_, &res.data_[0], CL_FALSE);
+
+            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
+
+            return res;
         }
         void Vector::Resize(NumberRows numberRows)
         {
@@ -385,28 +379,3 @@ namespace eilig
 } /* namespace eilig */
 
 #endif
-
-/*
-
-        void Add(Vector& out, const Vector& in, Scalar value)
-        {
-            out = in + value;
-        }
-        void Add(Vector& out, const Vector& in, const Vector& value)
-        {
-            out = in + value;
-        }
-        void Sub(Vector& out, const Vector& in, Scalar value)
-        {
-            out = in - value;
-        }
-        void Sub(Vector& out, const Vector& in, const Vector& value)
-        {
-            out = in - value;
-        }
-        void Mul(Vector& out, const Vector& in, Scalar value)
-        {
-            out = in * value;
-        }
-
-*/

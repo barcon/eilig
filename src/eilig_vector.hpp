@@ -54,6 +54,10 @@ namespace eilig
 
         void SetValue(Index row, Scalar value);
 
+#ifdef EILIG_ENABLE_OPENCL
+        friend opencl::Vector;
+#endif
+
     private:
         NumberRows numberRows_{ 0 };
 
