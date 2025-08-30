@@ -8,8 +8,8 @@ namespace eilig
     }
     Vector::Vector(const Scalars& values)
     {
-		data_ = values;
-		numberRows_ = data_.size();
+        data_ = values;
+        numberRows_ = data_.size();
     }
     Vector::Vector(Vector&& input) noexcept
     {
@@ -43,8 +43,8 @@ namespace eilig
     }
     void Vector::Resize(NumberRows numberRows, Scalar value)
     {
-        Resize(numberRows);
-        Fill(value);
+        numberRows_ = numberRows;
+        data_ = Scalars(numberRows_, value);
     }
     void Vector::Fill(Scalar value)
     {
@@ -133,7 +133,7 @@ namespace eilig
 
         for (Index i = 0; i < numberRows_; ++i)
         {
-            res.data_[i] -=  rhs.data_[i];
+            res.data_[i] -= rhs.data_[i];
         }
 
         return res;
@@ -175,7 +175,6 @@ namespace eilig
     {
         Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
         Index aux2 = row1 <= row2 ? row1 : row2;
-
         Vector res(aux1);
 
         for (Index i = 0; i < aux1; ++i)
@@ -216,53 +215,3 @@ namespace eilig
         (*this)(i) = value;
     }
 } /* namespace eilig */
-
-/*
-
-    void Add(Vector& out, const Vector& in, Scalar value)
-    {
-        auto rows = in.GetRows();
-
-        for (Index i = 0; i < rows; ++i)
-        {
-            out(i) = in(i) + value;
-        }
-    }
-    void Add(Vector& out, const Vector& in, const Vector& value)
-    {
-        auto rows = in.GetRows();
-
-        for (Index i = 0; i < rows; ++i)
-        {
-            out(i) = in(i) + value(i);
-        }
-    }
-    void Sub(Vector& out, const Vector& in, Scalar value)
-    {
-        auto rows = in.GetRows();
-
-        for (Index i = 0; i < rows; ++i)
-        {
-            out(i) = in(i) - value;
-        }
-    }
-    void Sub(Vector& out, const Vector& in, const Vector& value)
-    {
-        auto rows = in.GetRows();
-
-        for (Index i = 0; i < rows; ++i)
-        {
-            out(i) = in(i) - value(i);
-        }
-    }
-    void Mul(Vector& out, const Vector& in, Scalar value)
-    {
-        auto rows = in.GetRows();
-
-        for (Index i = 0; i < rows; ++i)
-        {
-            out(i) = in(i) * value;
-        }
-    }
-
-*/

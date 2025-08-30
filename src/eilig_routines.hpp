@@ -61,8 +61,8 @@ namespace eilig
 	Scalar NormP2(const opencl::Vector& in);
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
-	Status IterativeCG(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
-	Status IterativeBiCGStab(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
+	Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
+	Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);

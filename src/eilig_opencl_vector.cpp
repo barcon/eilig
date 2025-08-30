@@ -15,10 +15,8 @@ namespace eilig
         {
             kernels_ = kernels;
             Resize(values.size());
-
-			auto event = dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &values[0], CL_FALSE);
-
-            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
+            
+            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &values[0], CL_TRUE);
         }
         Vector::Vector(Vector&& input) noexcept
         {
@@ -33,9 +31,7 @@ namespace eilig
             kernels_ = kernels;
             Resize(input.GetRows());
 
-            auto event = dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &input.GetData()[0], CL_FALSE);
-
-            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
+            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &input.data_[0], CL_TRUE);
         }
         Vector::Vector(KernelsPtr kernels, NumberRows numberRows)
         {
@@ -51,9 +47,7 @@ namespace eilig
         {
 			auto res = eilig::Vector(numberRows_);
             
-			auto event = dataGPU_->Read(0, sizeof(Scalar) * numberRows_, &res.data_[0], CL_FALSE);
-
-            clWaitForEvents(static_cast<cl_uint>(0), &event->Get());
+            dataGPU_->Read(0, sizeof(Scalar) * numberRows_, &res.data_[0], CL_TRUE);
 
             return res;
         }
@@ -81,8 +75,24 @@ namespace eilig
         }
         void Vector::Resize(NumberRows numberRows, Scalar value)
         {
-            Resize(numberRows);
-            Fill(value);
+            club::Error error;
+            club::Events events(1);
+
+            if (!(numberRows > 0))
+            {
+                logger::Error(headerEilig, "Incompatible required number of rows");
+            }
+
+            numberRows_ = numberRows;
+            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
+
+            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &value, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_, 0, NULL, &events[0]);
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+            }
+
+            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
         }
         void Vector::Fill(Scalar value)
         {
@@ -328,12 +338,11 @@ namespace eilig
         {
             Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
             Index aux2 = row1 <= row2 ? row1 : row2;
-            Scalars data;
             Vector res(kernels_, aux1);
+            Scalars data(aux1);
 
-            data.resize(aux1);
-            dataGPU_->Read(sizeof(Scalars) * aux2, sizeof(Scalar) * aux1, &data[0], 0);
-            res.dataGPU_->Write(0, sizeof(Scalar) * aux1, &data[0], 0);
+            dataGPU_->Read(sizeof(Scalar) * aux2, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
+            res.dataGPU_->Write(0, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
 
             return res;
         }
@@ -341,11 +350,10 @@ namespace eilig
         {
             Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
             Index aux2 = row1 <= row2 ? row1 : row2;
-            Scalars data;
+            Scalars data(aux1);
 
-            data.resize(aux1);
-            in.dataGPU_->Read(0, sizeof(Scalar) * aux1, &data[0], 0);
-            dataGPU_->Write(sizeof(Scalar) * aux2, sizeof(Scalar) * aux1, &data[0], 0);
+            in.dataGPU_->Read(0, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
+            dataGPU_->Write(sizeof(Scalar) * aux2, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
         }
         NumberRows Vector::GetRows() const
         {

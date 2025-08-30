@@ -257,8 +257,12 @@ namespace eilig
     }
     void Ellpack::Resize(NumberRows numberRows, NumberCols numberCols, Scalar value)
     {
-        Resize(numberRows, numberCols);
-        Fill(value);
+        numberRows_ = numberRows;
+        numberCols_ = numberCols;
+        width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+        count_ = Indices(numberRows_, 0);
+        position_ = Indices(numberRows_ * width_, 0);
+        data_ = Scalars(numberRows_ * width_, value);
     }
     void Ellpack::Fill(Scalar value)
     {

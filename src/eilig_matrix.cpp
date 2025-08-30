@@ -82,8 +82,9 @@ namespace eilig
     }
     void Matrix::Resize(NumberRows numberRows, NumberRows numberCols, Scalar value)
     {
-        Resize(numberRows, numberCols);
-        Fill(value);
+        numberRows_ = numberRows;
+        numberCols_ = numberCols;
+        data_ = Scalars(numberRows_ * numberCols_, value);
     }
     void Matrix::Fill(Scalar value)
     {

@@ -59,17 +59,13 @@ namespace eilig
         }
         Ellpack::Ellpack(KernelsPtr kernels, const eilig::Ellpack& input)
         {
-            club::Events events;
-
             kernels_ = kernels;
             Resize(input.GetRows(), input.GetCols());
             Expand(input.GetWidth());
 
-			events.push_back(countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_FALSE)->Get());
-			events.push_back(positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_FALSE)->Get());
-			events.push_back(dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_FALSE)->Get());
-
-            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+			countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_TRUE);
+			positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_TRUE);
+			dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_TRUE);
         }
         Ellpack::Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols)
         {
@@ -240,8 +236,37 @@ namespace eilig
         }
         void Ellpack::Resize(Index numberRows, Index numberCols, Scalar value)
         {
-            Resize(numberRows, numberCols);
-            Fill(value);
+            club::Error error;
+            club::Events events(3);
+            Index rhs{ 0 };
+            Index expansion{ 0 };
+
+            numberRows_ = numberRows;
+            numberCols_ = numberCols;
+            width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+            countGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_);
+            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_ * width_);
+            positionGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_ * width_);
+
+            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), countGPU_->Get(), &rhs, sizeof(Index), 0, sizeof(Index) * numberRows_, 0, NULL, &events[0]);
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+            }
+
+            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), &rhs, sizeof(Index), 0, sizeof(Index) * numberRows_ * width_, 0, NULL, &events[1]);
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+            }
+
+            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &value, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_ * width_, 0, NULL, &events[2]);
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+            }
+
+            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);;
         }
         void Ellpack::Fill(Scalar value)
         {
@@ -287,8 +312,8 @@ namespace eilig
             dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_ * width_);
             positionGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_ * width_);
 
-            countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0]);
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0]);
+            countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_TRUE);
+            dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_TRUE);
             positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_TRUE);
         }
         void Ellpack::Dump() const
