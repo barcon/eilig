@@ -251,18 +251,40 @@ namespace eilig
         numberRows_ = numberRows;
         numberCols_ = numberCols;
         width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
-        count_ = Indices(numberRows_, 0);
-        position_ = Indices(numberRows_ * width_, 0);
-        data_ = Scalars(numberRows_ * width_, 0.0);
+
+        try
+        {
+            count_ = Indices(numberRows_, 0);
+            position_ = Indices(numberRows_ * width_, 0);
+            data_ = Scalars(numberRows_ * width_, 0.0);
+
+        }
+        catch (const std::bad_alloc& e)
+        {
+            logger::Error(headerEilig, "Exception allocate memory for matrix: %s", e.what());
+            logger::Error(headerEilig, "Could not allocate memory for matrix: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ * width_ / 1024));
+            throw;
+        }
     }
     void Ellpack::Resize(NumberRows numberRows, NumberCols numberCols, Scalar value)
     {
         numberRows_ = numberRows;
         numberCols_ = numberCols;
         width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
-        count_ = Indices(numberRows_, 0);
-        position_ = Indices(numberRows_ * width_, 0);
-        data_ = Scalars(numberRows_ * width_, value);
+
+        try
+        {
+            count_ = Indices(numberRows_, 0);
+            position_ = Indices(numberRows_ * width_, 0);
+            data_ = Scalars(numberRows_ * width_, value);
+
+        }
+        catch (const std::bad_alloc& e)
+        {
+            logger::Error(headerEilig, "Exception allocate memory for matrix: %s", e.what());
+            logger::Error(headerEilig, "Could not allocate memory for matrix: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ * width_ / 1024));
+            throw;
+        }
     }
     void Ellpack::Fill(Scalar value)
     {

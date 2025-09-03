@@ -39,12 +39,32 @@ namespace eilig
     void Vector::Resize(NumberRows numberRows)
     {
         numberRows_ = numberRows;
-        data_ = Scalars(numberRows_, 0.0);
+        
+        try 
+        {
+            data_ = Scalars(numberRows_, 0.0);
+        }
+        catch (const std::bad_alloc& e)
+        {
+            logger::Error(headerEilig, "Exception allocate memory for vector: %s", e.what());
+            logger::Error(headerEilig, "Could not allocate memory for vector: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
+            throw;
+		}
     }
     void Vector::Resize(NumberRows numberRows, Scalar value)
     {
         numberRows_ = numberRows;
-        data_ = Scalars(numberRows_, value);
+
+        try
+        {
+            data_ = Scalars(numberRows_, value);
+        }
+        catch (const std::bad_alloc& e)
+        {
+            logger::Error(headerEilig, "Exception allocate memory for vector: %s", e.what());
+            logger::Error(headerEilig, "Could not allocate memory for vector: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
+            throw;
+        }
     }
     void Vector::Fill(Scalar value)
     {
