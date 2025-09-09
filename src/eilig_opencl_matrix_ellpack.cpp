@@ -487,7 +487,7 @@ namespace eilig
         }
         Index Ellpack::GrowthRate()
         {
-             return static_cast<Index>(std::max(5.0, std::ceil(0.05 * numberCols_)));
+            return static_cast<Index>(10);
         }
         Index Ellpack::MaxCount()
         {
