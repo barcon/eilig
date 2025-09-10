@@ -92,19 +92,8 @@ namespace eilig
     }
     void Matrix::Resize(NumberRows numberRows, NumberRows numberCols, Scalar value)
     {
-        numberRows_ = numberRows;
-        numberCols_ = numberCols;
-
-        try
-        {
-            data_ = Scalars(numberRows_ * numberCols_, value);
-        }
-        catch (const std::bad_alloc& e)
-        {
-            logger::Error(headerEilig, "Exception allocate memory for matrix: %s", e.what());
-            logger::Error(headerEilig, "Could not allocate memory for matrix: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ * numberCols_ / 1024));
-            throw;
-        }
+        Resize(numberRows, numberCols);
+        (*this) = value;
     }
     void Matrix::Fill(Scalar value)
     {

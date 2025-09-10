@@ -75,24 +75,8 @@ namespace eilig
         }
         void Vector::Resize(NumberRows numberRows, Scalar value)
         {
-            club::Error error;
-            club::Events events(1);
-
-            if (!(numberRows > 0))
-            {
-                logger::Error(headerEilig, "Incompatible required number of rows");
-            }
-
-            numberRows_ = numberRows;
-            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
-
-            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &value, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_, 0, NULL, &events[0]);
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
-            }
-
-            clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
+            Resize(numberRows);
+            (*this) = value;
         }
         void Vector::Fill(Scalar value)
         {

@@ -53,18 +53,8 @@ namespace eilig
     }
     void Vector::Resize(NumberRows numberRows, Scalar value)
     {
-        numberRows_ = numberRows;
-
-        try
-        {
-            data_ = Scalars(numberRows_, value);
-        }
-        catch (const std::bad_alloc& e)
-        {
-            logger::Error(headerEilig, "Exception allocate memory for vector: %s", e.what());
-            logger::Error(headerEilig, "Could not allocate memory for vector: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
-            throw;
-        }
+        Resize(numberRows);
+        (*this) = value;
     }
     void Vector::Fill(Scalar value)
     {
