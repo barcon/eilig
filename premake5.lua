@@ -32,20 +32,10 @@ project "eilig"
 		defines { "DEBUG" }
 		symbols "On"
 		
-		links { "utils", "logger"}
-		
-		libdirs { "../utils/build/Debug" }
-		libdirs { "../logger/build/Debug" }		
-
 	filter "configurations:Release"
 		defines { "NDEBUG" }
 		optimize "Speed"
-		
-		links { "utils", "logger"}
-		
-		libdirs { "../utils/build/Release" }
-		libdirs { "../logger/build/Release" }		
-		
+				
 	filter "configurations:ReleaseCL"	
 		defines { "NDEBUG", "EILIG_ENABLE_OPENCL" }
 		optimize "Speed"		
@@ -61,10 +51,3 @@ project "eilig"
 		files "src/eilig_opencl_matrix_ellpack.cpp"	
 		files "src/eilig_opencl_vector.hpp"	
 		files "src/eilig_opencl_vector.cpp"
-		
-		links { "utils", "logger", "club", "opencl" }
-		
-		libdirs { "../utils/build/Release" }
-		libdirs { "../logger/build/Release" }
-		libdirs { "../club/build/Release" }
-		libdirs { "../opencl/lib/x86_64" }
