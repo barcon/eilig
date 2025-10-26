@@ -5,6 +5,23 @@
 
 namespace eilig
 {
+	CallbackIterative callbackIterative = [](Index iteration, Scalar residual) -> long long int
+    {
+		Scalar tolerance{ 1e-5 };
+
+        if (std::isnan(residual))
+        {
+			return EILIG_NOT_CONVERGED;
+        }
+
+        if (residual < tolerance)
+        {
+			return EILIG_SUCCESS;
+        }
+
+        return EILIG_CONTINUE;
+    };
+
     Indices CreateIndices()
     {
         return Indices();
@@ -401,7 +418,7 @@ namespace eilig
             x(i - 1) /= LU(i - 1, i - 1);
         }
     }
-    Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
+    Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -469,7 +486,7 @@ namespace eilig
         
         return EILIG_NOT_CONVERGED;
     }
-    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
+    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -1061,7 +1078,7 @@ namespace eilig
 
         return res;
     }
-    Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
+    Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -1129,7 +1146,7 @@ namespace eilig
 
         return EILIG_NOT_CONVERGED;
     }
-    Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
+    Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
