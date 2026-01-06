@@ -1,4 +1,5 @@
 #include "eilig_matrix_ellpack.hpp"
+#include <algorithm>
 
 namespace eilig
 {
