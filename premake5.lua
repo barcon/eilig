@@ -6,7 +6,7 @@ workspace "eilig"
 project "eilig"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	architecture "x86_64"	
 	objdir "%{cfg.location}/obj/%{cfg.platform}_%{cfg.buildcfg}"
 

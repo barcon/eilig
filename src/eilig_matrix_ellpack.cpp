@@ -135,7 +135,6 @@ namespace eilig
             data_[row * width_ + position] = zeroScalar;
         }
 
-        //std::cout << "Add Index = " << row * width_ + position << std::endl;
         return (row * width_ + position);
     }
     void Ellpack::Remove(Index row, Index col)
@@ -262,8 +261,12 @@ namespace eilig
         }
         catch (const std::bad_alloc& e)
         {
-            logger::Error(headerEilig, "Exception allocate memory for matrix: %s", e.what());
-            logger::Error(headerEilig, "Could not allocate memory for matrix: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ * width_ / 1024));
+            auto message1 = utils::string::Format("Exception allocate memory for matrix: {}", e.what());
+            auto message2 = utils::string::Format("Could not allocate memory for matrix: {} (kb)", size_t(sizeof(Scalar) * numberRows_ * numberCols_ / 1024));
+
+            logger::Error(headerEilig, message1);
+            logger::Error(headerEilig, message2);
+
             throw;
         }
     }
@@ -292,7 +295,7 @@ namespace eilig
     }
     void Ellpack::Dump() const
     {
-        logger::Info(headerEilig, "Matrix Ellpack (%zu x %zu):", numberRows_, numberCols_);
+        logger::Info(headerEilig, utils::string::Format("Matrix Ellpack ({} x {}):", numberRows_, numberCols_));
 
         std::cout << "Rows: " << numberRows_ << std::endl;
         std::cout << "Cols: " << numberCols_ << std::endl;

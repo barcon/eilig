@@ -36,7 +36,7 @@ namespace eilig
             context_ = club::CreateContext(platform_, platformNumber, deviceNumber);
             if (!context_)
             {
-                logger::Error(headerEilig, "Context (%d)(%d) could not be created", platformNumber, deviceNumber);
+                logger::Error(headerEilig, utils::string::Format("Context ({})({}) could not be created", platformNumber, deviceNumber));
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace eilig
             program_ = club::CreateProgramFromFile(context_, fileName);
             if (!program_)
             {
-                logger::Error(headerEilig, "Program could not be created " + fileName);
+                logger::Error(headerEilig, utils::string::Format("Program could not be created {}", fileName));
                 return;
             }
         }

@@ -68,7 +68,7 @@ namespace eilig
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &value, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_, 0, NULL, &events[0]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -106,7 +106,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return *this;
@@ -156,7 +156,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -183,7 +183,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -218,7 +218,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -245,7 +245,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -280,7 +280,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -288,22 +288,6 @@ namespace eilig
         Vector operator*(Scalar lhs, const Vector& rhs)
         {
             return rhs * lhs;
-        }
-        std::ostream& operator<<(std::ostream& stream, const Vector& vector)
-        {
-            Index rows = vector.GetRows();
-            Scalars data;
-
-            data.resize(rows);
-
-            vector.dataGPU_->Read(0, sizeof(Scalar) * rows, &data[0], CL_TRUE);
-
-            for (Index i = 0; i < vector.GetRows(); ++i)
-            {
-                stream << utils::string::Format("%12.5g\n", data[i]);
-            }
-
-            return stream;
         }
         Vector& Vector::SwapRows(Index row1, Index row2)
         {

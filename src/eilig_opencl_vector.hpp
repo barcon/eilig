@@ -49,8 +49,6 @@ namespace eilig
             Vector operator*(Scalar rhs) const;
             friend Vector operator*(Scalar lhs, const Vector& rhs);
 
-            friend std::ostream& operator<< (std::ostream& stream, const Vector& vector);
-
             Vector& SwapRows(Index row1, Index row2);
             Vector  Region(Index row1, Index row2);
             void    Region(Index row1, Index row2, const Vector& in);

@@ -217,19 +217,19 @@ namespace eilig
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), countGPU_->Get(), &rhs, sizeof(Index), 0, sizeof(Index) * numberRows_, 0, NULL, &events[0]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 1: {}", club::messages.at(error)));
             }
 
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), &rhs, sizeof(Index), 0, sizeof(Index) * numberRows_ * width_, 0, NULL, &events[1]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 2: {}", club::messages.at(error)));
             }
 
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &zero, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_ * width_, 0, NULL, &events[2]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 3: {}", club::messages.at(error)));
             }
 
             clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -254,19 +254,19 @@ namespace eilig
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), countGPU_->Get(), &count, sizeof(Index), 0, sizeof(Index) * numberRows_, 0, NULL, &events[0]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 1: {}", club::messages.at(error)));
             }
 
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), &position, sizeof(Index), 0, sizeof(Index) * numberRows_ * width_, 0, NULL, &events[1]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 2: {}", club::messages.at(error)));
             }
 
             error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &zero, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_ * width_, 0, NULL, &events[2]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel Resize: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel FillBuffer 3: {}", club::messages.at(error)));
             }
 
             clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -293,7 +293,7 @@ namespace eilig
             Indices position{};
             Indices count{};
 
-            logger::Info(headerEilig, "Matrix Ellpack CL (%zu x %zu):", numberRows_, numberCols_);
+            logger::Info(headerEilig, utils::string::Format("Matrix Ellpack CL ({} x {}):", numberRows_, numberCols_));
 
             std::cout << "Rows: " << numberRows_ << std::endl;
             std::cout << "Cols: " << numberCols_ << std::endl;
@@ -371,7 +371,7 @@ namespace eilig
 
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing Expand 1: {}", club::messages.at(error)));
                 }
 
                 kernels_->kEllpackExpandData_->SetArg(0, sizeof(Index), &numberRows_);
@@ -387,7 +387,7 @@ namespace eilig
 
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing Expand 2: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -430,7 +430,7 @@ namespace eilig
 
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing Shrink 1: {}", club::messages.at(error)));
                 }
 
                 kernels_->kEllpackShrinkData_->SetArg(0, sizeof(Index), &numberRows_);
@@ -446,7 +446,7 @@ namespace eilig
 
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing Shrink 2: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -487,7 +487,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing MaxCount: {}", club::messages.at(error)));
             }
 
             partial.resize(ngroups);
@@ -514,13 +514,13 @@ namespace eilig
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), buffer1->Get(), sizeof(Index) * row * width_, 0, sizeof(Index) * width_, 0, NULL, &events[0]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel 1: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing CopyBuffer 1: {}", club::messages.at(error)));
                 }
 
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), buffer2->Get(), sizeof(Scalar) * row * width_, 0, sizeof(Scalar) * width_, 0, NULL, &events[1]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel 2: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing CopyBuffer 2: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -528,13 +528,13 @@ namespace eilig
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), buffer1->Get(), positionGPU_->Get(), sizeof(Index) * (position), sizeof(Index) * (row * width_ + position + 1), sizeof(Index) * (count - position), 0, NULL, &events[0]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel 3: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing CopyBuffer 3: {}", club::messages.at(error)));
                 }
 
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), buffer2->Get(), dataGPU_->Get(), sizeof(Scalar) * (position), sizeof(Scalar) * (row * width_ + position + 1), sizeof(Scalar) * (count - position), 0, NULL, &events[1]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel 4: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing CopyBuffer 4: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -559,13 +559,13 @@ namespace eilig
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), positionGPU_->Get(), buffer1->Get(), sizeof(Index) * row * width_, 0, sizeof(Index) * width_, 0, NULL, &events[0]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
                 }
 
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), buffer2->Get(), sizeof(Scalar) * row * width_, 0, sizeof(Scalar) * width_, 0, NULL, &events[1]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -573,13 +573,13 @@ namespace eilig
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), buffer1->Get(), positionGPU_->Get(), sizeof(Index) * (position + 1), sizeof(Index) * (row * width_ + position), sizeof(Index) * (count - position - 1), 0, NULL, &events[0]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
                 }
 
                 error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), buffer2->Get(), dataGPU_->Get(), sizeof(Scalar) * (position + 1), sizeof(Scalar) * (row * width_ + position), sizeof(Scalar) * (count - position - 1), 0, NULL, &events[1]);
                 if (error != CL_SUCCESS)
                 {
-                    logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                    logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
                 }
 
                 clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -633,7 +633,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return *this;
@@ -672,19 +672,19 @@ namespace eilig
             error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), rhs.countGPU_->Get(), countGPU_->Get(), 0, 0, sizeof(Index) * numberRows_, 0, NULL, &events[0]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), rhs.positionGPU_->Get(), positionGPU_->Get(), 0, 0, sizeof(Index) * numberRows_ * width_, 0, NULL, &events[1]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             error = clEnqueueCopyBuffer(kernels_->context_->GetQueue(), rhs.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_ * width_, 0, NULL, &events[2]);
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             clWaitForEvents(static_cast<cl_uint>(events.size()), &events[0]);
@@ -727,7 +727,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -805,7 +805,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -876,7 +876,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -920,7 +920,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -951,9 +951,8 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
-
 
             return res;
         }
@@ -986,7 +985,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return *this;
@@ -1016,7 +1015,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return *this;
@@ -1050,7 +1049,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             count.resize(numberCols_);
@@ -1090,7 +1089,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1123,7 +1122,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1169,7 +1168,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1204,7 +1203,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1250,7 +1249,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1285,7 +1284,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;
@@ -1350,7 +1349,7 @@ namespace eilig
 
             if (error != CL_SUCCESS)
             {
-                logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
             return res;

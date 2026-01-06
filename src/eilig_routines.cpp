@@ -751,7 +751,7 @@ namespace eilig
 
         for (Index i = 0; i < numberRows; ++i)
         {
-            output += utils::string::Format("%14.5e\n", vector(i));
+            output += utils::string::Format("{:14.5e}\n", vector(i));
         }
 
         return output;
@@ -768,7 +768,7 @@ namespace eilig
         {
             for (Index j = 0; j < numberCols; ++j)
             {
-                output += utils::string::Format("%14.5e", matrix(i, j));
+                output += utils::string::Format("{:14.5e}", matrix(i, j));
             }
             
             output += "\n";
@@ -797,12 +797,12 @@ namespace eilig
             {
                 if ((k < count[i]) && (position[i * width + k] == j))
                 {
-                    output += utils::string::Format("%14.5e", data[i * width + k]);
+                    output += utils::string::Format("{:14.5e}", data[i * width + k]);
                     k++;
                     continue;
                 }
 
-                output += utils::string::Format("%14.5e", 0.0);
+                output += utils::string::Format("{:14.5e}", 0.0);
             }
 
             output += "\n";
@@ -840,7 +840,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -880,7 +880,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -930,7 +930,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -973,7 +973,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -1022,7 +1022,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -1065,7 +1065,7 @@ namespace eilig
 
         if (error != CL_SUCCESS)
         {
-            logger::Error(headerEilig, "Enqueueing kernel: " + club::messages.at(error));
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
         }
 
         partial.resize(ngroups);
@@ -1360,7 +1360,7 @@ namespace eilig
 
         for (Index i = 0; i < numberRows; ++i)
         {
-            output += utils::string::Format("%14.5e\n", data[i]);
+            output += utils::string::Format("{:14.5f}\n", data[i]);
         }
 
         return output;
@@ -1397,12 +1397,12 @@ namespace eilig
             {
                 if ( (k < count[i]) && (position[i * width + k] == j))
                 {
-                    output += utils::string::Format("%14.5e", data[i * width + k]);
+                    output += utils::string::Format("{:14.5e}", data[i * width + k]);
                     k++;
                     continue;
                 }
 
-                output += utils::string::Format("%14.5e", 0.0);
+                output += utils::string::Format("{:14.5e}", 0.0);
             }
             output += "\n";
         }

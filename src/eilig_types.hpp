@@ -23,7 +23,7 @@ namespace eilig
 	using Strings = utils::Strings;
 	using File = utils::file::Text;	
 	using Status = long long int;
-	
+
 	static const String headerEilig = "EILIG";
 
 	using Type = std::size_t;

@@ -46,8 +46,12 @@ namespace eilig
         }
         catch (const std::bad_alloc& e)
         {
-            logger::Error(headerEilig, "Exception allocate memory for vector: %s", e.what());
-            logger::Error(headerEilig, "Could not allocate memory for vector: %zu (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
+            auto message1 = utils::string::Format("Exception allocate memory for matrix: {}", e.what());
+            auto message2 = utils::string::Format("Could not allocate memory for matrix: {} (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
+
+            logger::Error(headerEilig, message1);
+            logger::Error(headerEilig, message2);
+
             throw;
 		}
     }
