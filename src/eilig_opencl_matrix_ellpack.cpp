@@ -273,6 +273,45 @@ namespace eilig
 
             Shrink();
         }
+        Index Ellpack::FindWidthTranspose() const
+        {
+            club::Error error;
+            Index globalSize[2];
+            Index res;
+            Indices count;
+
+            const auto& localSize = kernels_->kEllpackFindWidthTranspose_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+            globalSize[1] = GlobalSize(numberCols_, localSize[1]);
+
+            BufferPtr countGPU = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberCols_);
+
+            kernels_->kEllpackFindWidthTranspose_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackFindWidthTranspose_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackFindWidthTranspose_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackFindWidthTranspose_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackFindWidthTranspose_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackFindWidthTranspose_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackFindWidthTranspose_->SetArg(6, sizeof(cl_mem), &countGPU->Get());
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackFindWidthTranspose_->GetKernel(),
+                kernels_->kEllpackFindWidthTranspose_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackFindWidthTranspose_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            count.resize(numberCols_);
+            countGPU->Read(0, sizeof(Index) * numberCols_, &count[0], CL_TRUE);
+
+            res = *std::max_element(count.begin(), count.end());
+
+            return res;
+        }
         void Ellpack::Init(eilig::Ellpack& input)
         {
             numberRows_ = input.numberRows_;
@@ -1020,42 +1059,44 @@ namespace eilig
 
             return *this;
         }
-        Index Ellpack::FindWidthTranspose() const
+        Scalar Ellpack::Trace() const
         {
             club::Error error;
-            Index globalSize[2];
-            Index res;
-            Indices count;
+            Index globalSize[1];
+            Scalars partial;
+			Scalar res{ 0.0 };
 
-            const auto& localSize = kernels_->kEllpackFindWidthTranspose_->GetLocalSize();
+            const auto& localSize = kernels_->kEllpackTrace_->GetLocalSize();
 
             globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-            globalSize[1] = GlobalSize(numberCols_, localSize[1]);
 
-            BufferPtr countGPU = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberCols_);
+            BufferPtr partialGPU = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
 
-            kernels_->kEllpackFindWidthTranspose_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kEllpackFindWidthTranspose_->SetArg(1, sizeof(Index), &numberCols_);
-            kernels_->kEllpackFindWidthTranspose_->SetArg(2, sizeof(Index), &width_);
-            kernels_->kEllpackFindWidthTranspose_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
-            kernels_->kEllpackFindWidthTranspose_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
-            kernels_->kEllpackFindWidthTranspose_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kEllpackFindWidthTranspose_->SetArg(6, sizeof(cl_mem), &countGPU->Get());
+            kernels_->kEllpackTrace_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackTrace_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackTrace_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackTrace_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackTrace_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackTrace_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackTrace_->SetArg(6, sizeof(cl_mem), &partialGPU->Get());
 
             error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kEllpackFindWidthTranspose_->GetKernel(),
-                kernels_->kEllpackFindWidthTranspose_->GetDim(), NULL, globalSize,
-                &kernels_->kEllpackFindWidthTranspose_->GetLocalSize()[0], 0, NULL, NULL);
+                kernels_->kEllpackTrace_->GetKernel(),
+                kernels_->kEllpackTrace_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackTrace_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {
                 logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
             }
 
-            count.resize(numberCols_);
-            countGPU->Read(0, sizeof(Index) * numberCols_, &count[0], CL_TRUE);
+            partial.resize(numberRows_);
+            partialGPU->Read(0, sizeof(Scalar) * numberRows_, &partial[0], CL_TRUE);
 
-            res = *std::max_element(count.begin(), count.end());
+            for (Index i = 0; i < partial.size(); i++)
+            {
+				res += partial[i];
+            }
 
             return res;
         }

@@ -50,6 +50,7 @@ namespace eilig
         static const String kEllpackLower2 = "EllpackLower2";
         static const String kEllpackUpper1 = "EllpackUpper1";
         static const String kEllpackUpper2 = "EllpackUpper2";
+        static const String kEllpackTrace = "EllpackTrace";
 
         KernelsPtr CreateKernels(const String& fileName, const club::PlatformNumber& platformNumber, const club::DeviceNumber& deviceNumber);
 
@@ -105,6 +106,7 @@ namespace eilig
             club::KernelPtr kEllpackLower2_{ nullptr };
             club::KernelPtr kEllpackUpper1_{ nullptr };
             club::KernelPtr kEllpackUpper2_{ nullptr };
+            club::KernelPtr kEllpackTrace_{ nullptr };
 
         protected:
             Kernels(const Kernels& copy) = delete;

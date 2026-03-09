@@ -54,6 +54,7 @@ namespace eilig
 
         Ellpack& SwapRows(Index row1, Index row2);
         Ellpack& SwapCols(Index col1, Index col2);
+        Scalar Trace() const;
         Ellpack Transpose() const;
         Ellpack Diagonal() const;
         Ellpack Lower(bool diag) const;

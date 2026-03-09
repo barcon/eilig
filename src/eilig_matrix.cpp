@@ -301,6 +301,17 @@ namespace eilig
 
         return *this;
     }
+    Scalar Matrix::Trace() const
+    {
+        Scalar res{ 0.0 };
+
+        for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
+        {
+            res += (*this)(i, i);
+        }
+
+        return res;
+    }
     Matrix Matrix::Transpose() const
     {
         Matrix res(numberCols_, numberRows_);

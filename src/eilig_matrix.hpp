@@ -52,6 +52,7 @@ namespace eilig
 
         Matrix& SwapRows(Index row1, Index row2);
         Matrix& SwapCols(Index cols1, Index cols2);
+		Scalar Trace() const;
         Matrix Transpose() const;
         Matrix Diagonal() const;
         Matrix Lower(bool diag) const;
