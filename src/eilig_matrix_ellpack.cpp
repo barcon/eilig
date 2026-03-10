@@ -615,6 +615,20 @@ namespace eilig
 
         return res;
     }
+    Scalar Ellpack::Sum() const
+    {
+        Scalar res{ 0.0 };
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                res += data_[i * width_ + j];
+            }
+        }
+
+        return res;
+    }
     Ellpack Ellpack::Transpose() const
     {
         Ellpack res(numberCols_, numberRows_);

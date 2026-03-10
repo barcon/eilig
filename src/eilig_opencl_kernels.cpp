@@ -95,6 +95,7 @@ namespace eilig
             kEllpackUpper1_ = club::CreateKernel(program_, kEllpackUpper1, 1);
             kEllpackUpper2_ = club::CreateKernel(program_, kEllpackUpper2, 1);
             kEllpackTrace_ = club::CreateKernel(program_, kEllpackTrace, 1);
+            kEllpackSum_ = club::CreateKernel(program_, kEllpackSum, 1);
         }
     }
 } /* namespace eilig */

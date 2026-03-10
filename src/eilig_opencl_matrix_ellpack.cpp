@@ -1100,6 +1100,47 @@ namespace eilig
 
             return res;
         }
+        Scalar Ellpack::Sum() const
+        {
+            club::Error error;
+            Index globalSize[1];
+            Scalars partial;
+            Scalar res{ 0.0 };
+
+            const auto& localSize = kernels_->kEllpackTrace_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            BufferPtr partialGPU = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
+
+            kernels_->kEllpackSum_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackSum_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackSum_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackSum_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackSum_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackSum_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackSum_->SetArg(6, sizeof(cl_mem), &partialGPU->Get());
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackSum_->GetKernel(),
+                kernels_->kEllpackSum_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackSum_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            partial.resize(numberRows_);
+            partialGPU->Read(0, sizeof(Scalar) * numberRows_, &partial[0], CL_TRUE);
+
+            for (Index i = 0; i < partial.size(); i++)
+            {
+                res += partial[i];
+            }
+
+            return res;
+        }
         Ellpack Ellpack::Transpose() const
         {
             club::Error error;

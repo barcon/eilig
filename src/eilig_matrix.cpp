@@ -312,6 +312,20 @@ namespace eilig
 
         return res;
     }
+    Scalar Matrix::Sum() const
+    {
+		Scalar res{ 0.0 };
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                res += (*this)(i, j);
+            }
+		}
+
+        return res;
+    }
     Matrix Matrix::Transpose() const
     {
         Matrix res(numberCols_, numberRows_);

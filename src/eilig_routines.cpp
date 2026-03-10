@@ -28,7 +28,7 @@ namespace eilig
     }
     Scalar NormMax(const Vector& in)
     {
-        Scalar res{ std::abs(in(0)) };
+        Scalar res{ 0.0 };
         Scalar norm{ 0.0 };
 
         for (Index i = 0; i < in.GetRows(); ++i)
