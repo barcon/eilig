@@ -56,6 +56,8 @@ namespace eilig
 		Scalar Sum() const;
         Matrix Transpose() const;
         Matrix Diagonal() const;
+        Matrix DiagonalScale(Scalar factor) const;
+        Vector DiagonalVector() const;
         Matrix Lower(bool diag) const;
         Matrix LowerWithDiagonal() const;
         Matrix LowerWithoutDiagonal() const;

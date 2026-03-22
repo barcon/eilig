@@ -351,6 +351,28 @@ namespace eilig
 
         return res;
     }
+    Matrix Matrix::DiagonalScale(Scalar factor) const
+    {
+        Matrix res(*this);
+
+        for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
+        {
+            res(i, i) *= factor;
+        }
+
+        return res;
+    }
+    Vector Matrix::DiagonalVector() const
+    {
+		Vector res(numberRows_);
+
+        for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
+        {
+            res(i) = (*this)(i, i);
+        }
+
+        return res;
+    }
     Matrix Matrix::Lower(bool diag) const
     {
         if (diag)

@@ -654,6 +654,28 @@ namespace eilig
 
         return res;
     }
+    Ellpack Ellpack::DiagonalScale(Scalar factor) const
+    {
+        Ellpack res(*this);
+
+        for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
+        {
+            res(i, i) *= factor;
+        }
+
+		return res;
+    }
+    Vector  Ellpack::DiagonalVector() const
+    {
+        Vector res(numberRows_);
+
+        for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
+        {
+            res(i) = (*this)(i, i);
+        }
+
+        return res;
+    }
     Ellpack Ellpack::Lower(bool diag) const
     {
         if (diag)

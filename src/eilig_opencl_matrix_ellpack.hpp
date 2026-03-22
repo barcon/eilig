@@ -66,6 +66,8 @@ namespace eilig
             Scalar Sum() const;
             Ellpack Transpose() const;
             Ellpack Diagonal() const;
+            Ellpack DiagonalScale(Scalar factor) const;
+            Vector  DiagonalVector() const;
             Ellpack Lower(bool diag) const;
             Ellpack LowerWithDiagonal() const;
             Ellpack LowerWithoutDiagonal() const;

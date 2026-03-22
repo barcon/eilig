@@ -966,9 +966,9 @@ namespace eilig
         }
         Vector Ellpack::operator*(const Vector& rhs) const
         {
-            Vector res(kernels_, numberRows_, 0.0);
             club::Error error;
             Index globalSize[1];
+            Vector res(kernels_, numberRows_, 0.0);
 
             const auto& localSize = kernels_->kEllpackMulV_->GetLocalSize();
 
@@ -1201,6 +1201,66 @@ namespace eilig
                 kernels_->kEllpackDiagonal_->GetKernel(),
                 kernels_->kEllpackDiagonal_->GetDim(), NULL, globalSize,
                 &kernels_->kEllpackDiagonal_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            return res;
+        }
+        Ellpack Ellpack::DiagonalScale(Scalar factor) const
+        {
+            club::Error error;
+            Index globalSize[1];
+            Ellpack res(*this);
+
+            const auto& localSize = kernels_->kEllpackDiagonalScale_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            kernels_->kEllpackDiagonalScale_->SetArg(0, sizeof(Index), &res.numberCols_);
+            kernels_->kEllpackDiagonalScale_->SetArg(1, sizeof(Index), &res.numberCols_);
+            kernels_->kEllpackDiagonalScale_->SetArg(2, sizeof(Index), &res.width_);
+            kernels_->kEllpackDiagonalScale_->SetArg(3, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackDiagonalScale_->SetArg(4, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackDiagonalScale_->SetArg(5, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackDiagonalScale_->SetArg(6, sizeof(Scalar), &factor);
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackDiagonalScale_->GetKernel(),
+                kernels_->kEllpackDiagonalScale_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackDiagonalScale_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            return res;
+        }
+        Vector  Ellpack::DiagonalVector() const
+        {
+            club::Error error;
+            Index globalSize[1];
+            Vector res(kernels_, numberRows_, 0.0);
+
+            const auto& localSize = kernels_->kEllpackDiagonalVector_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);;
+
+            kernels_->kEllpackDiagonalVector_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackDiagonalVector_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackDiagonalVector_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackDiagonalVector_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackDiagonalVector_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackDiagonalVector_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackDiagonalVector_->SetArg(6, sizeof(cl_mem), &res.GetDataGPU()->Get());
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackDiagonalVector_->GetKernel(),
+                kernels_->kEllpackDiagonalVector_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackDiagonalVector_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {

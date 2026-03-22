@@ -41,6 +41,7 @@ namespace eilig
 	void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
 	Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b);
 	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b);
+	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, Scalar relaxation);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);

@@ -89,6 +89,8 @@ namespace eilig
             kEllpackTranspose_ = club::CreateKernel(program_, kEllpackTranspose, 1);
             kEllpackFindWidthTranspose_ = club::CreateKernel(program_, kEllpackFindWidthTranspose, 2);
             kEllpackDiagonal_ = club::CreateKernel(program_, kEllpackDiagonal, 1);
+            kEllpackDiagonalScale_ = club::CreateKernel(program_, kEllpackDiagonalScale, 1);
+            kEllpackDiagonalVector_ = club::CreateKernel(program_, kEllpackDiagonalVector, 1);
             kEllpackRegion_ = club::CreateKernel(program_, kEllpackRegion, 1);
             kEllpackLower1_ = club::CreateKernel(program_, kEllpackLower1, 1);
             kEllpackLower2_ = club::CreateKernel(program_, kEllpackLower2, 1);

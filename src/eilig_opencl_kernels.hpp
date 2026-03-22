@@ -45,6 +45,8 @@ namespace eilig
         static const String kEllpackTranspose = "EllpackTranspose";
         static const String kEllpackFindWidthTranspose = "EllpackFindWidthTranspose";
         static const String kEllpackDiagonal = "EllpackDiagonal";
+        static const String kEllpackDiagonalScale = "EllpackDiagonalScale";
+        static const String kEllpackDiagonalVector = "EllpackDiagonalVector";
         static const String kEllpackRegion = "EllpackRegion";
         static const String kEllpackLower1 = "EllpackLower1";
         static const String kEllpackLower2 = "EllpackLower2";
@@ -102,6 +104,8 @@ namespace eilig
             club::KernelPtr kEllpackTranspose_{ nullptr };
             club::KernelPtr kEllpackFindWidthTranspose_{ nullptr };
             club::KernelPtr kEllpackDiagonal_{ nullptr };
+            club::KernelPtr kEllpackDiagonalScale_{ nullptr };
+            club::KernelPtr kEllpackDiagonalVector_{ nullptr };
             club::KernelPtr kEllpackRegion_{ nullptr };
             club::KernelPtr kEllpackLower1_{ nullptr };
             club::KernelPtr kEllpackLower2_{ nullptr };

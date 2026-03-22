@@ -7,7 +7,7 @@ namespace eilig
 {
 	CallbackIterative callbackIterative = [](Index iteration, Scalar residual) -> long long int
     {
-		Scalar tolerance{ 1e-5 };
+		Scalar tolerance{ 1e-6 };
 
         if (std::isnan(residual))
         {
@@ -577,6 +577,16 @@ namespace eilig
         }
 
         return EILIG_NOT_CONVERGED;
+    }
+    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, Scalar relaxation)
+    {   
+        if (!(relaxation > 0.0 && relaxation < 1.0))
+        {
+            logger::Error(headerEilig, "Invalid relaxation factor (0.0 < relaxation < 1.0)");
+            return EILIG_INVALID_FACTOR;
+        }
+
+        return IterativeBiCGStab(A.DiagonalScale(1.0 / relaxation), x, b + (1.0 - relaxation) / relaxation * (A.Diagonal() * x));
     }
 
     void WriteToFile(const Vector& vec, const String& fileName)
