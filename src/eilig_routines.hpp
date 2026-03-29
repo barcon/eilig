@@ -30,7 +30,6 @@ namespace eilig
 	Scalar Determinant(const Matrix& A);
 	Matrix Inverse(const Matrix& A);
 	Matrix ScaleByVector(const Matrix& A, const Vector& alpha);
-	Vector Solve(const Matrix& A, const Vector& b);
 	
 	void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);
 	void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
@@ -39,9 +38,11 @@ namespace eilig
 	void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation);
 	void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation);
 	void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
-	Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b);
-	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b);
-	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, Scalar relaxation);
+	void Direct(const Matrix& A, Vector& x, const Vector& b);
+	Status IterativeCG(const Matrix& A, Vector& x, const Vector& b, CallbackIterative callbackIterative = nullptr);
+	Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative = nullptr);
+	Status IterativeBiCGStab(const Matrix& A, Vector& x, const Vector& b, CallbackIterative callbackIterative = nullptr);
+	Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative = nullptr);
 
 	void WriteToFile(const Vector& vec, const String& fileName);
 	void WriteToFile(const Matrix& mat, const String& fileName);
@@ -62,8 +63,8 @@ namespace eilig
 	Scalar NormP2(const opencl::Vector& in);
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
-	Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b);
-	Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b);
+	Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative = nullptr);
+	Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative = nullptr);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);
