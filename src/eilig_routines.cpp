@@ -19,8 +19,6 @@ namespace eilig
 			return EILIG_SUCCESS;
         }
 
-        logger::Info(headerEilig, utils::string::Format("Callback iterative residual: {}", residual));
-
         return EILIG_CONTINUE;
     };
 
