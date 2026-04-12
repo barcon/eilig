@@ -11,12 +11,12 @@ namespace eilig
             kernels_ = kernels;
             Resize(1);
         }
-        Vector::Vector(KernelsPtr kernels, const Scalars& values)
+        Vector::Vector(KernelsPtr kernels, const std::initializer_list<Scalar>& values)
         {
             kernels_ = kernels;
             Resize(values.size());
             
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &values[0], CL_TRUE);
+	         dataGPU_->Write(0, sizeof(Scalar) * numberRows_, std::data(values), CL_TRUE);
         }
         Vector::Vector(Vector&& input) noexcept
         {
@@ -57,9 +57,9 @@ namespace eilig
             club::Events events(1);
             Scalar value{ 0.0 };
 
-            if (!(numberRows > 0))
+            if (numberRows == 0)
             {
-                logger::Error(headerEilig, "Incompatible required number of rows");
+                throw std::invalid_argument("Vector dimensions cannot be zero.");
             }
 
             numberRows_ = numberRows;

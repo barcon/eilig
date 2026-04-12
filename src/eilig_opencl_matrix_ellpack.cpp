@@ -13,30 +13,42 @@ namespace eilig
             kernels_ = kernels;
             Resize(1, 1);
         }
-        Ellpack::Ellpack(Ellpack&& input) noexcept
-        {
-            (*this) = std::move(input);
-        }
         Ellpack::Ellpack(const Ellpack& input)
         {
             (*this) = input;
         }
-        Ellpack::Ellpack(KernelsPtr kernels, const std::vector<Scalars>& values)
+        Ellpack::Ellpack(Ellpack&& input) noexcept
+        {
+            (*this) = std::move(input);
+        }
+        Ellpack::Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& values)
         {
             kernels_ = kernels;
-            Resize(values.size(), values[0].size());
+            Index numberRows = values.size();
+            Index numberCols = values.begin()->size();
 
-            for (Index i = 0; i < numberRows_; i++)
+            Resize(numberRows, numberCols);
+
+            Index i = 0;
+            for (auto& outerItens : values)
             {
-                for (Index j = 0; j < numberCols_; j++)
+                if (outerItens.size() != numberCols)
                 {
-                    if (utils::math::IsAlmostEqual(values[i][j], 0.0, 5))
+                    throw std::invalid_argument("All rows must have the same number of columns.");
+                }
+
+                Index j = 0;
+                for (auto& value : outerItens)
+                {
+                    if (!utils::math::IsAlmostEqual(value, 0.0, 5))
                     {
-                        continue;
+                        (*this)(i, j) = value;
                     }
 
-                    (*this)(i, j) = values[i][j];
+                    ++j;
                 }
+
+                ++i;
             }
         }
         Ellpack::Ellpack(KernelsPtr kernels, const eilig::Matrix& input)
@@ -207,9 +219,15 @@ namespace eilig
             Scalar zero{ 0 };
             Index expansion{ 0 };
 
+            if (numberRows == 0 || numberCols == 0)
+            {
+                throw std::invalid_argument("Matrix dimensions cannot be zero.");
+            }
+
             numberRows_ = numberRows;
             numberCols_ = numberCols;
             width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+
             countGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_);
             dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_ * width_);
             positionGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_ * width_);

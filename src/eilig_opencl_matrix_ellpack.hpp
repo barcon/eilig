@@ -17,12 +17,12 @@ namespace eilig
         public:
             Ellpack(KernelsPtr kernels);
             Ellpack(const Ellpack& input);
-            Ellpack(KernelsPtr kernels, const std::vector<Scalars>& values);
+            Ellpack(Ellpack&& input) noexcept;
+            Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& values);
             Ellpack(KernelsPtr kernels, const eilig::Matrix& input);
             Ellpack(KernelsPtr kernels, const eilig::Ellpack& input);
             Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols);
             Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols, Type type);
-            Ellpack(Ellpack&& input) noexcept;
 
             ~Ellpack() = default;
 

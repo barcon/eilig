@@ -15,7 +15,7 @@ namespace eilig
         {
         public:
             Vector(KernelsPtr kernels);
-            Vector(KernelsPtr kernels, const Scalars& values);
+            Vector(KernelsPtr kernels, const std::initializer_list<Scalar>& values);
             Vector(const Vector& input);
             Vector(KernelsPtr kernels, const eilig::Vector& input);
             Vector(KernelsPtr kernels, NumberRows numberRows);

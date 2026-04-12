@@ -6,10 +6,18 @@ namespace eilig
     {
         Resize(1);
     }
-    Vector::Vector(const Scalars& values)
+    Vector::Vector(const std::initializer_list<Scalar>& values)
     {
-        data_ = values;
-        numberRows_ = data_.size();
+        Index numberRows = values.size();
+
+        Resize(numberRows);
+
+        Index i = 0;
+        for (auto& value : values)
+        {
+            data_[i] = value;
+            ++i;
+        }
     }
     Vector::Vector(Vector&& input) noexcept
     {
@@ -38,10 +46,15 @@ namespace eilig
     }
     void Vector::Resize(NumberRows numberRows)
     {
-        numberRows_ = numberRows;
+        if (numberRows == 0)
+        {
+            throw std::invalid_argument("Vector dimensions cannot be zero.");
+        }
         
         try 
         {
+            numberRows_ = numberRows;
+
             data_ = Scalars(numberRows_, 0.0);
         }
         catch (const std::bad_alloc& e)

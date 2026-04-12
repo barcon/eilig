@@ -7,6 +7,35 @@ namespace eilig
     {
         Resize(1, 1);
     }
+    Ellpack::Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& values)
+    {
+        Index numberRows = values.size();
+        Index numberCols = values.begin()->size();
+
+        Resize(numberRows, numberCols);
+
+        Index i = 0;
+        for (auto& outerItens : values)
+        {
+            if (outerItens.size() != numberCols)
+            {
+                throw std::invalid_argument("All rows must have the same number of columns.");
+            }
+
+            Index j = 0;
+            for (auto& value : outerItens)
+            {
+                if (!utils::math::IsAlmostEqual(value, 0.0, 5))
+                {
+                    (*this)(i, j) = value;
+                }
+
+                ++j;
+            }
+
+            ++i;
+        }
+    }
     Ellpack::Ellpack(Ellpack&& input) noexcept
     {
         (*this) = std::move(input);
@@ -14,23 +43,6 @@ namespace eilig
     Ellpack::Ellpack(const Ellpack& input)
     {
         (*this) = input;
-    }
-    Ellpack::Ellpack(const std::vector<Scalars>& values)
-    {
-        Resize(values.size(), values[0].size());
-
-        for (Index i = 0; i < numberRows_; i++)
-        {
-            for (Index j = 0; j < numberCols_; j++)
-            {
-                if (utils::math::IsAlmostEqual(values[i][j], 0.0, 5))
-                {
-                    continue;
-                }
-
-                (*this)(i, j) = values[i][j];
-            }
-        }
     }
     Ellpack::Ellpack(const eilig::Matrix& input)
     {
@@ -248,12 +260,17 @@ namespace eilig
     }
     void Ellpack::Resize(NumberRows numberRows, NumberCols numberCols)
     {
-        numberRows_ = numberRows;
-        numberCols_ = numberCols;
-        width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+        if (numberRows == 0 || numberCols == 0)
+        {
+            throw std::invalid_argument("Matrix dimensions cannot be zero.");
+        }
 
         try
         {
+            numberRows_ = numberRows;
+            numberCols_ = numberCols;
+            width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+
             count_ = Indices(numberRows_, 0);
             position_ = Indices(numberRows_ * width_, 0);
             data_ = Scalars(numberRows_ * width_, 0.0);

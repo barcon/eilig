@@ -10,7 +10,7 @@ namespace eilig
     {
     public:
         Vector();
-        Vector(const Scalars& values);
+        Vector(const std::initializer_list<Scalar>& values);
         Vector(const Vector& input);
         Vector(const Matrix& input, Index col);
         Vector(NumberRows numberRows);

@@ -6,16 +6,29 @@ namespace eilig
     {
         Resize(1, 1);
     }
-    Matrix::Matrix(const std::vector<Scalars>& values)
+    Matrix::Matrix(const std::initializer_list<std::initializer_list<Scalar>>& values)
     {
-        Resize(values.size(), values[0].size());
+		Index numberRows = values.size();
+		Index numberCols = values.begin()->size();
 
-        for (Index i = 0; i < numberRows_; ++i)
+        Resize(numberRows, numberCols);
+
+		Index i = 0;
+        for (auto& outerItens : values)
         {
-            for (Index j = 0; j < numberCols_; ++j)
+            if (outerItens.size() != numberCols)
             {
-                data_[i * numberCols_ + j] = values[i][j];
-            }
+                throw std::invalid_argument("All rows must have the same number of columns.");
+			}
+
+            Index j = 0;
+            for(auto& value: outerItens)
+            {
+                data_[i * numberCols_ + j] = value;
+				++j;
+			}
+
+            ++i;
         }
     }
     Matrix::Matrix(Matrix&& input) noexcept
@@ -76,11 +89,16 @@ namespace eilig
     }
     void Matrix::Resize(NumberRows numberRows, NumberRows numberCols)
     {
-        numberRows_ = numberRows;
-        numberCols_ = numberCols;
+        if (numberRows == 0 || numberCols == 0)
+        {
+            throw std::invalid_argument("Matrix dimensions cannot be zero.");
+        }
 
         try
         {
+            numberRows_ = numberRows;
+            numberCols_ = numberCols;
+
             data_ = Scalars(numberRows_ * numberCols_, 0.0);
         }
         catch (const std::bad_alloc& e)

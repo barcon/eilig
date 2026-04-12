@@ -11,8 +11,8 @@ namespace eilig
     {
     public:
         Ellpack();
+        Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& values);
         Ellpack(const Ellpack& input);
-        Ellpack(const std::vector<Scalars>& values);
         Ellpack(const eilig::Matrix& input);
         Ellpack(NumberRows numberRows, NumberCols numberCols);
         Ellpack(NumberRows numberRows, NumberCols numberCols, Type type);
