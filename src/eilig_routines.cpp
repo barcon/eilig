@@ -606,6 +606,14 @@ namespace eilig
             case EILIG_SUCCESS:
                 x = h0;
                 return status;
+            case EILIG_NOT_CONVERGED:
+                x = h0;
+                return status;
+            case EILIG_STOP:
+                x = h0;
+                return status;
+            case EILIG_CONTINUE:
+                break;
             }
 
             t0 = A * s0;
@@ -613,24 +621,6 @@ namespace eilig
 
             x1 = x0 + alpha * p0 + omega * s0;
             r2 = s0 - omega * t0;
-
-            residual = NormP2(r2);
-            status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = x1;
-                return status;
-            case EILIG_STOP:
-                x = x1;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
 
             beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
             p1 = r2 + beta * (p0 - omega * v0);
@@ -697,33 +687,23 @@ namespace eilig
             case EILIG_SUCCESS:
                 x = h0;
                 return status;
-            }
-
-            t0 = A * s0;
-            omega = Dot(t0, s0) / Dot(t0, t0);
-            
-            x1 = x0 + alpha * p0 + omega * s0;
-            r2 = s0 - omega * t0;
-
-            residual = NormP2(r2);
-            status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
             case EILIG_NOT_CONVERGED:
-                x = x1;
+                x = h0;
                 return status;
             case EILIG_STOP:
-                x = x1;
+                x = h0;
                 return status;
             case EILIG_CONTINUE:
                 break;
             }
 
-            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);            
+            t0 = A * s0;
+            omega = Dot(t0, s0) / Dot(t0, t0);
+
+            x1 = x0 + alpha * p0 + omega * s0;
+            r2 = s0 - omega * t0;
+
+            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
             p1 = r2 + beta * (p0 - omega * v0);
             r1 = r2;
 
@@ -1355,6 +1335,14 @@ namespace eilig
             case EILIG_SUCCESS:
                 x = h0;
                 return status;
+            case EILIG_NOT_CONVERGED:
+                x = h0;
+                return status;
+            case EILIG_STOP:
+                x = h0;
+                return status;
+            case EILIG_CONTINUE:
+                break;
             }
 
             t0 = A * s0;
@@ -1363,29 +1351,12 @@ namespace eilig
             x1 = x0 + alpha * p0 + omega * s0;
             r2 = s0 - omega * t0;
 
-            residual = NormP2(r2);
-            status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = x1;
-                return status;
-            case EILIG_STOP:
-                x = x1;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
             beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
             p1 = r2 + beta * (p0 - omega * v0);
             r1 = r2;
 
             p0 = p1;
+            x0 = x1;
             x0 = x1;
         }
 
