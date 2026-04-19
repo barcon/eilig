@@ -1,4 +1,4 @@
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 
 #include "eilig_routines.hpp"
 #include "eilig_opencl_matrix_ellpack.hpp"

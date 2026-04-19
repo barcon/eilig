@@ -37,7 +37,7 @@ project "eilig"
 		optimize "Speed"
 				
 	filter "configurations:ReleaseCL"	
-		defines { "NDEBUG", "EILIG_ENABLE_OPENCL" }
+		defines { "NDEBUG", "ENABLE_OPENCL" }
 		optimize "Speed"		
 		
 		includedirs { "../club/src" }		

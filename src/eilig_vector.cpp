@@ -198,7 +198,7 @@ namespace eilig
 
         return *this;
     }
-    Vector Vector::Region(Index row1, Index row2)
+    Vector Vector::Region(Index row1, Index row2) const
     {
         Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
         Index aux2 = row1 <= row2 ? row1 : row2;

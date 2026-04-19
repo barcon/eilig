@@ -44,7 +44,7 @@ namespace eilig
         friend Vector operator*(Scalar lhs, const Vector& rhs);
 
         Vector& SwapRows(Index row1, Index row2);
-        Vector  Region(Index row1, Index row2);
+        Vector  Region(Index row1, Index row2) const;
         void    Region(Index row1, Index row2, const Vector& in);
 
         NumberRows GetRows() const;
@@ -54,7 +54,7 @@ namespace eilig
 
         void SetValue(Index row, Scalar value);
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
         friend opencl::Vector;
 #endif
 

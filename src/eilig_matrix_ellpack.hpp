@@ -79,7 +79,7 @@ namespace eilig
 
         void SetValue(Index row, Index col, Scalar value);
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
         friend opencl::Ellpack;
 #endif
 

@@ -946,7 +946,7 @@ namespace eilig
         return output;
     }
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
     Scalar NormMax(const opencl::Vector& in)
     {
         club::Error error;

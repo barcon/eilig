@@ -1,4 +1,4 @@
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 
 #include "eilig_opencl_kernels.hpp"
 

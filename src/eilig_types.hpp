@@ -4,7 +4,7 @@
 #include "utils.hpp"
 #include "logger.hpp"
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 #include "club.hpp"
 #endif
 
@@ -42,9 +42,9 @@ namespace eilig
 
 	using Vectors = std::vector<Vector>;
 	using Matrices = std::vector<Matrix>;
-	using Ellpacks = std::vector<Ellpack>;
+	using Sparses = std::vector<Ellpack>;
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 	namespace opencl
 	{
 		class Kernels;

@@ -5,7 +5,7 @@
 #include "eilig_matrix.hpp"
 #include "eilig_matrix_ellpack.hpp"
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 #include "eilig_opencl_vector.hpp"
 #include "eilig_opencl_matrix_ellpack.hpp"
 #endif
@@ -56,7 +56,7 @@ namespace eilig
 	String ListMatrix(const Matrix& matrix);
 	String ListMatrix(const Ellpack& matrix);
 
-#ifdef EILIG_ENABLE_OPENCL
+#ifdef ENABLE_OPENCL
 	Scalar NormMax(const opencl::Vector& in);
 	Scalar NormP(const opencl::Vector& in, Scalar p);
 	Scalar NormP(const opencl::Ellpack& in, Scalar p);
