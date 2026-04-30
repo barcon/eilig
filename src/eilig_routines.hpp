@@ -28,7 +28,11 @@ namespace eilig
 	
 	Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation);
 	Scalar Determinant(const Matrix& A);
+	Scalar Determinant2x2(const Matrix& A);
+	Scalar Determinant3x3(const Matrix& A);
 	Matrix Inverse(const Matrix& A);
+	Matrix Inverse2x2(const Matrix& A);
+	Matrix Inverse3x3(const Matrix& A);
 	Matrix ScaleByVector(const Matrix& A, const Vector& alpha);
 	
 	void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);

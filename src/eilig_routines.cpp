@@ -217,6 +217,15 @@ namespace eilig
 
         return DeterminantLUP(LU, permutation);
     }
+    Scalar Determinant2x2(const Matrix& A)
+    {
+        return A(0,0) * A(1,1) - A(0,1) * A(1,0);
+    }
+    Scalar Determinant3x3(const Matrix& A)
+    {
+        return A(0,0) * A(1,1) * A(2,2) + A(0,1) * A(1,2) * A(2,0) + A(0,2) * A(1,0) * A(2,1)
+			- A(0, 2) * A(1, 1) * A(2, 0) - A(0, 1) * A(1, 0) * A(2, 2) - A(0, 0) * A(1, 2) * A(2, 1);
+    }
     Matrix Inverse(const Matrix& A)
     {
         Index numberRows{ A.GetRows() };
@@ -230,6 +239,35 @@ namespace eilig
         InverseLUP(IA, LU, permutation);
 
         return IA;
+    }
+    Matrix Inverse2x2(const Matrix& A)
+    {
+		Matrix res(2, 2);
+
+        res(0, 0) =  A(1, 1);
+        res(0, 1) = -A(0, 1);
+        res(1, 0) = -A(1, 0);
+        res(1, 1) =  A(0, 0);
+
+		return res * (1.0 / Determinant2x2(A));
+    }
+    Matrix Inverse3x3(const Matrix& A)
+    {
+        Matrix res(3, 3);
+
+		res(0, 0) = A(1, 1) * A(2, 2) - A(1, 2) * A(2, 1);
+		res(0, 1) = A(0, 2) * A(2, 1) - A(0, 1) * A(2, 2);
+		res(0, 2) = A(0, 1) * A(1, 2) - A(0, 2) * A(1, 1);
+
+		res(1, 0) = A(1, 2) * A(2, 0) - A(1, 0) * A(2, 2);
+		res(1, 1) = A(0, 0) * A(2, 2) - A(0, 2) * A(2, 0);
+		res(1, 2) = A(0, 2) * A(1, 0) - A(0, 0) * A(1, 2);
+
+		res(2, 0) = A(1, 0) * A(2, 1) - A(1, 1) * A(2, 0);
+		res(2, 1) = A(0, 1) * A(2, 0) - A(0, 0) * A(2, 1);
+		res(2, 2) = A(0, 0) * A(1, 1) - A(0, 1) * A(1, 0);
+
+        return res * (1.0 / Determinant3x3(A));
     }
     Matrix ScaleByVector(const Matrix& A, const Vector& alpha)
     {
