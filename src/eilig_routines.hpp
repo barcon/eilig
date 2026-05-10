@@ -26,11 +26,8 @@ namespace eilig
     Scalar Dot(const Vector& in1, const Vector& in2);
     Vector Cross(const Vector& in1, const Vector& in2);
 	
-	Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation);
-	Scalar Determinant(const Matrix& A);
 	Scalar Determinant2x2(const Matrix& A);
 	Scalar Determinant3x3(const Matrix& A);
-	Matrix Inverse(const Matrix& A);
 	Matrix Inverse2x2(const Matrix& A);
 	Matrix Inverse3x3(const Matrix& A);
 	Matrix ScaleByVector(const Matrix& A, const Vector& alpha);
@@ -61,14 +58,16 @@ namespace eilig
 	String ListMatrix(const Ellpack& matrix);
 
 #ifdef ENABLE_OPENCL
+	using CallbackIterativeCL = long long int (*)(std::size_t, double);
+
 	Scalar NormMax(const opencl::Vector& in);
 	Scalar NormP(const opencl::Vector& in, Scalar p);
 	Scalar NormP(const opencl::Ellpack& in, Scalar p);
 	Scalar NormP2(const opencl::Vector& in);
 	Scalar NormP2(const opencl::Ellpack& in);
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
-	Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative = nullptr);
-	Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative = nullptr);
+	Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative = nullptr);
+	Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative = nullptr);
 
 	void WriteToFile(const opencl::Vector& vec, const String& fileName);
 	void WriteToFile(const opencl::Ellpack& mat, const String& file);
@@ -84,3 +83,7 @@ namespace eilig
 } /* namespace eilig */
 
 #endif /* EILIG_ROUTINES_HPP_ */
+
+//Scalar Determinant(const Matrix& A);
+//Matrix Inverse(const Matrix& A);
+//Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation);

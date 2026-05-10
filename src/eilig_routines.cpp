@@ -193,30 +193,6 @@ namespace eilig
             out(i + rows1) = in2(i);
         }
     }
-    Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation)
-    {
-        Index numberRows{ LU.GetRows() };
-        Scalar det{ LU(0, 0) };
-
-        for (Index i = 1; i < numberRows; i++)
-        {
-            det *= LU(i, i);
-        }
-
-        return (permutation[numberRows] - numberRows) % 2 == 0 ? det : -det;
-    }
-    Scalar Determinant(const Matrix& A)
-    {
-        Index numberRows{ A.GetRows() };
-        Index numberCols{ A.GetCols() };
-
-        Matrix LU(numberRows, numberCols);
-        Indices permutation(numberRows + 1 );
-
-        DecomposeLUP(LU, A, permutation);
-
-        return DeterminantLUP(LU, permutation);
-    }
     Scalar Determinant2x2(const Matrix& A)
     {
         return A(0,0) * A(1,1) - A(0,1) * A(1,0);
@@ -225,20 +201,6 @@ namespace eilig
     {
         return A(0,0) * A(1,1) * A(2,2) + A(0,1) * A(1,2) * A(2,0) + A(0,2) * A(1,0) * A(2,1)
 			- A(0, 2) * A(1, 1) * A(2, 0) - A(0, 1) * A(1, 0) * A(2, 2) - A(0, 0) * A(1, 2) * A(2, 1);
-    }
-    Matrix Inverse(const Matrix& A)
-    {
-        Index numberRows{ A.GetRows() };
-        Index numberCols{ A.GetCols() };
-
-        Matrix LU(numberRows, numberCols);
-        Matrix IA(numberRows, numberCols);
-        Indices permutation(numberRows + 1);
-
-        DecomposeLUP(LU, A, permutation);
-        InverseLUP(IA, LU, permutation);
-
-        return IA;
     }
     Matrix Inverse2x2(const Matrix& A)
     {
@@ -985,6 +947,23 @@ namespace eilig
     }
 
 #ifdef ENABLE_OPENCL
+    CallbackIterativeCL callbackIterativeDefaultCL = [](Index iteration, Scalar residual) -> long long int
+        {
+            Scalar tolerance{ 1e-6 };
+
+            if (std::isnan(residual))
+            {
+                return EILIG_NOT_CONVERGED;
+            }
+
+            if (residual < tolerance)
+            {
+                return EILIG_SUCCESS;
+            }
+
+            return EILIG_CONTINUE;
+        };
+
     Scalar NormMax(const opencl::Vector& in)
     {
         club::Error error;
@@ -1251,7 +1230,7 @@ namespace eilig
 
         return res;
     }
-    Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
+    Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -1268,7 +1247,7 @@ namespace eilig
     
         if (callbackIterative == nullptr)
         {
-            callbackIterative = callbackIterativeDefault;
+            callbackIterative = callbackIterativeDefaultCL;
         }
 
         x0 = x;
@@ -1318,7 +1297,7 @@ namespace eilig
 
         return EILIG_NOT_CONVERGED;
     }
-    Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterative callbackIterative)
+    Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative)
     {
         Scalar alpha{ 0.0 };
         Scalar beta{ 0.0 };
@@ -1341,7 +1320,7 @@ namespace eilig
 
         if (callbackIterative == nullptr)
         {
-            callbackIterative = callbackIterativeDefault;
+            callbackIterative = callbackIterativeDefaultCL;
         }
 
         x0 = x;
@@ -1574,6 +1553,48 @@ namespace eilig
 #endif    
 
 } /* namespace eilig */
+
+/*
+    Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation)
+    {
+        Index numberRows{ LU.GetRows() };
+        Scalar det{ LU(0, 0) };
+
+        for (Index i = 1; i < numberRows; i++)
+        {
+            det *= LU(i, i);
+        }
+
+        return (permutation[numberRows] - numberRows) % 2 == 0 ? det : -det;
+    }
+    Scalar Determinant(const Matrix& A)
+    {
+        Index numberRows{ A.GetRows() };
+        Index numberCols{ A.GetCols() };
+
+        Matrix LU(numberRows, numberCols);
+        Indices permutation(numberRows + 1 );
+
+        DecomposeLUP(LU, A, permutation);
+
+        return DeterminantLUP(LU, permutation);
+    }
+
+    Matrix Inverse(const Matrix& A)
+    {
+        Index numberRows{ A.GetRows() };
+        Index numberCols{ A.GetCols() };
+
+        Matrix LU(numberRows, numberCols);
+        Matrix IA(numberRows, numberCols);
+        Indices permutation(numberRows + 1);
+
+        DecomposeLUP(LU, A, permutation);
+        InverseLUP(IA, LU, permutation);
+
+        return IA;
+    }
+*/
 
 /*
     Status IterativeBiCGStab(const Matrix& A, Vector& x, const Vector& b, Scalar relaxation)
