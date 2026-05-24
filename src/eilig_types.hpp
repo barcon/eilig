@@ -23,13 +23,16 @@ namespace eilig
 	using Strings = utils::Strings;
 	using File = utils::file::Text;	
 	using Status = long long int;
+	using Number = std::size_t;
 
 	static const String headerEilig = "EILIG";
 
+	using Tag = std::size_t;
+	
 	using Type = std::size_t;
-	static const Type matrix_ones		= 1;
-	static const Type matrix_zeros		= 2;
-	static const Type matrix_diagonal	= 3;
+	static const Type matrix_ones{ 1 };
+	static const Type matrix_zeros{ 2 };
+	static const Type matrix_diagonal{ 3 };
 	
 	using Axis = std::size_t;
 	static const Axis axis_x{ 0 };
@@ -44,12 +47,36 @@ namespace eilig
 	using Matrices = std::vector<Matrix>;
 	using Sparses = std::vector<Ellpack>;
 
+	namespace threaded
+	{
+		class IDevice;
+		using IDevicePtr = std::shared_ptr<IDevice>;
+		using Devices = std::vector<IDevicePtr>;
+
+		//---------------------------------------------------------------------
+		class VectorCPU;
+		using VectorCPUPtr = std::shared_ptr<VectorCPU>;
+
+		class EntryProxyVector;
+		class KernelVectorResize;
+		class KernelVectorCopyScalar;
+		class KernelVectorCopyVector;
+		class KernelVectorAddScalar;
+		class KernelVectorInitializerList;
+
+		//---------------------------------------------------------------------
+
+		class Vector;
+		class Matrix;
+		class Ellpack;
+	}
+
 #ifdef ENABLE_OPENCL
 	namespace opencl
 	{
 		class Kernels;
-		using KernelsPtr = Kernels*;
-		using ConstKernelsPtr = const Kernels*;
+		using KernelsPtr = std::shared_ptr<Kernels>;
+		using ConstKernelsPtr = std::shared_ptr<const Kernels>;
 
 		class EntryProxy;
 		class Vector;

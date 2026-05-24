@@ -5,6 +5,8 @@
 #include "eilig_matrix.hpp"
 #include "eilig_matrix_ellpack.hpp"
 
+#include "eilig_threaded_vector.hpp"
+
 #ifdef ENABLE_OPENCL
 #include "eilig_opencl_vector.hpp"
 #include "eilig_opencl_matrix_ellpack.hpp"
@@ -54,6 +56,8 @@ namespace eilig
 	Status	ReadFromFile(Ellpack& output, const String& fileName);
 
 	String ListVector(const Vector& vector);
+	String ListVector(const threaded::Vector& vector);
+	
 	String ListMatrix(const Matrix& matrix);
 	String ListMatrix(const Ellpack& matrix);
 

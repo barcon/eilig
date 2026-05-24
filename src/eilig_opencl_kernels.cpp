@@ -8,9 +8,19 @@ namespace eilig
     {
         KernelsPtr CreateKernels(const String& fileName, const club::PlatformNumber& platformNumber, const club::DeviceNumber& deviceNumber)
         {
-            auto res = new Kernels();
+            auto res = Kernels::Create();
 
             res->Init(fileName, platformNumber, deviceNumber);
+
+            return res;
+        }
+        KernelsPtr Kernels::Create()
+        {
+            class MakeSharedEnabler : public Kernels
+            {
+            };
+
+            auto res = std::make_shared<MakeSharedEnabler>();
 
             return res;
         }

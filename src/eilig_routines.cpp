@@ -877,12 +877,13 @@ namespace eilig
 
         return EILIG_SUCCESS;
     }
+
     String ListVector(const Vector& vector)
     {
         String output{};
         Index numberRows = vector.GetRows();
 
-        //logger::Info(headerEilig, "Vector (%zu x 1):", vector.GetRows());
+        logger::Info(headerEilig, utils::string::Format("Vector ({} x 1):", vector.GetRows()));
 
         for (Index i = 0; i < numberRows; ++i)
         {
@@ -891,13 +892,28 @@ namespace eilig
 
         return output;
     }
+    String ListVector(const threaded::Vector& vector)
+    {
+        String output{};
+        Index numberRows = vector.GetRows();
+
+        logger::Info(headerEilig, utils::string::Format("Vector ({} x 1):", vector.GetRows()));
+
+        for (Index i = 0; i < numberRows; ++i)
+        {
+            output += utils::string::Format("{:14.5e}\n", vector.GetValue(i));
+        }
+
+        return output;
+    }
+
     String ListMatrix(const Matrix& matrix)
     {
         String output{};
         Index numberRows = matrix.GetRows();
         Index numberCols = matrix.GetCols();
 
-        //logger::Info(headerEilig, "Matrix (%zu x %zu):", matrix.GetRows(), matrix.GetCols());
+        logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
 
         for (Index i = 0; i < numberRows; ++i)
         {
@@ -922,7 +938,7 @@ namespace eilig
         const auto& data = matrix.GetData();
         const auto& position = matrix.GetPosition();
 
-        //logger::Info(headerEilig, "Matrix Ellpack (%zu x %zu):", matrix.GetRows(), matrix.GetCols());
+        logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
 
         for (Index i = 0; i < numberRows; ++i)
         {
@@ -1486,6 +1502,7 @@ namespace eilig
 
         return EILIG_SUCCESS;
     }
+   
     String ListVector(const opencl::Vector& vector)
     {
         String output{};

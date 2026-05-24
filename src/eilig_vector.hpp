@@ -54,6 +54,12 @@ namespace eilig
 
         void SetValue(Index row, Scalar value);
 
+        friend threaded::EntryProxyVector;
+        friend threaded::KernelVectorResize;
+        friend threaded::KernelVectorCopyScalar;
+        friend threaded::KernelVectorAddScalar;
+        friend threaded::KernelVectorInitializerList;
+
 #ifdef ENABLE_OPENCL
         friend opencl::Vector;
 #endif

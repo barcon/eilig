@@ -24,15 +24,13 @@ namespace eilig
         Ellpack::Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& values)
         {
             kernels_ = kernels;
-            Index numberRows = values.size();
-            Index numberCols = values.begin()->size();
 
-            Resize(numberRows, numberCols);
+            Resize(values.size(), values.begin()->size());
 
             Index i = 0;
             for (auto& outerItens : values)
             {
-                if (outerItens.size() != numberCols)
+                if (outerItens.size() != numberCols_)
                 {
                     throw std::invalid_argument("All rows must have the same number of columns.");
                 }

@@ -13,6 +13,7 @@ project "eilig"
 	targetdir "build/%{cfg.buildcfg}"
 	includedirs { "../utils/src" }
 	includedirs { "../logger/src" }
+	includedirs { "../thread-pool/include" }	
 	
 	files "src/eilig.hpp"	
 	files "src/eilig_matrix.hpp"	
@@ -26,7 +27,15 @@ project "eilig"
 	files "src/eilig_transform.cpp"	
 	files "src/eilig_types.hpp"	
 	files "src/eilig_vector.hpp"	
-	files "src/eilig_vector.cpp"	
+	files "src/eilig_vector.cpp"
+	
+	files "src/eilig_threaded.hpp"
+	files "src/eilig_threaded_entry_proxy.hpp"
+	files "src/eilig_threaded_entry_proxy.cpp"
+	files "src/eilig_threaded_vector_cpu.hpp"
+	files "src/eilig_threaded_vector_cpu.cpp"
+	files "src/eilig_threaded_vector.hpp"
+	files "src/eilig_threaded_vector.cpp"
 	
 	filter "configurations:Debug"
 		defines { "DEBUG" }

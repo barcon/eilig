@@ -18,10 +18,6 @@ namespace eilig
             
 	         dataGPU_->Write(0, sizeof(Scalar) * numberRows_, std::data(values), CL_TRUE);
         }
-        Vector::Vector(Vector&& input) noexcept
-        {
-            (*this) = std::move(input);
-        }
         Vector::Vector(const Vector& input)
         {
             (*this) = input;
@@ -42,6 +38,10 @@ namespace eilig
         {
             kernels_ = kernels;
             Resize(numberRows, value);
+        }
+        Vector::Vector(Vector&& input) noexcept
+        {
+            (*this) = std::move(input);
         }
         eilig::Vector Vector::Convert() const
         {
@@ -111,6 +111,16 @@ namespace eilig
 
             return *this;
         }
+        Vector& Vector::operator=(const Vector& rhs)
+        {
+            kernels_ = rhs.kernels_;
+            numberRows_ = rhs.numberRows_;
+            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
+
+            clEnqueueCopyBuffer(kernels_->context_->GetQueue(), rhs.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_, 0, NULL, NULL);
+
+            return *this;
+        }
         Vector& Vector::operator=(Vector&& rhs) noexcept
         {
             if (&rhs == this)
@@ -121,16 +131,6 @@ namespace eilig
             kernels_ = rhs.kernels_;
             numberRows_ = rhs.numberRows_;
             dataGPU_ = BufferPtr(std::move(rhs.dataGPU_));
-
-            return *this;
-        }
-        Vector& Vector::operator=(const Vector& rhs)
-        {
-            kernels_ = rhs.kernels_;
-            numberRows_ = rhs.numberRows_;
-            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
-
-            clEnqueueCopyBuffer(kernels_->context_->GetQueue(), rhs.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_, 0, NULL, NULL);
 
             return *this;
         }

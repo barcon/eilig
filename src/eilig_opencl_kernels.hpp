@@ -8,6 +8,7 @@ namespace eilig
     namespace opencl
     {
         using BufferPtr = club::BufferPtr;
+		using KernelPtr = club::KernelPtr;
 
         static const String kVectorCopyS = "VectorCopyS";
         static const String kVectorAddS = "VectorAddS";
@@ -60,61 +61,64 @@ namespace eilig
         class Kernels
         {
         public:
-            Kernels() = default;
             virtual ~Kernels() = default;
+
+            static KernelsPtr Create();
+
             void Init(const String& fileName, const club::PlatformNumber& platformNumber, const club::DeviceNumber& deviceNumber);
 
             club::PlatformPtr platform_{ nullptr };
             club::ContextPtr context_{ nullptr };
             club::ProgramPtr program_{ nullptr };
 
-            club::KernelPtr kVectorCopyS_{ nullptr };
-            club::KernelPtr kVectorAddS_{ nullptr };
-            club::KernelPtr kVectorAddSl_{ nullptr };
-            club::KernelPtr kVectorAddV_{ nullptr };
-            club::KernelPtr kVectorPlus_{ nullptr };
-            club::KernelPtr kVectorSubS_{ nullptr };
-            club::KernelPtr kVectorSubSl_{ nullptr };
-            club::KernelPtr kVectorSubV_{ nullptr };
-            club::KernelPtr kVectorMinus_{ nullptr };
-            club::KernelPtr kVectorMulS_{ nullptr };
-            club::KernelPtr kVectorDot_{ nullptr };
-            club::KernelPtr kVectorNormMax_{ nullptr };
-            club::KernelPtr kVectorNormP_{ nullptr };
-            club::KernelPtr kVectorNormP2_{ nullptr };
-            club::KernelPtr kEllpackNormP_{ nullptr };
-            club::KernelPtr kEllpackNormP2_{ nullptr };
-            club::KernelPtr kEllpackMaxCount_{ nullptr };
-            club::KernelPtr kEllpackExpandPosition_{ nullptr };
-            club::KernelPtr kEllpackExpandData_{ nullptr };
-            club::KernelPtr kEllpackShrinkPosition_{ nullptr };
-            club::KernelPtr kEllpackShrinkData_{ nullptr };
-            club::KernelPtr kEllpackCopyS_{ nullptr };
-            club::KernelPtr kEllpackAddS_{ nullptr };
-            club::KernelPtr kEllpackAddSl_{ nullptr };
-            club::KernelPtr kEllpackPlus_{ nullptr };
-            club::KernelPtr kEllpackSubS_{ nullptr };
-            club::KernelPtr kEllpackSubSl_{ nullptr };
-            club::KernelPtr kEllpackMinus_{ nullptr };
-            club::KernelPtr kEllpackMulS_{ nullptr };
-            club::KernelPtr kEllpackMulV_{ nullptr };
-            club::KernelPtr kEllpackMulM_{ nullptr };
-            club::KernelPtr kEllpackSwapRows_{ nullptr };
-            club::KernelPtr kEllpackSwapCols_{ nullptr };
-            club::KernelPtr kEllpackTranspose_{ nullptr };
-            club::KernelPtr kEllpackFindWidthTranspose_{ nullptr };
-            club::KernelPtr kEllpackDiagonal_{ nullptr };
-            club::KernelPtr kEllpackDiagonalScale_{ nullptr };
-            club::KernelPtr kEllpackDiagonalVector_{ nullptr };
-            club::KernelPtr kEllpackRegion_{ nullptr };
-            club::KernelPtr kEllpackLower1_{ nullptr };
-            club::KernelPtr kEllpackLower2_{ nullptr };
-            club::KernelPtr kEllpackUpper1_{ nullptr };
-            club::KernelPtr kEllpackUpper2_{ nullptr };
-            club::KernelPtr kEllpackTrace_{ nullptr };
-            club::KernelPtr kEllpackSum_{ nullptr };
+            KernelPtr kVectorCopyS_{ nullptr };
+            KernelPtr kVectorAddS_{ nullptr };
+            KernelPtr kVectorAddSl_{ nullptr };
+            KernelPtr kVectorAddV_{ nullptr };
+            KernelPtr kVectorPlus_{ nullptr };
+            KernelPtr kVectorSubS_{ nullptr };
+            KernelPtr kVectorSubSl_{ nullptr };
+            KernelPtr kVectorSubV_{ nullptr };
+            KernelPtr kVectorMinus_{ nullptr };
+            KernelPtr kVectorMulS_{ nullptr };
+            KernelPtr kVectorDot_{ nullptr };
+            KernelPtr kVectorNormMax_{ nullptr };
+            KernelPtr kVectorNormP_{ nullptr };
+            KernelPtr kVectorNormP2_{ nullptr };
+            KernelPtr kEllpackNormP_{ nullptr };
+            KernelPtr kEllpackNormP2_{ nullptr };
+            KernelPtr kEllpackMaxCount_{ nullptr };
+            KernelPtr kEllpackExpandPosition_{ nullptr };
+            KernelPtr kEllpackExpandData_{ nullptr };
+            KernelPtr kEllpackShrinkPosition_{ nullptr };
+            KernelPtr kEllpackShrinkData_{ nullptr };
+            KernelPtr kEllpackCopyS_{ nullptr };
+            KernelPtr kEllpackAddS_{ nullptr };
+            KernelPtr kEllpackAddSl_{ nullptr };
+            KernelPtr kEllpackPlus_{ nullptr };
+            KernelPtr kEllpackSubS_{ nullptr };
+            KernelPtr kEllpackSubSl_{ nullptr };
+            KernelPtr kEllpackMinus_{ nullptr };
+            KernelPtr kEllpackMulS_{ nullptr };
+            KernelPtr kEllpackMulV_{ nullptr };
+            KernelPtr kEllpackMulM_{ nullptr };
+            KernelPtr kEllpackSwapRows_{ nullptr };
+            KernelPtr kEllpackSwapCols_{ nullptr };
+            KernelPtr kEllpackTranspose_{ nullptr };
+            KernelPtr kEllpackFindWidthTranspose_{ nullptr };
+            KernelPtr kEllpackDiagonal_{ nullptr };
+            KernelPtr kEllpackDiagonalScale_{ nullptr };
+            KernelPtr kEllpackDiagonalVector_{ nullptr };
+            KernelPtr kEllpackRegion_{ nullptr };
+            KernelPtr kEllpackLower1_{ nullptr };
+            KernelPtr kEllpackLower2_{ nullptr };
+            KernelPtr kEllpackUpper1_{ nullptr };
+            KernelPtr kEllpackUpper2_{ nullptr };
+            KernelPtr kEllpackTrace_{ nullptr };
+            KernelPtr kEllpackSum_{ nullptr };
 
         protected:
+            Kernels() = default;
             Kernels(const Kernels& copy) = delete;
             Kernels(Kernels&& move) = delete;
 

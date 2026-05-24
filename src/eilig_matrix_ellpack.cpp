@@ -9,15 +9,12 @@ namespace eilig
     }
     Ellpack::Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& values)
     {
-        Index numberRows = values.size();
-        Index numberCols = values.begin()->size();
-
-        Resize(numberRows, numberCols);
+        Resize(values.size(), values.begin()->size());
 
         Index i = 0;
         for (auto& outerItens : values)
         {
-            if (outerItens.size() != numberCols)
+            if (outerItens.size() != numberCols_)
             {
                 throw std::invalid_argument("All rows must have the same number of columns.");
             }
@@ -265,27 +262,13 @@ namespace eilig
             throw std::invalid_argument("Matrix dimensions cannot be zero.");
         }
 
-        try
-        {
-            numberRows_ = numberRows;
-            numberCols_ = numberCols;
-            width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+        numberRows_ = numberRows;
+        numberCols_ = numberCols;
+        width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
 
-            count_ = Indices(numberRows_, 0);
-            position_ = Indices(numberRows_ * width_, 0);
-            data_ = Scalars(numberRows_ * width_, 0.0);
-
-        }
-        catch (const std::bad_alloc& e)
-        {
-            auto message1 = utils::string::Format("Exception allocate memory for matrix: {}", e.what());
-            auto message2 = utils::string::Format("Could not allocate memory for matrix: {} (kb)", size_t(sizeof(Scalar) * numberRows_ * numberCols_ / 1024));
-
-            logger::Error(headerEilig, message1);
-            logger::Error(headerEilig, message2);
-
-            throw;
-        }
+        count_ = Indices(numberRows_, 0);
+        position_ = Indices(numberRows_ * width_, 0);
+        data_ = Scalars(numberRows_ * width_, 0.0);
     }
     void Ellpack::Resize(NumberRows numberRows, NumberCols numberCols, Scalar value)
     {

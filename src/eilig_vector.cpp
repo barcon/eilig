@@ -8,9 +8,7 @@ namespace eilig
     }
     Vector::Vector(const std::initializer_list<Scalar>& values)
     {
-        Index numberRows = values.size();
-
-        Resize(numberRows);
+        Resize(values.size());
 
         Index i = 0;
         for (auto& value : values)
@@ -18,10 +16,6 @@ namespace eilig
             data_[i] = value;
             ++i;
         }
-    }
-    Vector::Vector(Vector&& input) noexcept
-    {
-        (*this) = std::move(input);
     }
     Vector::Vector(const Vector& input)
     {
@@ -44,6 +38,10 @@ namespace eilig
     {
         Resize(numberRows, value);
     }
+    Vector::Vector(Vector&& input) noexcept
+    {
+        (*this) = std::move(input);
+    }
     void Vector::Resize(NumberRows numberRows)
     {
         if (numberRows == 0)
@@ -51,22 +49,8 @@ namespace eilig
             throw std::invalid_argument("Vector dimensions cannot be zero.");
         }
         
-        try 
-        {
-            numberRows_ = numberRows;
-
-            data_ = Scalars(numberRows_, 0.0);
-        }
-        catch (const std::bad_alloc& e)
-        {
-            auto message1 = utils::string::Format("Exception allocate memory for matrix: {}", e.what());
-            auto message2 = utils::string::Format("Could not allocate memory for matrix: {} (kb)", size_t(sizeof(Scalar) * numberRows_ / 1024));
-
-            logger::Error(headerEilig, message1);
-            logger::Error(headerEilig, message2);
-
-            throw;
-		}
+        numberRows_ = numberRows;
+        data_ = Scalars(numberRows_, 0.0);
     }
     void Vector::Resize(NumberRows numberRows, Scalar value)
     {
@@ -94,6 +78,13 @@ namespace eilig
 
         return *this;
     }
+    Vector& Vector::operator=(const Vector& rhs)
+    {
+        numberRows_ = rhs.numberRows_;
+        data_ = rhs.data_;
+
+        return *this;
+    }
     Vector& Vector::operator=(Vector&& rhs) noexcept
     {
         if (&rhs == this)
@@ -103,13 +94,6 @@ namespace eilig
 
         numberRows_ = rhs.numberRows_;
         data_ = Scalars(std::move(rhs.data_));
-
-        return *this;
-    }
-    Vector& Vector::operator=(const Vector& rhs)
-    {
-        numberRows_ = rhs.numberRows_;
-        data_ = rhs.data_;
 
         return *this;
     }

@@ -10,26 +10,24 @@ namespace eilig
         class EntryProxy
         {
         public:
-
             explicit EntryProxy(club::BufferPtr buffer, Index offset);
 
-            void SetBuffer(club::BufferPtr buffer);
-            void SetIndex(Index index);
+            ~EntryProxy() = default;
 
             Scalar operator()();
             EntryProxy& operator=(Scalar rhs);
             EntryProxy& operator+=(Scalar rhs);
             EntryProxy& operator-=(Scalar rhs);
            
-            ~EntryProxy() = default;
-
         private:
+            void SetBuffer(club::BufferPtr buffer);
+            void SetIndex(Index index);
+            void Write(Scalar value);
+            Scalar Read() const;
 
             Index index_{ 0 };
             club::BufferPtr buffer_{ nullptr };
 
-            Scalar Read() const;
-            void Write(Scalar value);
         };
     }
 
