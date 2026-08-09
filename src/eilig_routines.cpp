@@ -5,27 +5,11 @@
 
 namespace eilig
 {
-	CallbackIterative callbackIterativeDefault = [](Index iteration, Scalar residual) -> long long int
-    {
-		Scalar tolerance{ 1e-6 };
-
-        if (std::isnan(residual))
-        {
-			return EILIG_NOT_CONVERGED;
-        }
-
-        if (residual < tolerance)
-        {
-			return EILIG_SUCCESS;
-        }
-
-        return EILIG_CONTINUE;
-    };
-
     Indices CreateIndices()
     {
         return Indices();
     }
+    
     Scalar NormMax(const Vector& in)
     {
         Scalar res{ 0.0 };
@@ -137,6 +121,7 @@ namespace eilig
         res = std::sqrt(norm);
         return res;
     }
+
     Scalar Dot(const Vector& in1, const Vector& in2)
     {
         Scalar res{ 0.0 };
@@ -158,6 +143,7 @@ namespace eilig
 
         return res;
     }
+    
     Vector Merge(const Vector& in1, const Vector& in2)
     {
         NumberRows rows1 = in1.GetRows();
@@ -193,6 +179,11 @@ namespace eilig
             out(i + rows1) = in2(i);
         }
     }
+   
+    Scalar Determinant1x1(const Matrix& A)
+    {
+        return A(0, 0);
+    }
     Scalar Determinant2x2(const Matrix& A)
     {
         return A(0,0) * A(1,1) - A(0,1) * A(1,0);
@@ -201,6 +192,14 @@ namespace eilig
     {
         return A(0,0) * A(1,1) * A(2,2) + A(0,1) * A(1,2) * A(2,0) + A(0,2) * A(1,0) * A(2,1)
 			- A(0, 2) * A(1, 1) * A(2, 0) - A(0, 1) * A(1, 0) * A(2, 2) - A(0, 0) * A(1, 2) * A(2, 1);
+    }
+    Matrix Inverse1x1(const Matrix& A)
+    {
+        Matrix res(1, 1);
+
+        res(0, 0) = 1.0 / A(1, 1);
+
+        return res;
     }
     Matrix Inverse2x2(const Matrix& A)
     {
@@ -245,6 +244,7 @@ namespace eilig
 
         return res;
     }
+
     void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
     {
         Index numberRows = A.GetRows();
@@ -417,302 +417,6 @@ namespace eilig
         DecomposeLUP(LU, A, permutation);
         DirectLUP(LU, x, b, permutation);
     }
-    Status IterativeCG(const Matrix& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar rho0{ 0.0 };
-
-        Index numberRows = A.GetRows();
-        Index iteration = { 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector x1(numberRows);
-        Vector r1(numberRows);
-
-        if (callbackIterative == nullptr)
-        {
-			callbackIterative = callbackIterativeDefault;
-        }
-
-        x0 = x;
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-
-        for (;;)
-        {
-            iteration++;
-
-            alpha = Dot(r0, r0) / Dot(p0, A * p0);
-
-            x1 = x0 + alpha * p0;
-            r1 = r0 - alpha * (A * p0);
-
-            auto residual = NormP2(r1);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = x1;
-                return status;
-            case EILIG_STOP:
-                x = x1;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            beta = Dot(r1, r1) / Dot(r0, r0);
-            p0 = r1 + beta * p0;
-
-            x0 = x1;
-            r0 = r1;
-        }
-
-        return EILIG_NOT_CONVERGED;
-    }
-    Status IterativeCG(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar rho0{ 0.0 };
-
-        Index numberRows = A.GetRows();
-        Index iteration = { 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector x1(numberRows);
-        Vector r1(numberRows);
-
-        if (callbackIterative == nullptr)
-        {
-            callbackIterative = callbackIterativeDefault;
-        }
-
-        x0 = x;
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-
-        for (;;)
-        {
-            iteration++;
-
-            alpha = Dot(r0, r0) / Dot(p0, A * p0);
-
-            x1 = x0 + alpha * p0 ;
-            r1 = r0 - alpha * (A * p0);
-
-            auto residual = NormP2(r1);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = x1;
-                return status;
-            case EILIG_STOP:
-                x = x1;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            beta = Dot(r1, r1) / Dot(r0, r0);
-            p0 = r1 + beta * p0;
-
-            x0 = x1;
-            r0 = r1;
-        }
-        
-        return EILIG_NOT_CONVERGED;
-    }
-    Status IterativeBiCGStab(const Matrix& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar omega{ 0.0 };
-
-        Index numberRows = A.GetRows();
-        Index iteration{ 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector s0(numberRows);
-        Vector h0(numberRows);
-        Vector t0(numberRows);
-        Vector v0(numberRows);
-        Vector x1(numberRows);
-        Vector p1(numberRows);
-        Vector r1(numberRows);
-        Vector r2(numberRows);
-
-        if (callbackIterative == nullptr)
-        {
-            callbackIterative = callbackIterativeDefault;
-        }
-
-        x0 = x;
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = x + 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-        r1 = r0;
-
-        for (;;)
-        {
-            iteration++;
-
-            v0 = A * p0;
-            alpha = Dot(r1, r0) / Dot(v0, r0);
-            h0 = x0 + alpha * p0;
-            s0 = r1 - alpha * v0;
-
-            auto residual = NormP2(s0);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = h0;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = h0;
-                return status;
-            case EILIG_STOP:
-                x = h0;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            t0 = A * s0;
-            omega = Dot(t0, s0) / Dot(t0, t0);
-
-            x1 = x0 + alpha * p0 + omega * s0;
-            r2 = s0 - omega * t0;
-
-            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
-            p1 = r2 + beta * (p0 - omega * v0);
-            r1 = r2;
-
-            p0 = p1;
-            x0 = x1;
-        }
-
-        return EILIG_NOT_CONVERGED;
-    }
-    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, CallbackIterative callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar omega{ 0.0 };
-
-        Index numberRows = A.GetRows();
-        Index iteration { 0 };
-
-        Vector x0(numberRows);
-        Vector r0(numberRows);
-        Vector p0(numberRows);
-        Vector s0(numberRows);
-        Vector h0(numberRows);
-        Vector t0(numberRows);
-        Vector v0(numberRows);
-        Vector x1(numberRows);
-        Vector p1(numberRows);
-        Vector r1(numberRows);
-        Vector r2(numberRows);
-
-        if (callbackIterative == nullptr)
-        {
-            callbackIterative = callbackIterativeDefault;
-        }
-
-        x0 = x;       
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = x + 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-        r1 = r0;
-        
-        for (;;)
-        {
-            iteration++;
-
-            v0 = A * p0;
-            alpha = Dot(r1, r0) / Dot(v0, r0);
-            h0 = x0 + alpha * p0;
-            s0 = r1 - alpha * v0;
-
-            auto residual = NormP2(s0);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = h0;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = h0;
-                return status;
-            case EILIG_STOP:
-                x = h0;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            t0 = A * s0;
-            omega = Dot(t0, s0) / Dot(t0, t0);
-
-            x1 = x0 + alpha * p0 + omega * s0;
-            r2 = s0 - omega * t0;
-
-            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
-            p1 = r2 + beta * (p0 - omega * v0);
-            r1 = r2;
-
-            p0 = p1;
-            x0 = x1;
-        }
-
-        return EILIG_NOT_CONVERGED;
-    }
 
     void WriteToFile(const Vector& vec, const String& fileName)
     {
@@ -762,6 +466,7 @@ namespace eilig
 
         file.Write(output);
     }
+
     Status ReadFromFile(Vector& output, const String& fileName)
     {
         File file;
@@ -831,7 +536,7 @@ namespace eilig
         {
             for (Index j = 0; j < output.GetCols(); j++)
             {
-                output.SetValue(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
+                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
             }
         }
 
@@ -871,115 +576,14 @@ namespace eilig
         {
             for (Index j = 0; j < output.GetCols(); j++)
             {
-                output.SetValue(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
+                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
             }
         }
 
         return EILIG_SUCCESS;
     }
 
-    String ListVector(const Vector& vector)
-    {
-        String output{};
-        Index numberRows = vector.GetRows();
-
-        logger::Info(headerEilig, utils::string::Format("Vector ({} x 1):", vector.GetRows()));
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            output += utils::string::Format("{:14.5e}\n", vector(i));
-        }
-
-        return output;
-    }
-    String ListVector(const threaded::Vector& vector)
-    {
-        String output{};
-        Index numberRows = vector.GetRows();
-
-        logger::Info(headerEilig, utils::string::Format("Vector ({} x 1):", vector.GetRows()));
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            output += utils::string::Format("{:14.5e}\n", vector.GetValue(i));
-        }
-
-        return output;
-    }
-
-    String ListMatrix(const Matrix& matrix)
-    {
-        String output{};
-        Index numberRows = matrix.GetRows();
-        Index numberCols = matrix.GetCols();
-
-        logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            for (Index j = 0; j < numberCols; ++j)
-            {
-                output += utils::string::Format("{:14.5e}", matrix(i, j));
-            }
-            
-            output += "\n";
-        }
-
-        return output;
-    }
-    String ListMatrix(const Ellpack& matrix)
-    {
-        String output{};
-        Index numberRows = matrix.GetRows();
-        Index numberCols = matrix.GetCols();
-        Index width = matrix.GetWidth();
-
-        const auto& count = matrix.GetCount();
-        const auto& data = matrix.GetData();
-        const auto& position = matrix.GetPosition();
-
-        logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            Index k = 0;
-
-            for (Index j = 0; j < numberCols; j++)
-            {
-                if ((k < count[i]) && (position[i * width + k] == j))
-                {
-                    output += utils::string::Format("{:14.5e}", data[i * width + k]);
-                    k++;
-                    continue;
-                }
-
-                output += utils::string::Format("{:14.5e}", 0.0);
-            }
-
-            output += "\n";
-        }
-
-        return output;
-    }
-
-#ifdef ENABLE_OPENCL
-    CallbackIterativeCL callbackIterativeDefaultCL = [](Index iteration, Scalar residual) -> long long int
-        {
-            Scalar tolerance{ 1e-6 };
-
-            if (std::isnan(residual))
-            {
-                return EILIG_NOT_CONVERGED;
-            }
-
-            if (residual < tolerance)
-            {
-                return EILIG_SUCCESS;
-            }
-
-            return EILIG_CONTINUE;
-        };
-
+#ifdef EILIG_ENABLE_OPENCL
     Scalar NormMax(const opencl::Vector& in)
     {
         club::Error error;
@@ -1204,6 +808,7 @@ namespace eilig
         res = std::sqrt(norm);
         return res;
     }
+
     Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2)
     {
         club::Error error;
@@ -1246,155 +851,7 @@ namespace eilig
 
         return res;
     }
-    Status IterativeCGCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar rho0{ 0.0 };
 
-        Index numberRows = A.GetRows();
-        Index iteration = { 0 };
-
-        opencl::Vector x0(b.GetKernels(), numberRows);
-        opencl::Vector r0(b.GetKernels(), numberRows);
-        opencl::Vector p0(b.GetKernels(), numberRows);
-        opencl::Vector x1(b.GetKernels(), numberRows);
-        opencl::Vector r1(b.GetKernels(), numberRows);
-    
-        if (callbackIterative == nullptr)
-        {
-            callbackIterative = callbackIterativeDefaultCL;
-        }
-
-        x0 = x;
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = x + 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-
-        for (;;)
-        {
-            iteration++;
-
-            alpha = Dot(r0, r0) / Dot(p0, A * p0);
-
-            x1 = x0 + alpha * p0;
-            r1 = r0 - alpha * (A * p0);
-
-            auto residual = NormP2(r1);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = x1;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = x1;
-                return status;
-            case EILIG_STOP:
-                x = x1;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            beta = Dot(r1, r1) / Dot(r0, r0);
-            p0 = r1 + beta * p0;
-
-            x0 = x1;
-            r0 = r1;
-        }
-
-        return EILIG_NOT_CONVERGED;
-    }
-    Status IterativeBiCGStabCL(const opencl::Ellpack& A, opencl::Vector& x, const opencl::Vector& b, CallbackIterativeCL callbackIterative)
-    {
-        Scalar alpha{ 0.0 };
-        Scalar beta{ 0.0 };
-        Scalar omega{ 0.0 };
-
-        Index numberRows = A.GetRows();
-        Index iteration{ 0 };
-
-        opencl::Vector x0(b.GetKernels(), numberRows);
-        opencl::Vector r0(b.GetKernels(), numberRows);
-        opencl::Vector p0(b.GetKernels(), numberRows);
-        opencl::Vector s0(b.GetKernels(), numberRows);
-        opencl::Vector h0(b.GetKernels(), numberRows);
-        opencl::Vector t0(b.GetKernels(), numberRows);
-        opencl::Vector v0(b.GetKernels(), numberRows);
-        opencl::Vector x1(b.GetKernels(), numberRows);
-        opencl::Vector p1(b.GetKernels(), numberRows);
-        opencl::Vector r1(b.GetKernels(), numberRows);
-        opencl::Vector r2(b.GetKernels(), numberRows);
-
-        if (callbackIterative == nullptr)
-        {
-            callbackIterative = callbackIterativeDefaultCL;
-        }
-
-        x0 = x;
-        r0 = b - A * x0;
-
-        if (utils::math::IsAlmostEqual(NormP2(r0), 0.0, 5))
-        {
-            x0 = x + 1.0;
-            r0 = b - A * x0;
-        }
-
-        p0 = r0;
-        r1 = r0;
-
-        for (;;)
-        {
-            iteration++;
-
-            v0 = A * p0;
-            alpha = Dot(r1, r0) / Dot(v0, r0);
-            h0 = x0 + alpha * p0;
-            s0 = r1 - alpha * v0;
-
-            auto residual = NormP2(s0);
-            auto status = callbackIterative(iteration, residual);
-
-            switch (status)
-            {
-            case EILIG_SUCCESS:
-                x = h0;
-                return status;
-            case EILIG_NOT_CONVERGED:
-                x = h0;
-                return status;
-            case EILIG_STOP:
-                x = h0;
-                return status;
-            case EILIG_CONTINUE:
-                break;
-            }
-
-            t0 = A * s0;
-            omega = Dot(t0, s0) / Dot(t0, t0);
-
-            x1 = x0 + alpha * p0 + omega * s0;
-            r2 = s0 - omega * t0;
-
-            beta = (Dot(r2, r0) / Dot(r1, r0)) * (alpha / omega);
-            p1 = r2 + beta * (p0 - omega * v0);
-            r1 = r2;
-
-            p0 = p1;
-            x0 = x1;
-            x0 = x1;
-        }
-
-        return EILIG_NOT_CONVERGED;
-    }
     void WriteToFile(const opencl::Vector& vec, const String& fileName)
     {
         File file;
@@ -1427,6 +884,7 @@ namespace eilig
 
         file.Write(output);
     }
+
     Status ReadFromFile(opencl::Vector& output, const String& fileName)
     {
         File file;
@@ -1479,7 +937,7 @@ namespace eilig
             logger::Error(headerEilig, "File could not be opened");
             return EILIG_INVALID_FILE;
         }
-     
+
         auto stream = static_cast<std::istringstream>(file.GetFull());
         while (std::getline(stream, line))
         {
@@ -1496,142 +954,12 @@ namespace eilig
         {
             for (Index j = 0; j < output.GetCols(); j++)
             {
-                output.SetValue(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
+                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
             }
         }
 
         return EILIG_SUCCESS;
     }
-   
-    String ListVector(const opencl::Vector& vector)
-    {
-        String output{};
-        Scalars data{};
-        Index numberRows = vector.GetRows();
-
-        const auto& dataGPU = vector.GetDataGPU();
-
-        data.resize(numberRows);
-        dataGPU->Read(0, sizeof(Scalar) * numberRows, &data[0], CL_TRUE);
-
-        //logger::Info(headerEilig, "Vector CL (%zu x 1):", vector.GetRows());
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            output += utils::string::Format("{:14.5f}\n", data[i]);
-        }
-
-        return output;
-    }
-    String ListMatrix(const opencl::Ellpack& matrix)
-    {
-        String output{};
-        Scalars data{};
-        Indices position{};
-        Indices count{};
-
-        Index numberRows = matrix.GetRows();
-        Index numberCols = matrix.GetCols();
-        Index width = matrix.GetWidth();
-        const auto& countGPU = matrix.GetCountGPU();
-        const auto& dataGPU = matrix.GetDataGPU();
-        const auto& positionGPU = matrix.GetPositionGPU();
-
-        count.resize(numberRows);
-        data.resize(numberRows * width);
-        position.resize(numberRows * width);
-
-        countGPU->Read(0, sizeof(Index) * numberRows, &count[0], CL_TRUE);
-        dataGPU->Read(0, sizeof(Scalar) * numberRows * width, &data[0], CL_TRUE);
-        positionGPU->Read(0, sizeof(Index) * numberRows * width, &position[0], CL_TRUE);
-
-        //logger::Info(headerEilig, "Matrix Ellpack CL (%zu x %zu):", matrix.GetRows(), matrix.GetCols());
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            Index k = 0;
-
-            for (Index j = 0; j < numberCols; j++)
-            {
-                if ( (k < count[i]) && (position[i * width + k] == j))
-                {
-                    output += utils::string::Format("{:14.5e}", data[i * width + k]);
-                    k++;
-                    continue;
-                }
-
-                output += utils::string::Format("{:14.5e}", 0.0);
-            }
-            output += "\n";
-        }
-
-        return output;
-    }
-#endif    
+#endif
 
 } /* namespace eilig */
-
-/*
-    Scalar DeterminantLUP(const Matrix& LU, const Indices& permutation)
-    {
-        Index numberRows{ LU.GetRows() };
-        Scalar det{ LU(0, 0) };
-
-        for (Index i = 1; i < numberRows; i++)
-        {
-            det *= LU(i, i);
-        }
-
-        return (permutation[numberRows] - numberRows) % 2 == 0 ? det : -det;
-    }
-    Scalar Determinant(const Matrix& A)
-    {
-        Index numberRows{ A.GetRows() };
-        Index numberCols{ A.GetCols() };
-
-        Matrix LU(numberRows, numberCols);
-        Indices permutation(numberRows + 1 );
-
-        DecomposeLUP(LU, A, permutation);
-
-        return DeterminantLUP(LU, permutation);
-    }
-
-    Matrix Inverse(const Matrix& A)
-    {
-        Index numberRows{ A.GetRows() };
-        Index numberCols{ A.GetCols() };
-
-        Matrix LU(numberRows, numberCols);
-        Matrix IA(numberRows, numberCols);
-        Indices permutation(numberRows + 1);
-
-        DecomposeLUP(LU, A, permutation);
-        InverseLUP(IA, LU, permutation);
-
-        return IA;
-    }
-*/
-
-/*
-    Status IterativeBiCGStab(const Matrix& A, Vector& x, const Vector& b, Scalar relaxation)
-    {
-        if (!(relaxation > 0.0 && relaxation < 1.0))
-        {
-            logger::Error(headerEilig, "Invalid relaxation factor (0.0 < relaxation < 1.0)");
-            return EILIG_INVALID_FACTOR;
-        }
-
-        return IterativeBiCGStab(A.DiagonalScale(1.0 / relaxation), x, b + (1.0 - relaxation) / relaxation * (A.Diagonal() * x));
-    }
-    Status IterativeBiCGStab(const Ellpack& A, Vector& x, const Vector& b, Scalar relaxation)
-    {
-        if (!(relaxation > 0.0 && relaxation < 1.0))
-        {
-            logger::Error(headerEilig, "Invalid relaxation factor (0.0 < relaxation < 1.0)");
-            return EILIG_INVALID_FACTOR;
-        }
-
-        return IterativeBiCGStab(A.DiagonalScale(1.0 / relaxation), x, b + (1.0 - relaxation) / relaxation * (A.Diagonal() * x));
-    }
-*/

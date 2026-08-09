@@ -6,14 +6,15 @@ namespace eilig
     {
         Resize(1);
     }
-    Vector::Vector(const std::initializer_list<Scalar>& values)
+    Vector::Vector(const std::initializer_list<Scalar>& value)
     {
-        Resize(values.size());
+        Resize(value.size());
 
-        Index i = 0;
-        for (auto& value : values)
+        Index i{ 0 };
+
+        for (auto& it : value)
         {
-            data_[i] = value;
+            data_[i] = it;
             ++i;
         }
     }
@@ -48,7 +49,12 @@ namespace eilig
         {
             throw std::invalid_argument("Vector dimensions cannot be zero.");
         }
-        
+
+        if (numberRows_ == numberRows)
+        {
+            return;
+        }       
+
         numberRows_ = numberRows;
         data_ = Scalars(numberRows_, 0.0);
     }
@@ -71,17 +77,13 @@ namespace eilig
     }
     Vector& Vector::operator=(Scalar rhs)
     {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            data_[i] = rhs;
-        }
+		Equal(rhs);
 
         return *this;
     }
     Vector& Vector::operator=(const Vector& rhs)
     {
-        numberRows_ = rhs.numberRows_;
-        data_ = rhs.data_;
+        Equal(rhs);
 
         return *this;
     }
@@ -101,10 +103,7 @@ namespace eilig
     {
         Vector res(*this);
 
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            res.data_[i] += rhs;
-        }
+        res.Add(rhs);
 
         return res;
     }
@@ -112,10 +111,7 @@ namespace eilig
     {
         Vector res(*this);
 
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            res.data_[i] += rhs.data_[i];
-        }
+        res.Add(rhs);
 
         return res;
     }
@@ -131,10 +127,7 @@ namespace eilig
     {
         Vector res(*this);
 
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            res.data_[i] -= rhs;
-        }
+        res.Sub(rhs);
 
         return res;
     }
@@ -142,10 +135,7 @@ namespace eilig
     {
         Vector res(*this);
 
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            res.data_[i] -= rhs.data_[i];
-        }
+        res.Sub(rhs);
 
         return res;
     }
@@ -161,10 +151,7 @@ namespace eilig
     {
         Vector res(*this);
 
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            res.data_[i] *= rhs;
-        }
+		res.Mul(rhs);
 
         return res;
     }
@@ -174,11 +161,7 @@ namespace eilig
     }
     Vector& Vector::SwapRows(Index row1, Index row2)
     {
-        Scalar temp;
-
-        temp = data_[row1];
-        data_[row2] = data_[row1];
-        data_[row1] = temp;
+        std::swap(data_[row1], data_[row2]);
 
         return *this;
     }
@@ -195,14 +178,13 @@ namespace eilig
 
         return res;
     }
-    void Vector::Region(Index row1, Index row2, const Vector& in)
+    void Vector::Replace(Index row1, const Vector& in)
     {
-        Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
-        Index aux2 = row1 <= row2 ? row1 : row2;
+		NumberRows numberRows = in.GetRows();
 
-        for (Index i = 0; i < aux1; ++i)
+        for (Index i = 0; i < numberRows; ++i)
         {
-            (*this)(i + aux2) = in(i);
+            (*this)(i + row1) = in(i);
         }
     }
     NumberRows Vector::GetRows() const
@@ -221,8 +203,67 @@ namespace eilig
     {
         return data_;
     }
-    void Vector::SetValue(Index i, Scalar value)
+    void Vector::Equal(Index i, Scalar value)
     {
         (*this)(i) = value;
+    }
+    void Vector::Equal(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] = value;
+        }
+    }
+    void Vector::Equal(const Vector& value)
+    {
+        numberRows_ = value.numberRows_;
+        data_ = value.data_;
+    }
+    void Vector::Equal(const std::initializer_list<Scalar>& value)
+    {
+        Resize(value.size());
+
+        Index i{ 0 };
+
+        for (auto& it : value)
+        {
+            data_[i] = it;
+            ++i;
+        }
+    }
+    void Vector::Add(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] += value;
+        }
+    }
+    void Vector::Add(const Vector& value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] += value.data_[i];
+        }
+    }
+    void Vector::Sub(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] -= value;
+        }
+    }
+    void Vector::Sub(const Vector& value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] -= value.data_[i];
+        }
+    }
+    void Vector::Mul(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            data_[i] *= value;
+        }
     }
 } /* namespace eilig */

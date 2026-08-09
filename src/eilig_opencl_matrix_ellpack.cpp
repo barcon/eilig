@@ -1,6 +1,3 @@
-#ifdef ENABLE_OPENCL
-
-#include "eilig_routines.hpp"
 #include "eilig_opencl_matrix_ellpack.hpp"
 #include <algorithm>
 
@@ -8,27 +5,22 @@ namespace eilig
 {
     namespace opencl
     {
-        Ellpack::Ellpack(KernelsPtr kernels)
-        {
-            kernels_ = kernels;
-            Resize(1, 1);
-        }
         Ellpack::Ellpack(const Ellpack& input)
         {
             (*this) = input;
         }
-        Ellpack::Ellpack(Ellpack&& input) noexcept
+        Ellpack::Ellpack(KernelsPtr kernels)
         {
-            (*this) = std::move(input);
+            SetKernels(kernels);
+            Resize(1, 1);
         }
-        Ellpack::Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& values)
+        Ellpack::Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& value)
         {
-            kernels_ = kernels;
-
-            Resize(values.size(), values.begin()->size());
+            SetKernels(kernels);
+            Resize(value.size(), value.begin()->size());
 
             Index i = 0;
-            for (auto& outerItens : values)
+            for (auto& outerItens : value)
             {
                 if (outerItens.size() != numberCols_)
                 {
@@ -36,11 +28,11 @@ namespace eilig
                 }
 
                 Index j = 0;
-                for (auto& value : outerItens)
+                for (auto& it : outerItens)
                 {
-                    if (!utils::math::IsAlmostEqual(value, 0.0, 5))
+                    if (!utils::math::IsAlmostEqual(it, 0.0, 5))
                     {
-                        (*this)(i, j) = value;
+                        (*this)(i, j) = it;
                     }
 
                     ++j;
@@ -49,9 +41,19 @@ namespace eilig
                 ++i;
             }
         }
+        Ellpack::Ellpack(KernelsPtr kernels, const eilig::Ellpack& input)
+        {
+            SetKernels(kernels);
+            Resize(input.GetRows(), input.GetCols());
+            Expand(input.GetWidth());
+
+			countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_TRUE);
+			positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_TRUE);
+			dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_TRUE);
+        }
         Ellpack::Ellpack(KernelsPtr kernels, const eilig::Matrix& input)
         {
-            kernels_ = kernels;
+            SetKernels(kernels);
             Resize(input.GetRows(), input.GetCols());
 
             for (Index i = 0; i < numberRows_; i++)
@@ -67,24 +69,14 @@ namespace eilig
                 }
             }
         }
-        Ellpack::Ellpack(KernelsPtr kernels, const eilig::Ellpack& input)
-        {
-            kernels_ = kernels;
-            Resize(input.GetRows(), input.GetCols());
-            Expand(input.GetWidth());
-
-			countGPU_->Write(0, sizeof(Index) * numberRows_, &input.count_[0], CL_TRUE);
-			positionGPU_->Write(0, sizeof(Index) * numberRows_ * width_, &input.position_[0], CL_TRUE);
-			dataGPU_->Write(0, sizeof(Scalar) * numberRows_ * width_, &input.data_[0], CL_TRUE);
-        }
         Ellpack::Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols)
         {
-            kernels_ = kernels;
+            SetKernels(kernels);
             Resize(numberRows, numberCols);
         }
         Ellpack::Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols, Type type)
         {            
-            kernels_ = kernels;
+            SetKernels(kernels);
 
             switch (type)
             {
@@ -104,6 +96,11 @@ namespace eilig
                 Resize(numberRows, numberCols, 0.0);
             }
         }
+        Ellpack::Ellpack(Ellpack&& input) noexcept
+        {
+            (*this) = std::move(input);
+        }
+       
         eilig::Ellpack Ellpack::Convert() const
         {
             club::Events events;
@@ -220,6 +217,11 @@ namespace eilig
             if (numberRows == 0 || numberCols == 0)
             {
                 throw std::invalid_argument("Matrix dimensions cannot be zero.");
+            }
+
+            if (numberRows == numberRows_ && numberCols == numberCols_)
+            {
+                return;
             }
 
             numberRows_ = numberRows;
@@ -645,6 +647,7 @@ namespace eilig
             count -= 1;
             countGPU_->Write(sizeof(Index) * row, sizeof(Index), &count, CL_TRUE);
         }
+        
         EntryProxy Ellpack::operator()(Index row, Index col)
         {
             Index index;
@@ -748,8 +751,8 @@ namespace eilig
         }
         Ellpack Ellpack::operator+(Scalar rhs) const
         {
-            club::Error error;
             Ellpack res(kernels_);
+            club::Error error;
             Index globalSize[2];
 
             const auto& localSize = kernels_->kEllpackAddS_->GetLocalSize();
@@ -773,7 +776,6 @@ namespace eilig
             kernels_->kEllpackAddS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
             kernels_->kEllpackAddS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
             kernels_->kEllpackAddS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
-            kernels_->kEllpackAddS_->SetArg(9, sizeof(Scalar), &rhs);
 
             error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
                 kernels_->kEllpackAddS_->GetKernel(),
@@ -789,10 +791,10 @@ namespace eilig
         }
         Ellpack Ellpack::operator+(const Ellpack& rhs) const
         {
+            Ellpack res(*this);
             Indices count;
             Indices position;
             Scalars data;
-            Ellpack res(*this);
 
             count.resize(rhs.numberRows_);
             position.resize(rhs.width_);
@@ -826,11 +828,11 @@ namespace eilig
         }
         Ellpack Ellpack::operator-(Scalar rhs) const
         {
-            club::Error error;
             Ellpack res(kernels_);
+            club::Error error;
             Index globalSize[2];
 
-            const auto& localSize = kernels_->kEllpackSubS_->GetLocalSize();
+            const auto& localSize = kernels_->kEllpackAddS_->GetLocalSize();
 
             globalSize[0] = GlobalSize(numberRows_, localSize[0]);
             globalSize[1] = GlobalSize(numberCols_, localSize[1]);
@@ -842,21 +844,21 @@ namespace eilig
 
             res.Resize(numberRows_, numberCols_, -rhs);
 
-            kernels_->kEllpackSubS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kEllpackSubS_->SetArg(1, sizeof(Index), &numberCols_);
-            kernels_->kEllpackSubS_->SetArg(2, sizeof(Index), &width_);
-            kernels_->kEllpackSubS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
-            kernels_->kEllpackSubS_->SetArg(9, sizeof(Scalar), &rhs);
-
+            kernels_->kEllpackAddS_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackAddS_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackAddS_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackAddS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(9, sizeof(Scalar), &rhs);
+            
             error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kEllpackSubS_->GetKernel(),
-                kernels_->kEllpackSubS_->GetDim(), NULL, globalSize,
-                &kernels_->kEllpackSubS_->GetLocalSize()[0], 0, NULL, NULL);
+                kernels_->kEllpackAddS_->GetKernel(),
+                kernels_->kEllpackAddS_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackAddS_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {
@@ -867,10 +869,10 @@ namespace eilig
         }
         Ellpack Ellpack::operator-(const Ellpack& rhs) const
         {
+            Ellpack res(*this);
             Indices count;
             Indices position;
             Scalars data;
-            Ellpack res(*this);
 
             count.resize(rhs.numberRows_);
             position.resize(rhs.width_);
@@ -904,30 +906,30 @@ namespace eilig
         }
         Ellpack Ellpack::operator*(Scalar rhs) const
         {
-            club::Error error;
             Ellpack res(*this);
+            club::Error error;
             Index globalSize[2];
 
-            const auto& localSize = kernels_->kEllpackMulS_->GetLocalSize();
+            const auto& localSize = kernels_->kEllpackMulScalar_->GetLocalSize();
 
             globalSize[0] = GlobalSize(numberRows_, localSize[0]);
             globalSize[1] = GlobalSize(width_, localSize[1]);
 
-            kernels_->kEllpackMulS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kEllpackMulS_->SetArg(1, sizeof(Index), &numberCols_);
-            kernels_->kEllpackMulS_->SetArg(2, sizeof(Index), &width_);
-            kernels_->kEllpackMulS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
-            kernels_->kEllpackMulS_->SetArg(9, sizeof(Scalar), &rhs);
+            kernels_->kEllpackMulScalar_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackMulScalar_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackMulScalar_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackMulScalar_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(9, sizeof(Scalar), &rhs);
 
             error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kEllpackMulS_->GetKernel(),
-                kernels_->kEllpackMulS_->GetDim(), NULL, globalSize,
-                &kernels_->kEllpackMulS_->GetLocalSize()[0], 0, NULL, NULL);
+                kernels_->kEllpackMulScalar_->GetKernel(),
+                kernels_->kEllpackMulScalar_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackMulScalar_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {
@@ -940,38 +942,39 @@ namespace eilig
         {
             //TODO: If localMem bigger than max. allowable memory, it will not work. 
             //Adjust kernel to check if global_id < numberRows_
-            Ellpack transpose = rhs.Transpose();
+
             Ellpack res(kernels_, numberRows_, rhs.numberCols_);
+            Ellpack transpose = rhs.Transpose();
             club::Error error;
             Index globalSize[1];
             Index localMem{ numberCols_ };
 
-            const auto& localSize = kernels_->kEllpackMulM_->GetLocalSize();
+            const auto& localSize = kernels_->kEllpackMulMatrix_->GetLocalSize();
 
             globalSize[0] = GlobalSize(numberRows_, localSize[0]);
 
             res.Expand(transpose.GetWidth());
 
-            kernels_->kEllpackMulM_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kEllpackMulM_->SetArg(1, sizeof(Index), &numberCols_);
-            kernels_->kEllpackMulM_->SetArg(2, sizeof(Index), &rhs.numberCols_);
-            kernels_->kEllpackMulM_->SetArg(3, sizeof(Index), &width_);
-            kernels_->kEllpackMulM_->SetArg(4, sizeof(cl_mem), &countGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(5, sizeof(cl_mem), &positionGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(6, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(7, sizeof(Index), &transpose.width_);
-            kernels_->kEllpackMulM_->SetArg(8, sizeof(cl_mem), &transpose.countGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(9, sizeof(cl_mem), &transpose.positionGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(10, sizeof(cl_mem), &transpose.dataGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(11, sizeof(cl_mem), &res.countGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(12, sizeof(cl_mem), &res.positionGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(13, sizeof(cl_mem), &res.dataGPU_->Get());
-            kernels_->kEllpackMulM_->SetArg(14, sizeof(Scalar) * localMem, NULL);
+            kernels_->kEllpackMulMatrix_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackMulMatrix_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackMulMatrix_->SetArg(2, sizeof(Index), &rhs.numberCols_);
+            kernels_->kEllpackMulMatrix_->SetArg(3, sizeof(Index), &width_);
+            kernels_->kEllpackMulMatrix_->SetArg(4, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(5, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(6, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(7, sizeof(Index), &transpose.width_);
+            kernels_->kEllpackMulMatrix_->SetArg(8, sizeof(cl_mem), &transpose.countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(9, sizeof(cl_mem), &transpose.positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(10, sizeof(cl_mem), &transpose.dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(11, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(12, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(13, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(14, sizeof(Scalar) * localMem, NULL);
 
             error = clEnqueueNDRangeKernel(res.kernels_->context_->GetQueue(),
-                res.kernels_->kEllpackMulM_->GetKernel(),
-                res.kernels_->kEllpackMulM_->GetDim(), NULL, globalSize,
-                &res.kernels_->kEllpackMulM_->GetLocalSize()[0], 0, NULL, NULL);
+                res.kernels_->kEllpackMulMatrix_->GetKernel(),
+                res.kernels_->kEllpackMulMatrix_->GetDim(), NULL, globalSize,
+                &res.kernels_->kEllpackMulMatrix_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {
@@ -980,29 +983,33 @@ namespace eilig
 
             return res;
         }
+        Ellpack Ellpack::operator*(const eilig::Ellpack& rhs) const
+        {
+            return (*this) * Ellpack(kernels_, rhs);
+        }
         Vector Ellpack::operator*(const Vector& rhs) const
         {
+            Vector res(kernels_, numberRows_, 0.0);
             club::Error error;
             Index globalSize[1];
-            Vector res(kernels_, numberRows_, 0.0);
 
-            const auto& localSize = kernels_->kEllpackMulV_->GetLocalSize();
+            const auto& localSize = kernels_->kEllpackMulVector_->GetLocalSize();
 
             globalSize[0] = GlobalSize(numberRows_, localSize[0]);;
 
-            kernels_->kEllpackMulV_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kEllpackMulV_->SetArg(1, sizeof(Index), &numberCols_);
-            kernels_->kEllpackMulV_->SetArg(2, sizeof(Index), &width_);
-            kernels_->kEllpackMulV_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
-            kernels_->kEllpackMulV_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
-            kernels_->kEllpackMulV_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kEllpackMulV_->SetArg(6, sizeof(cl_mem), &rhs.GetDataGPU()->Get());
-            kernels_->kEllpackMulV_->SetArg(7, sizeof(cl_mem), &res.GetDataGPU()->Get());
+            kernels_->kEllpackMulVector_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackMulVector_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackMulVector_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackMulVector_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackMulVector_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackMulVector_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackMulVector_->SetArg(6, sizeof(cl_mem), &rhs.GetDataGPU()->Get());
+            kernels_->kEllpackMulVector_->SetArg(7, sizeof(cl_mem), &res.GetDataGPU()->Get());
 
             error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kEllpackMulV_->GetKernel(),
-                kernels_->kEllpackMulV_->GetDim(), NULL, globalSize,
-                &kernels_->kEllpackMulV_->GetLocalSize()[0], 0, NULL, NULL);
+                kernels_->kEllpackMulVector_->GetKernel(),
+                kernels_->kEllpackMulVector_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackMulVector_->GetLocalSize()[0], 0, NULL, NULL);
 
             if (error != CL_SUCCESS)
             {
@@ -1015,6 +1022,7 @@ namespace eilig
         {
             return rhs * lhs;
         }
+        
         Ellpack& Ellpack::SwapRows(Index row1, Index row2)
         {
             club::Error error;
@@ -1365,7 +1373,7 @@ namespace eilig
             }
 
             return res;
-        }
+        }        
         Ellpack Ellpack::Upper(bool diag) const
         {
             if (diag)
@@ -1512,42 +1520,20 @@ namespace eilig
 
             return res;
         }
-        void   Ellpack::Region(Index row1, Index col1, Index row2, Index col2, const Ellpack& in)
+        void Ellpack::Replace(Index row1, Index col1, const Ellpack& in)
         {
-            Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
-            Index aux2 = col1 <= col2 ? (col2 - col1) + 1 : (col1 - col2) + 1;
-            Index aux3;
-            Index aux4;
+            NumberRows numberRows = in.GetRows();
+            NumberCols numberCols = in.GetCols();
 
-            if ((row1 <= row2) && (col1 <= col2))
+            for (Index i = 0; i < numberRows; ++i)
             {
-                aux3 = row1;
-                aux4 = col1;
-            }
-            else if ((row1 >= row2) && (col1 <= col2))
-            {
-                aux3 = row2;
-                aux4 = col1;
-            }
-            else if ((row1 >= row2) && (col1 >= col2))
-            {
-                aux3 = row2;
-                aux4 = col2;
-            }
-            else
-            {
-                aux3 = row1;
-                aux4 = col2;
-            }
-
-            for (Index i = 0; i < aux1; ++i)
-            {
-                for (Index j = 0; j < aux2; ++j)
+                for (Index j = 0; j < numberCols; ++j)
                 {
-                    (*this)(aux3 + i, aux4 + j) = in.GetValue(i, j);
+                    (*this)(row1 + i, col1 + j) = in.GetValue(i, j);
                 }
             }
         }
+        
         NumberRows Ellpack::GetRows() const
         {
             return numberRows_;
@@ -1591,7 +1577,8 @@ namespace eilig
         {
             return dataGPU_;
         }
-        void Ellpack::SetValue(Index row, Index col, Scalar value)
+        
+        void Ellpack::Equal(Index row, Index col, Scalar value)
         {
             if (utils::math::IsAlmostEqual(value, 0.0, 5))
             {
@@ -1602,7 +1589,299 @@ namespace eilig
                 (*this)(row, col) = value;
             }
         }
+        void Ellpack::Equal(Scalar value)
+        {
+            club::Error error;
+            Index globalSize[2];
+
+            const auto& localSize = kernels_->kEllpackCopyS_->GetLocalSize();
+
+            if (utils::math::IsAlmostEqual(value, 0.0, 5))
+            {
+                Clear();
+                Shrink();
+                return;
+            }
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+            globalSize[1] = GlobalSize(numberCols_, localSize[1]);
+
+            width_ = numberCols_;
+            positionGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Index) * numberRows_ * width_);
+            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_ * width_);
+
+            kernels_->kEllpackCopyS_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackCopyS_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackCopyS_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackCopyS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackCopyS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackCopyS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackCopyS_->SetArg(6, sizeof(Scalar), &value);
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackCopyS_->GetKernel(),
+                kernels_->kEllpackCopyS_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackCopyS_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+        }
+        void Ellpack::Equal(const Ellpack& value)
+        {
+            (*this) = value;
+        }
+        void Ellpack::Equal(const std::initializer_list<std::initializer_list<Scalar>>& value)
+        {
+            Resize(value.size(), value.begin()->size());
+
+            Index i = 0;
+            for (auto& outerItens : value)
+            {
+                if (outerItens.size() != numberCols_)
+                {
+                    throw std::invalid_argument("All rows must have the same number of columns.");
+                }
+
+                Index j = 0;
+                for (auto& it : outerItens)
+                {
+                    if (!utils::math::IsAlmostEqual(it, 0.0, 5))
+                    {
+                        (*this)(i, j) = it;
+                    }
+
+                    ++j;
+                }
+
+                ++i;
+            }
+        }
+        
+        void Ellpack::Add(Scalar value)
+        {
+            Ellpack res(kernels_);
+            club::Error error;
+            Index globalSize[2];
+
+            const auto& localSize = kernels_->kEllpackAddS_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+            globalSize[1] = GlobalSize(width_, localSize[1]);
+
+            if (utils::math::IsAlmostEqual(value, 0.0, 5))
+            {
+                return;
+            }
+
+            res.Resize(numberRows_, numberCols_, value);
+
+            kernels_->kEllpackAddS_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackAddS_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackAddS_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackAddS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackAddS_->GetKernel(),
+                kernels_->kEllpackAddS_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackAddS_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            (*this) = std::move(res);
+        }
+        void Ellpack::Add(const Ellpack& value)
+        {
+            Ellpack res(*this);
+            Indices count;
+            Indices position;
+            Scalars data;
+
+            count.resize(value.numberRows_);
+            position.resize(value.width_);
+            data.resize(value.width_);
+
+            value.countGPU_->Read(0, sizeof(Index) * value.numberRows_, &count[0], CL_TRUE);
+
+            for (Index i = 0; i < value.numberRows_; ++i)
+            {
+                value.positionGPU_->Read(i * value.width_ * sizeof(Index), value.width_ * sizeof(Index), &position[0], CL_TRUE);
+                value.dataGPU_->Read(i * value.width_ * sizeof(Scalar), value.width_ * sizeof(Scalar), &data[0], CL_TRUE);
+
+                for (Index j = 0; j < count[i]; ++j)
+                {
+                    auto col = position[j];
+                    auto value = data[j];
+
+                    res(i, col) += value;
+                }
+            }
+
+            (*this) = std::move(res);
+        }
+        void Ellpack::Sub(Scalar value)
+        {
+            Ellpack res(kernels_);
+            club::Error error;
+            Index globalSize[2];
+
+            const auto& localSize = kernels_->kEllpackAddS_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+            globalSize[1] = GlobalSize(numberCols_, localSize[1]);
+
+            if (utils::math::IsAlmostEqual(value, 0.0, 5))
+            {
+                return;
+            }
+
+            res.Resize(numberRows_, numberCols_, -value);
+
+            kernels_->kEllpackAddS_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackAddS_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackAddS_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackAddS_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackAddS_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackAddS_->GetKernel(),
+                kernels_->kEllpackAddS_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackAddS_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            (*this) = std::move(res);
+        }
+        void Ellpack::Sub(const Ellpack& value)
+        {
+            Ellpack res(*this);
+            Indices count;
+            Indices position;
+            Scalars data;
+
+            count.resize(value.numberRows_);
+            position.resize(value.width_);
+            data.resize(value.width_);
+
+            value.countGPU_->Read(0, sizeof(Index) * value.numberRows_, &count[0], CL_TRUE);
+
+            for (Index i = 0; i < res.numberRows_; ++i)
+            {
+                value.positionGPU_->Read((i * value.width_) * sizeof(Index), value.width_ * sizeof(Index), &position[0], CL_TRUE);
+                value.dataGPU_->Read((i * value.width_) * sizeof(Scalar), value.width_ * sizeof(Scalar), &data[0], CL_TRUE);
+
+                for (Index j = 0; j < count[i]; ++j)
+                {
+                    auto col = position[j];
+                    auto value = data[j];
+
+                    res(i, col) -= value;
+                }
+            }
+
+            (*this) = std::move(res);
+        }
+        void Ellpack::Mul(Scalar value)
+        {
+            Ellpack res(*this);
+            club::Error error;
+            Index globalSize[2];
+
+            const auto& localSize = kernels_->kEllpackMulScalar_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+            globalSize[1] = GlobalSize(width_, localSize[1]);
+
+            kernels_->kEllpackMulScalar_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackMulScalar_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackMulScalar_->SetArg(2, sizeof(Index), &width_);
+            kernels_->kEllpackMulScalar_->SetArg(3, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(4, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(5, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(6, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(7, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(8, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackMulScalar_->SetArg(9, sizeof(Scalar), &value);
+
+            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
+                kernels_->kEllpackMulScalar_->GetKernel(),
+                kernels_->kEllpackMulScalar_->GetDim(), NULL, globalSize,
+                &kernels_->kEllpackMulScalar_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+        
+            (*this) = std::move(res);
+        }
+        void Ellpack::Mul(const Ellpack& rhs)
+        {
+            Ellpack res(kernels_, numberRows_, rhs.numberCols_);
+            Ellpack transpose = rhs.Transpose();
+            club::Error error;
+            Index globalSize[1];
+            Index localMem{ numberCols_ };
+
+            const auto& localSize = kernels_->kEllpackMulMatrix_->GetLocalSize();
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.Expand(transpose.GetWidth());
+
+            kernels_->kEllpackMulMatrix_->SetArg(0, sizeof(Index), &numberRows_);
+            kernels_->kEllpackMulMatrix_->SetArg(1, sizeof(Index), &numberCols_);
+            kernels_->kEllpackMulMatrix_->SetArg(2, sizeof(Index), &rhs.numberCols_);
+            kernels_->kEllpackMulMatrix_->SetArg(3, sizeof(Index), &width_);
+            kernels_->kEllpackMulMatrix_->SetArg(4, sizeof(cl_mem), &countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(5, sizeof(cl_mem), &positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(6, sizeof(cl_mem), &dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(7, sizeof(Index), &transpose.width_);
+            kernels_->kEllpackMulMatrix_->SetArg(8, sizeof(cl_mem), &transpose.countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(9, sizeof(cl_mem), &transpose.positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(10, sizeof(cl_mem), &transpose.dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(11, sizeof(cl_mem), &res.countGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(12, sizeof(cl_mem), &res.positionGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(13, sizeof(cl_mem), &res.dataGPU_->Get());
+            kernels_->kEllpackMulMatrix_->SetArg(14, sizeof(Scalar) * localMem, NULL);
+
+            error = clEnqueueNDRangeKernel(res.kernels_->context_->GetQueue(),
+                res.kernels_->kEllpackMulMatrix_->GetKernel(),
+                res.kernels_->kEllpackMulMatrix_->GetDim(), NULL, globalSize,
+                &res.kernels_->kEllpackMulMatrix_->GetLocalSize()[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
+
+            (*this) = std::move(res);
+        }
+
+        void Ellpack::SetKernels(KernelsPtr kernels)
+        {
+            if (kernels == nullptr)
+            {
+                throw std::invalid_argument("Kernels cannot be null.");
+            }
+
+            kernels_ = kernels;
+        }
     }
 } /* namespace eilig */
-
-#endif

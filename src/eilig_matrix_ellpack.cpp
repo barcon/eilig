@@ -3,16 +3,17 @@
 
 namespace eilig
 {
+
     Ellpack::Ellpack()
     {
         Resize(1, 1);
     }
-    Ellpack::Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& values)
+    Ellpack::Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& value)
     {
-        Resize(values.size(), values.begin()->size());
+        Resize(value.size(), value.begin()->size());
 
         Index i = 0;
-        for (auto& outerItens : values)
+        for (auto& outerItens : value)
         {
             if (outerItens.size() != numberCols_)
             {
@@ -20,11 +21,11 @@ namespace eilig
             }
 
             Index j = 0;
-            for (auto& value : outerItens)
+            for (auto& it : outerItens)
             {
-                if (!utils::math::IsAlmostEqual(value, 0.0, 5))
+                if (!utils::math::IsAlmostEqual(it, 0.0, 5))
                 {
-                    (*this)(i, j) = value;
+                    (*this)(i, j) = it;
                 }
 
                 ++j;
@@ -32,10 +33,6 @@ namespace eilig
 
             ++i;
         }
-    }
-    Ellpack::Ellpack(Ellpack&& input) noexcept
-    {
-        (*this) = std::move(input);
     }
     Ellpack::Ellpack(const Ellpack& input)
     {
@@ -82,6 +79,11 @@ namespace eilig
             Resize(numberRows, numberCols, 0.0);
         }
     }
+    Ellpack::Ellpack(Ellpack&& input) noexcept
+    {
+        (*this) = std::move(input);
+    }
+    
     bool Ellpack::IsUsed(Index row, Index col) const
     {
         Index position{ 0 };
@@ -262,13 +264,16 @@ namespace eilig
             throw std::invalid_argument("Matrix dimensions cannot be zero.");
         }
 
-        numberRows_ = numberRows;
-        numberCols_ = numberCols;
-        width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
+        if (numberRows != numberRows_ || numberCols != numberCols_)
+        {
+            numberRows_ = numberRows;
+            numberCols_ = numberCols;
+            width_ = GrowthRate() > numberCols_ ? numberCols_ : GrowthRate();
 
-        count_ = Indices(numberRows_, 0);
-        position_ = Indices(numberRows_ * width_, 0);
-        data_ = Scalars(numberRows_ * width_, 0.0);
+            count_ = Indices(numberRows_, 0);
+            position_ = Indices(numberRows_ * width_, 0);
+            data_ = Scalars(numberRows_ * width_, 0.0);
+        }
     }
     void Ellpack::Resize(NumberRows numberRows, NumberCols numberCols, Scalar value)
     {
@@ -331,6 +336,7 @@ namespace eilig
         }
         std::cout << std::endl;
     }
+    
     Scalar Ellpack::operator()(Index row, Index col) const
     {
         Scalar res{ 0. };
@@ -352,24 +358,7 @@ namespace eilig
     }
     Ellpack& Ellpack::operator=(Scalar rhs)
     {
-        if (utils::math::IsAlmostEqual(rhs, 0.0, 5))
-        {
-            Clear();
-            Shrink();
-            return *this;
-        }
-
-        Expand(numberCols_);
-
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            count_[i] = numberCols_;
-            for (Index j = 0; j < count_[i]; ++j)
-            {
-                data_[i * width_ + j] = rhs;
-                position_[i * width_ + j] = j;
-            }
-        }
+        Equal(rhs);
 
         return *this;
     }
@@ -403,11 +392,10 @@ namespace eilig
     Ellpack Ellpack::operator+(Scalar rhs) const
     {
         Ellpack res;
-        Index k;
-        
+
         if (utils::math::IsAlmostEqual(rhs, 0.0, 5))
         {
-            return *this;
+            return (*this);
         }
 
         res.Resize(numberRows_, numberCols_, rhs);
@@ -416,8 +404,8 @@ namespace eilig
         {
             for (Index j = 0; j < count_[i]; ++j)
             {
-                k = position_[i * width_ + j];
-                res.data_[i * res.width_ + k] += data_[i * width_ + j];
+                auto col = position_[i * width_ + j];
+                res.data_[i * res.width_ + col] += data_[i * width_ + j];
             }
         }
 
@@ -427,14 +415,14 @@ namespace eilig
     {
         Ellpack res(*this);
 
-        for (Index i = 0; i < rhs.numberRows_; ++i)
-        {          
+        for (Index i = 0; i < numberRows_; ++i)
+        {
             for (Index j = 0; j < rhs.count_[i]; ++j)
             {
                 auto col = rhs.position_[i * rhs.width_ + j];
-                auto value = rhs.data_[i * rhs.width_ + j];
+                auto val = rhs.data_[i * rhs.width_ + j];
 
-                res(i, col) += value;
+                res(i, col) += val;
             }
         }
 
@@ -451,11 +439,10 @@ namespace eilig
     Ellpack Ellpack::operator-(Scalar rhs) const
     {
         Ellpack res;
-        Index k;
 
         if (utils::math::IsAlmostEqual(rhs, 0.0, 5))
         {
-            return *this;
+            return (*this);
         }
 
         res.Resize(numberRows_, numberCols_, -rhs);
@@ -464,8 +451,8 @@ namespace eilig
         {
             for (Index j = 0; j < count_[i]; ++j)
             {
-                k = position_[i * width_ + j];
-                res.data_[i * res.width_ + k] += data_[i * width_ + j];
+                auto col = position_[i * width_ + j];
+                res.data_[i * res.width_ + col] += data_[i * width_ + j];
             }
         }
 
@@ -480,9 +467,9 @@ namespace eilig
             for (Index j = 0; j < rhs.count_[i]; ++j)
             {
                 auto col = rhs.position_[i * rhs.width_ + j];
-                auto value = rhs.data_[i * rhs.width_ + j];
+                auto val = rhs.data_[i * rhs.width_ + j];
 
-                res(i, col) -= value;
+                res(i, col) -= val;
             }
         }
 
@@ -500,11 +487,11 @@ namespace eilig
     {
         Ellpack res(*this);
 
-        for (Index i = 0; i < res.numberRows_; ++i)
+        for (Index i = 0; i < numberRows_; ++i)
         {
-            for (Index j = 0; j < res.count_[i]; ++j)
+            for (Index j = 0; j < count_[i]; ++j)
             {
-                res.data_[i * res.width_ + j] *= rhs;
+                res.data_[i * width_ + j] *= rhs;
             }
         }
 
@@ -513,20 +500,19 @@ namespace eilig
     Ellpack Ellpack::operator*(const Ellpack& rhs) const
     {
         Ellpack res(numberRows_, rhs.numberCols_);
-        Scalar sum;
 
         for (Index i = 0; i < numberRows_; ++i)
         {
             for (Index j = 0; j < rhs.numberCols_; ++j)
             {
-                sum = 0.;
+                Scalar sum{ 0. };
 
                 for (Index k = 0; k < count_[i]; ++k)
                 {
                     sum += data_[i * width_ + k] * rhs(position_[i * width_ + k], j);
                 }
 
-                if (sum != 0.0)
+                if (!utils::math::IsAlmostEqual(sum, 0.0, 5))
                 {
                     res(i, j) = sum;
                 }
@@ -568,6 +554,7 @@ namespace eilig
 
         return stream;
     }
+    
     Ellpack& Ellpack::SwapRows(Index row1, Index row2)
     {
         Scalar dataT;
@@ -780,7 +767,6 @@ namespace eilig
             }
         }
 
-
         return res;
     }
     Ellpack Ellpack::Region(Index row1, Index col1, Index row2, Index col2) const
@@ -828,42 +814,20 @@ namespace eilig
 
         return res;
     }
-    void Ellpack::Region(Index row1, Index col1, Index row2, Index col2, const Ellpack& in)
+    void Ellpack::Replace(Index row1, Index col1, const Ellpack& in)
     {
-        Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
-        Index aux2 = col1 <= col2 ? (col2 - col1) + 1 : (col1 - col2) + 1;
-        Index aux3;
-        Index aux4;
+		NumberRows numberRows = in.GetRows();
+		NumberCols numberCols = in.GetCols();
 
-        if ((row1 <= row2) && (col1 <= col2))
+        for (Index i = 0; i < numberRows; ++i)
         {
-            aux3 = row1;
-            aux4 = col1;
-        }
-        else if ((row1 >= row2) && (col1 <= col2))
-        {
-            aux3 = row2;
-            aux4 = col1;
-        }
-        else if ((row1 >= row2) && (col1 >= col2))
-        {
-            aux3 = row2;
-            aux4 = col2;
-        }
-        else
-        {
-            aux3 = row1;
-            aux4 = col2;
-        }
-
-        for (Index i = 0; i < aux1; ++i)
-        {
-            for (Index j = 0; j < aux2; ++j)
+            for (Index j = 0; j < numberCols; ++j)
             {
-                (*this)(aux3 + i, aux4 + j) = in.GetValue(i, j);
+                (*this)(row1 + i, col1 + j) = in.GetValue(i, j);
             }
         }
     }
+    
     NumberRows Ellpack::GetRows() const
     {
         return numberRows_;
@@ -903,7 +867,8 @@ namespace eilig
     {
         return data_;
     }
-    void Ellpack::SetValue(Index i, Index j, Scalar value)
+    
+    void Ellpack::Equal(Index i, Index j, Scalar value)
     {
         if (utils::math::IsAlmostEqual(value, 0.0, 5))
         {
@@ -914,4 +879,169 @@ namespace eilig
             (*this)(i, j) = value;
         }
     }
+    void Ellpack::Equal(Scalar value)
+    {
+        if (utils::math::IsAlmostEqual(value, 0.0, 5))
+        {
+            Clear();
+            Shrink();
+            return;
+        }
+
+        Expand(numberCols_);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            count_[i] = numberCols_;
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                data_[i * width_ + j] = value;
+                position_[i * width_ + j] = j;
+            }
+        }
+    }
+    void Ellpack::Equal(const Ellpack& value)
+    {
+        (*this) = value;
+    }
+    void Ellpack::Equal(const std::initializer_list<std::initializer_list<Scalar>>& value)
+    {
+        Resize(value.size(), value.begin()->size());
+
+        Index i = 0;
+        for (auto& outerItens : value)
+        {
+            if (outerItens.size() != numberCols_)
+            {
+                throw std::invalid_argument("All rows must have the same number of columns.");
+            }
+
+            Index j = 0;
+            for (auto& it : outerItens)
+            {
+                if (!utils::math::IsAlmostEqual(it, 0.0, 5))
+                {
+                    (*this)(i, j) = it;
+                }
+
+                ++j;
+            }
+
+            ++i;
+        }
+    }
+    
+    void Ellpack::Add(Scalar value)
+    {
+        Ellpack res;
+
+        if (utils::math::IsAlmostEqual(value, 0.0, 5))
+        {
+            return;
+        }
+
+        res.Resize(numberRows_, numberCols_, value);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                auto col = position_[i * width_ + j];
+                res.data_[i * res.width_ + col] += data_[i * width_ + j];
+            }
+        }
+
+		(*this) = std::move(res);
+    }
+    void Ellpack::Add(const Ellpack& value)
+    {
+        Ellpack res(*this);
+
+        for (Index i = 0; i < value.numberRows_; ++i)
+        {
+            for (Index j = 0; j < value.count_[i]; ++j)
+            {
+                auto col = value.position_[i * value.width_ + j];
+                auto val = value.data_[i * value.width_ + j];
+
+                res(i, col) += val;
+            }
+        }
+
+		(*this) = std::move(res);
+    }
+    void Ellpack::Sub(Scalar value)
+    {
+        Ellpack res;
+
+        if (utils::math::IsAlmostEqual(value, 0.0, 5))
+        {
+            return;
+        }
+
+        res.Resize(numberRows_, numberCols_, -value);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                auto col = position_[i * width_ + j];
+                res.data_[i * res.width_ + col] += data_[i * width_ + j];
+            }
+        }
+
+        (*this) = std::move(res);
+    }
+    void Ellpack::Sub(const Ellpack& value)
+    {
+        Ellpack res(*this);
+
+        for (Index i = 0; i < res.numberRows_; ++i)
+        {
+            for (Index j = 0; j < value.count_[i]; ++j)
+            {
+                auto col = value.position_[i * value.width_ + j];
+                auto val = value.data_[i * value.width_ + j];
+
+                res(i, col) -= val;
+            }
+        }
+
+        (*this) = std::move(res);
+    }
+    void Ellpack::Mul(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                data_[i * width_ + j] *= value;
+            }
+        }
+    }
+    void Ellpack::Mul(const Ellpack& rhs)
+    {
+        Ellpack res(numberRows_, rhs.numberCols_);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < rhs.numberCols_; ++j)
+            {
+                Scalar sum{ 0. };
+
+                for (Index k = 0; k < count_[i]; ++k)
+                {
+                    sum += data_[i * width_ + k] * rhs(position_[i * width_ + k], j);
+                }
+
+                if (!utils::math::IsAlmostEqual(sum, 0.0, 5))
+                {
+                    (*this)(i, j) = sum;
+                }
+            }
+        }
+
+		(*this) = std::move(res);
+    }
+    
 } /* namespace eilig */

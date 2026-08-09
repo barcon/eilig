@@ -1,27 +1,24 @@
-#ifndef EILIG_OPENCL_VECTOR_HPP_
-#define EILIG_OPENCL_VECTOR_HPP_
+#ifndef EILIG_THREADED_VECTOR_HPP_
+#define EILIG_THREADED_VECTOR_HPP_
 
-#include "eilig_types.hpp"
-#include "eilig_vector.hpp"
-
-#include "eilig_opencl_kernels.hpp"
-#include "eilig_opencl_entry_proxy.hpp"
+#include "eilig_threaded.hpp"
+#include "eilig_threaded_entry_proxy.hpp"
 
 namespace eilig
 {
-    namespace opencl
+    namespace threaded
     {
         class Vector
         {
         public:
             Vector(const Vector& input);
-            Vector(KernelsPtr kernels);
-            Vector(KernelsPtr kernels, const std::initializer_list<Scalar>& value);
-            Vector(KernelsPtr kernels, const eilig::Vector& input);
-            Vector(KernelsPtr kernels, NumberRows numberRows);
-            Vector(KernelsPtr kernels, NumberRows numberRows, Scalar value);
+            Vector(const Devices& devices);
+            Vector(const Devices& devices, const std::initializer_list<Scalar>& value);
+            Vector(const Devices& devices, const eilig::Vector& input);
+            Vector(const Devices& devices, NumberRows numberRows);
+            Vector(const Devices& devices, NumberRows numberRows, Scalar value);
             Vector(Vector&& input) noexcept;
-
+            
             ~Vector() = default;
 
             eilig::Vector Convert() const;
@@ -30,12 +27,12 @@ namespace eilig
             void Resize(NumberRows numberRows, Scalar value);
             void Fill(Scalar value);
 
-            EntryProxy operator()(Index row);
-
+            EntryProxyVector operator()(Index row);
+            
             Vector& operator=(Scalar rhs);
             Vector& operator=(const Vector& rhs);
             Vector& operator=(Vector&& rhs) noexcept;
-            
+
             Vector operator+(Scalar rhs) const;
             Vector operator+(const Vector& rhs) const;
             Vector operator+() const;
@@ -49,7 +46,7 @@ namespace eilig
             Vector operator*(Scalar rhs) const;
             friend Vector operator*(Scalar lhs, const Vector& rhs);
 
-            Vector& SwapRows(Index row1, Index row2);
+            Vector& SwapRows(Index row1, Index row2);            
             Vector  Region(Index row1, Index row2) const;
             void    Replace(Index row1, const Vector& in);
             void    Replace(Index row1, const eilig::Vector& in);
@@ -57,8 +54,6 @@ namespace eilig
             NumberRows GetRows() const;
             NumberCols GetCols() const;
             Scalar GetValue(Index row) const;
-            KernelsPtr GetKernels() const;
-            BufferPtr GetDataGPU () const;
 
             void Equal(Index row, Scalar value);
             void Equal(Scalar value);
@@ -71,19 +66,19 @@ namespace eilig
             void Sub(Scalar value);
             void Sub(const Vector& value);
             void Mul(Scalar value);
-			
-            void SetKernels(KernelsPtr kernels);
+
+			const Blocks& GetBlocks() const;
+
+			friend threaded::Ellpack;
 
         private:
-			Vector() = default;
+			void SetDevices(const Devices& devices);
 
-            NumberRows numberRows_{ 0 };
-            
-            KernelsPtr kernels_{ nullptr };
-            BufferPtr dataGPU_{ nullptr };
+            Blocks blocks_;
+
+            NumberRows numberRows_{ 0 }; 
         };
     }
-
 } /* namespace eilig */
 
-#endif /* EILIG_OPENCL_VECTOR_HPP_ */
+#endif /* EILIG_THREADED_VECTOR_HPP_ */

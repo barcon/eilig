@@ -10,7 +10,7 @@ namespace eilig
     {
     public:
         Vector();
-        Vector(const std::initializer_list<Scalar>& values);
+        Vector(const std::initializer_list<Scalar>& value);
         Vector(const Vector& input);
         Vector(const Matrix& input, Index col);
         Vector(NumberRows numberRows);
@@ -45,26 +45,29 @@ namespace eilig
 
         Vector& SwapRows(Index row1, Index row2);
         Vector  Region(Index row1, Index row2) const;
-        void    Region(Index row1, Index row2, const Vector& in);
+        void    Replace(Index row1, const Vector& in);
 
         NumberRows GetRows() const;
         NumberCols GetCols() const;
         Scalar GetValue(Index row) const;
         const Scalars& GetData() const;
 
-        void SetValue(Index row, Scalar value);
+        void Equal(Index row, Scalar value);
+        void Equal(Scalar value);
+        void Equal(const Vector& value);
+        void Equal(const std::initializer_list<Scalar>& value);
 
-        friend threaded::EntryProxyVector;
-        friend threaded::KernelVectorResize;
-        friend threaded::KernelVectorCopyScalar;
-        friend threaded::KernelVectorAddScalar;
-        friend threaded::KernelVectorInitializerList;
+		void Add(Scalar value);
+		void Add(const Vector& value);
+		void Sub(Scalar value);
+		void Sub(const Vector& value);
+		void Mul(Scalar value);
 
-#ifdef ENABLE_OPENCL
+#ifdef EILIG_ENABLE_OPENCL
         friend opencl::Vector;
 #endif
 
-    private:
+    private:      
         NumberRows numberRows_{ 0 };
 
         Scalars data_{};

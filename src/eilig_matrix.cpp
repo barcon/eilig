@@ -2,16 +2,35 @@
 
 namespace eilig
 {
+    struct Parameters
+    {
+        NumberRows numberRows{ 0 };
+        NumberCols numberCols{ 0 };
+    };
+
+    static Parameters GetParameters(const Matrices& input)
+    {
+        Parameters parameters;
+
+        for (const auto& it : input)
+        {
+            parameters.numberRows += it.GetRows();
+            parameters.numberCols = std::max(parameters.numberCols, it.GetCols());
+        }
+
+        return parameters;
+    }
+
     Matrix::Matrix()
     {
         Resize(1, 1);
     }
-    Matrix::Matrix(const std::initializer_list<std::initializer_list<Scalar>>& values)
+    Matrix::Matrix(const std::initializer_list<std::initializer_list<Scalar>>& value)
     {
-        Resize(values.size(), values.begin()->size());
+        Resize(value.size(), value.begin()->size());
 
 		Index i = 0;
-        for (auto& outerItens : values)
+        for (auto& outerItens : value)
         {
             if (outerItens.size() != numberCols_)
             {
@@ -19,9 +38,9 @@ namespace eilig
 			}
 
             Index j = 0;
-            for(auto& value: outerItens)
+            for(auto& it: outerItens)
             {
-                data_[i * numberCols_ + j] = value;
+                data_[i * numberCols_ + j] = it;
 				++j;
 			}
 
@@ -35,6 +54,26 @@ namespace eilig
     Matrix::Matrix(const Matrix& input)
     {
         (*this) = input;
+    }
+    Matrix::Matrix(const Matrices& input)
+    {
+        auto [numberRows, numberCols] = GetParameters(input);
+
+        Resize(numberRows, numberCols);
+
+        Index rowOffset{ 0 };
+        for (const auto& it : input)
+        {
+            for (Index i = 0; i < it.GetRows(); ++i)
+            {
+                for (Index j = 0; j < it.GetCols(); ++j)
+                {
+                    (*this)(rowOffset + i, j) = it(i, j);
+                }
+            }
+
+            rowOffset += it.GetRows();
+        }
     }
     Matrix::Matrix(const Ellpack& input)
     {
@@ -89,6 +128,11 @@ namespace eilig
         if (numberRows == 0 || numberCols == 0)
         {
             throw std::invalid_argument("Matrix dimensions cannot be zero.");
+        }
+
+        if (numberRows == numberRows_ && numberCols == numberCols_)
+        {
+            return;
         }
 
         numberRows_ = numberRows;
@@ -520,39 +564,16 @@ namespace eilig
 
         return res;
     }
-    void   Matrix::Region(Index row1, Index col1, Index row2, Index col2, const Matrix& in)
+    void   Matrix::Replace(Index row1, Index col1, const Matrix& in)
     {
-        Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
-        Index aux2 = col1 <= col2 ? (col2 - col1) + 1 : (col1 - col2) + 1;
-        Index aux3;
-        Index aux4;
+        NumberRows numberRows = in.GetRows();
+        NumberCols numberCols = in.GetCols();
 
-        if ((row1 <= row2) && (col1 <= col2))
+        for (Index i = 0; i < numberRows; ++i)
         {
-            aux3 = row1;
-            aux4 = col1;
-        }
-        else if ((row1 >= row2) && (col1 <= col2))
-        {
-            aux3 = row2;
-            aux4 = col1;
-        }
-        else if ((row1 >= row2) && (col1 >= col2))
-        {
-            aux3 = row2;
-            aux4 = col2;
-        }
-        else
-        {
-            aux3 = row1;
-            aux4 = col2;
-        }
-
-        for (Index i = 0; i < aux1; ++i)
-        {
-            for (Index j = 0; j < aux2; ++j)
+            for (Index j = 0; j < numberCols; ++j)
             {
-                (*this)(aux3 + i, aux4 + j) = in(i, j);
+                (*this)(row1 + i, col1 + j) = in(i, j);
             }
         }
     }
@@ -572,8 +593,102 @@ namespace eilig
     {
         return data_;
     }
-    void Matrix::SetValue(Index row, Index col, Scalar value)
+    void Matrix::Equal(Index row, Index col, Scalar value)
     {
         (*this)(row, col) = value;
+    }
+    void Matrix::Equal(const Matrix& value)
+    {
+        (*this) = value;
+    }
+    void Matrix::Equal(const std::initializer_list<std::initializer_list<Scalar>>& value)
+    {
+        Resize(value.size(), value.begin()->size());
+
+        Index i = 0;
+        for (auto& outerItens : value)
+        {
+            if (outerItens.size() != numberCols_)
+            {
+                throw std::invalid_argument("All rows must have the same number of columns.");
+            }
+
+            Index j = 0;
+            for (auto& it : outerItens)
+            {
+                data_[i * numberCols_ + j] = it;
+                ++j;
+            }
+
+            ++i;
+        }
+    }
+    void Matrix::Add(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] += value;
+            }
+        }
+    }
+    void Matrix::Add(const Matrix& value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] += value.data_[i * numberCols_ + j];
+            }
+        }
+    }
+    void Matrix::Sub(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] -= value;
+            }
+        }
+    }
+    void Matrix::Sub(const Matrix& value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] -= value.data_[i * numberCols_ + j];
+            }
+        }
+    }
+    void Matrix::Mul(Scalar value)
+    {
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index j = 0; j < numberCols_; ++j)
+            {
+                data_[i * numberCols_ + j] *= value;
+            }
+        }
+
+    }
+    void Matrix::Mul(const Matrix& value)
+    {
+        Matrix res(numberRows_, value.numberCols_, matrix_zeros);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            for (Index k = 0; k < numberCols_; ++k)
+            {
+                for (Index j = 0; j < value.numberCols_; ++j)
+                {
+                    res(i, j) += (*this)(i, k) * value(k, j);
+                }
+            }
+        }
+
+        (*this) = std::move(res);
     }
 } /* namespace eilig */

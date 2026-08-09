@@ -1,5 +1,3 @@
-#ifdef ENABLE_OPENCL
-
 #include "eilig_opencl_kernels.hpp"
 
 namespace eilig
@@ -91,9 +89,9 @@ namespace eilig
             kEllpackSubS_ = club::CreateKernel(program_, kEllpackSubS, 2);
             kEllpackSubSl_ = club::CreateKernel(program_, kEllpackSubSl, 2);
             kEllpackMinus_ = club::CreateKernel(program_, kEllpackMinus, 2);
-            kEllpackMulS_ = club::CreateKernel(program_, kEllpackMulS, 2);
-            kEllpackMulV_ = club::CreateKernel(program_, kEllpackMulV, 1);
-            kEllpackMulM_ = club::CreateKernel(program_, kEllpackMulM, 1);
+            kEllpackMulScalar_ = club::CreateKernel(program_, kEllpackMulScalar, 2);
+            kEllpackMulVector_ = club::CreateKernel(program_, kEllpackMulVector, 1);
+            kEllpackMulMatrix_ = club::CreateKernel(program_, kEllpackMulMatrix, 1);
             kEllpackSwapRows_ = club::CreateKernel(program_, kEllpackSwapRows, 1);
             kEllpackSwapCols_ = club::CreateKernel(program_, kEllpackSwapCols, 1);
             kEllpackTranspose_ = club::CreateKernel(program_, kEllpackTranspose, 1);
@@ -101,15 +99,13 @@ namespace eilig
             kEllpackDiagonal_ = club::CreateKernel(program_, kEllpackDiagonal, 1);
             kEllpackDiagonalScale_ = club::CreateKernel(program_, kEllpackDiagonalScale, 1);
             kEllpackDiagonalVector_ = club::CreateKernel(program_, kEllpackDiagonalVector, 1);
-            kEllpackRegion_ = club::CreateKernel(program_, kEllpackRegion, 1);
             kEllpackLower1_ = club::CreateKernel(program_, kEllpackLower1, 1);
             kEllpackLower2_ = club::CreateKernel(program_, kEllpackLower2, 1);
             kEllpackUpper1_ = club::CreateKernel(program_, kEllpackUpper1, 1);
             kEllpackUpper2_ = club::CreateKernel(program_, kEllpackUpper2, 1);
+            kEllpackRegion_ = club::CreateKernel(program_, kEllpackRegion, 1);
             kEllpackTrace_ = club::CreateKernel(program_, kEllpackTrace, 1);
             kEllpackSum_ = club::CreateKernel(program_, kEllpackSum, 1);
         }
     }
 } /* namespace eilig */
-
-#endif

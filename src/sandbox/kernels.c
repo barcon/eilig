@@ -535,7 +535,7 @@ __kernel void EllpackMinus(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, con
 		}
 	}		
 };
-__kernel void EllpackMulS(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SCALAR alpha)
+__kernel void EllpackMulScalar(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SCALAR alpha)
 {
 	size_t i = get_global_id(0);
 	size_t j = get_global_id(1);
@@ -551,7 +551,7 @@ __kernel void EllpackMulS(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, cons
 		}
 	}	
 };
-__kernel void EllpackMulV(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SCALAR* vector, __global EILIG_SCALAR* dataRes)
+__kernel void EllpackMulVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SCALAR* vector, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
 	size_t n;
@@ -572,7 +572,7 @@ __kernel void EllpackMulV(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, cons
 		dataRes[i] = sum;
 	}
 };
-__kernel void EllpackMulM(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T rowsTrans, const EILIG_SIZE_T colsTrans, const EILIG_SIZE_T widthTrans, __global EILIG_SIZE_T* countTrans, __global EILIG_SIZE_T* positionTrans, __global EILIG_SCALAR* dataTrans, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, __local size_t* localMem)
+__kernel void EllpackMulMatrix(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T rowsTrans, const EILIG_SIZE_T colsTrans, const EILIG_SIZE_T widthTrans, __global EILIG_SIZE_T* countTrans, __global EILIG_SIZE_T* positionTrans, __global EILIG_SCALAR* dataTrans, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, __local size_t* localMem)
 {
 	size_t i = get_global_id(0);
 	size_t n = count[i];
@@ -861,6 +861,30 @@ __kernel void EllpackDiagonalScale(const EILIG_SIZE_T rows, const EILIG_SIZE_T c
 		}	
 	}
 };
+__kernel void EllpackDiagonalScaleOffset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SCALAR factor, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+
+	if (i < rows)
+	{
+		n = count[i];
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] == i + offset)
+			{
+				data[i * width + j] *= factor;
+				break;
+			}
+
+			if (position[i * width + j] > i + offset)
+			{
+				break;
+			}
+		}
+	}
+};
 __kernel void EllpackDiagonalVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
@@ -883,6 +907,30 @@ __kernel void EllpackDiagonalVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T 
 				break;
 			}
 		}	
+	}
+};
+__kernel void EllpackDiagonalVectorOffset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+
+	if (i < rows)
+	{
+		n = count[i];
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] == i + offset)
+			{
+				dataRes[i] = data[i * width + j];
+				break;
+			}
+
+			if (position[i * width + j] > i + offset)
+			{
+				break;
+			}
+		}
 	}
 };
 __kernel void EllpackRegion(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T aux1, const EILIG_SIZE_T aux2, const EILIG_SIZE_T aux3, const EILIG_SIZE_T aux4)
@@ -932,6 +980,30 @@ __kernel void EllpackLower1(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, co
 		}
 	}		
 };
+__kernel void EllpackLower1Offset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+	size_t pos = 0;
+
+	if (i < rows)
+	{
+		n = count[i];
+		countRes[i] = 0;
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] <= i + offset)
+			{
+				pos = countRes[i];
+				positionRes[i * widthRes + pos] = position[i * width + j];
+				dataRes[i * widthRes + pos] = data[i * width + j];
+				pos += 1;
+				countRes[i] = pos;
+			}
+		}
+	}
+};
 __kernel void EllpackLower2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
@@ -957,6 +1029,30 @@ __kernel void EllpackLower2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, co
 	
 			
 };
+__kernel void EllpackLower2Offset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+	size_t pos = 0;
+
+	if (i < rows)
+	{
+		n = count[i];
+		countRes[i] = 0;
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] < i + offset)
+			{
+				pos = countRes[i];
+				positionRes[i * widthRes + pos] = position[i * width + j];
+				dataRes[i * widthRes + pos] = data[i * width + j];
+				pos += 1;
+				countRes[i] = pos;
+			}
+		}
+	}
+};
 __kernel void EllpackUpper1(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
@@ -981,6 +1077,30 @@ __kernel void EllpackUpper1(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, co
 		}
 	}	
 };
+__kernel void EllpackUpper1Offset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+	size_t pos = 0;
+
+	if (i < rows)
+	{
+		n = count[i];
+		countRes[i] = 0;
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] >= i + offset)
+			{
+				pos = countRes[i];
+				positionRes[i * widthRes + pos] = position[i * width + j];
+				dataRes[i * widthRes + pos] = data[i * width + j];
+				pos += 1;
+				countRes[i] = pos;
+			}
+		}
+	}
+};
 __kernel void EllpackUpper2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
@@ -1003,5 +1123,29 @@ __kernel void EllpackUpper2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, co
 				countRes[i] = pos;			
 			}
 		}	
+	}
+};
+__kernel void EllpackUpper2Offset(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SIZE_T width, __global EILIG_SIZE_T* count, __global EILIG_SIZE_T* position, __global EILIG_SCALAR* data, const EILIG_SIZE_T widthRes, __global EILIG_SIZE_T* countRes, __global EILIG_SIZE_T* positionRes, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T offset)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+	size_t pos = 0;
+
+	if (i < rows)
+	{
+		n = count[i];
+		countRes[i] = 0;
+
+		for (size_t j = 0; j < n; j++)
+		{
+			if (position[i * width + j] > i + offset)
+			{
+				pos = countRes[i];
+				positionRes[i * widthRes + pos] = position[i * width + j];
+				dataRes[i * widthRes + pos] = data[i * width + j];
+				pos += 1;
+				countRes[i] = pos;
+			}
+		}
 	}
 };

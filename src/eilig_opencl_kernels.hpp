@@ -38,9 +38,9 @@ namespace eilig
         static const String kEllpackSubS = "EllpackSubS";
         static const String kEllpackSubSl = "EllpackSubSl";
         static const String kEllpackMinus = "EllpackMinus";
-        static const String kEllpackMulS = "EllpackMulS";
-        static const String kEllpackMulV = "EllpackMulV";
-        static const String kEllpackMulM = "EllpackMulM";
+        static const String kEllpackMulScalar = "EllpackMulScalar";
+        static const String kEllpackMulVector = "EllpackMulVector";
+        static const String kEllpackMulMatrix = "EllpackMulMatrix";
         static const String kEllpackSwapRows = "EllpackSwapRows";
         static const String kEllpackSwapCols = "EllpackSwapCols";
         static const String kEllpackTranspose = "EllpackTranspose";
@@ -48,11 +48,11 @@ namespace eilig
         static const String kEllpackDiagonal = "EllpackDiagonal";
         static const String kEllpackDiagonalScale = "EllpackDiagonalScale";
         static const String kEllpackDiagonalVector = "EllpackDiagonalVector";
-        static const String kEllpackRegion = "EllpackRegion";
         static const String kEllpackLower1 = "EllpackLower1";
         static const String kEllpackLower2 = "EllpackLower2";
         static const String kEllpackUpper1 = "EllpackUpper1";
         static const String kEllpackUpper2 = "EllpackUpper2";
+        static const String kEllpackRegion = "EllpackRegion";
         static const String kEllpackTrace = "EllpackTrace";
         static const String kEllpackSum = "EllpackSum";
 
@@ -99,9 +99,9 @@ namespace eilig
             KernelPtr kEllpackSubS_{ nullptr };
             KernelPtr kEllpackSubSl_{ nullptr };
             KernelPtr kEllpackMinus_{ nullptr };
-            KernelPtr kEllpackMulS_{ nullptr };
-            KernelPtr kEllpackMulV_{ nullptr };
-            KernelPtr kEllpackMulM_{ nullptr };
+            KernelPtr kEllpackMulScalar_{ nullptr };
+            KernelPtr kEllpackMulVector_{ nullptr };
+            KernelPtr kEllpackMulMatrix_{ nullptr };
             KernelPtr kEllpackSwapRows_{ nullptr };
             KernelPtr kEllpackSwapCols_{ nullptr };
             KernelPtr kEllpackTranspose_{ nullptr };
@@ -109,11 +109,11 @@ namespace eilig
             KernelPtr kEllpackDiagonal_{ nullptr };
             KernelPtr kEllpackDiagonalScale_{ nullptr };
             KernelPtr kEllpackDiagonalVector_{ nullptr };
-            KernelPtr kEllpackRegion_{ nullptr };
             KernelPtr kEllpackLower1_{ nullptr };
             KernelPtr kEllpackLower2_{ nullptr };
             KernelPtr kEllpackUpper1_{ nullptr };
             KernelPtr kEllpackUpper2_{ nullptr };
+            KernelPtr kEllpackRegion_{ nullptr };
             KernelPtr kEllpackTrace_{ nullptr };
             KernelPtr kEllpackSum_{ nullptr };
 

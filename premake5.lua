@@ -1,6 +1,6 @@
 -- premake5.lua
 workspace "eilig"
-	configurations { "Debug", "Release", "ReleaseCL"}
+	configurations { "Debug", "Release", "ReleaseCL" }
 	location "build"
 
 project "eilig"
@@ -13,7 +13,6 @@ project "eilig"
 	targetdir "build/%{cfg.buildcfg}"
 	includedirs { "../utils/src" }
 	includedirs { "../logger/src" }
-	includedirs { "../thread-pool/include" }	
 	
 	files "src/eilig.hpp"	
 	files "src/eilig_matrix.hpp"	
@@ -29,14 +28,6 @@ project "eilig"
 	files "src/eilig_vector.hpp"	
 	files "src/eilig_vector.cpp"
 	
-	files "src/eilig_threaded.hpp"
-	files "src/eilig_threaded_entry_proxy.hpp"
-	files "src/eilig_threaded_entry_proxy.cpp"
-	files "src/eilig_threaded_vector_cpu.hpp"
-	files "src/eilig_threaded_vector_cpu.cpp"
-	files "src/eilig_threaded_vector.hpp"
-	files "src/eilig_threaded_vector.cpp"
-	
 	filter "configurations:Debug"
 		defines { "DEBUG" }
 		symbols "On"
@@ -44,14 +35,14 @@ project "eilig"
 	filter "configurations:Release"
 		defines { "NDEBUG" }
 		optimize "Speed"
-				
-	filter "configurations:ReleaseCL"	
-		defines { "NDEBUG", "ENABLE_OPENCL" }
-		optimize "Speed"		
 		
-		includedirs { "../club/src" }		
-		includedirs { "../opencl/inc" }
-
+	filter "configurations:ReleaseCL"   
+		defines { "NDEBUG", "EILIG_ENABLE_OPENCL" }
+		optimize "Speed"	
+	
+		includedirs { "../club/src" }	
+		includedirs { "../opencl/inc" }	
+		
 		files "src/eilig_opencl_entry_proxy.hpp"	
 		files "src/eilig_opencl_entry_proxy.cpp"	
 		files "src/eilig_opencl_kernels.hpp"	
@@ -59,4 +50,4 @@ project "eilig"
 		files "src/eilig_opencl_matrix_ellpack.hpp"	
 		files "src/eilig_opencl_matrix_ellpack.cpp"	
 		files "src/eilig_opencl_vector.hpp"	
-		files "src/eilig_opencl_vector.cpp"
+		files "src/eilig_opencl_vector.cpp"			

@@ -10,6 +10,8 @@ namespace eilig
     class Ellpack
     {
     public:
+		using vector_type = Vector;
+
         Ellpack();
         Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& values);
         Ellpack(const Ellpack& input);
@@ -67,7 +69,7 @@ namespace eilig
         Ellpack UpperWithDiagonal() const;
         Ellpack UpperWithoutDiagonal() const;
         Ellpack Region(Index row1, Index col1, Index row2, Index col2) const;
-        void   Region(Index row1, Index col1, Index row2, Index col2, const Ellpack& in);
+        void Replace(Index row1, Index col1, const Ellpack& in);
 
         NumberRows GetRows() const;
         NumberCols GetCols() const;
@@ -77,9 +79,19 @@ namespace eilig
         const Indices& GetPosition() const;
         const Scalars& GetData() const;
 
-        void SetValue(Index row, Index col, Scalar value);
+        void Equal(Index row, Index col, Scalar value);
+        void Equal(Scalar value);
+        void Equal(const Ellpack& value);
+        void Equal(const std::initializer_list<std::initializer_list<Scalar>>& value);
 
-#ifdef ENABLE_OPENCL
+        void Add(Scalar value);
+        void Add(const Ellpack& value);
+        void Sub(Scalar value);
+        void Sub(const Ellpack& value);
+        void Mul(Scalar value);
+        void Mul(const Ellpack& rhs);
+
+#ifdef EILIG_ENABLE_OPENCL
         friend opencl::Ellpack;
 #endif
 

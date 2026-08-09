@@ -1,5 +1,3 @@
-#ifdef ENABLE_OPENCL
-
 #include "eilig_opencl_entry_proxy.hpp"
 
 namespace eilig
@@ -59,5 +57,3 @@ namespace eilig
         }
     }
 } /* namespace eilig */
-
-#endif

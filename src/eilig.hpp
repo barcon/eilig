@@ -7,17 +7,12 @@
 #include "eilig_matrix.hpp"
 #include "eilig_matrix_ellpack.hpp"
 
-#include "eilig_threaded.hpp"
-#include "eilig_threaded_entry_proxy.hpp"
-#include "eilig_threaded_vector.hpp"
-#include "eilig_threaded_vector_cpu.hpp"
-
-#ifdef ENABLE_OPENCL
+#ifdef EILIG_ENABLE_OPENCL
 #include "eilig_opencl_entry_proxy.hpp"
 #include "eilig_opencl_kernels.hpp"
 #include "eilig_opencl_vector.hpp"
 #include "eilig_opencl_matrix_ellpack.hpp"
-#endif // ENABLE_OPENCL
+#endif // EILIG_ENABLE_OPENCL
 
 #include "eilig_routines.hpp"
 #include "eilig_transform.hpp"
