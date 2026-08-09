@@ -70,6 +70,22 @@ namespace eilig
 	Status ReadFromFile(Matrix& output, const String& fileName);
 	Status ReadFromFile(Ellpack& output, const String& fileName);
 
+#ifdef EILIG_ENABLE_OPENCL
+	Scalar NormMax(const opencl::Vector& in);
+	Scalar NormP(const opencl::Vector& in, Scalar p);
+	Scalar NormP(const opencl::Ellpack& in, Scalar p);
+	Scalar NormP2(const opencl::Vector& in);
+	Scalar NormP2(const opencl::Ellpack& in);
+
+	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
+
+	void WriteToFile(const opencl::Vector& vec, const String& fileName);
+	void WriteToFile(const opencl::Ellpack& mat, const String& file);
+
+	Status ReadFromFile(opencl::Vector& output, const String& fileName);
+	Status ReadFromFile(opencl::Ellpack& output, const String& fileName);
+#endif
+
 	template <typename T, typename U>
 	Status IterativeCG(const T& A, U& x, const U& b, CallbackIterative callbackIterative = nullptr)
 	{
@@ -227,14 +243,14 @@ namespace eilig
 	{
 		String output{};
 		Index numberRows = vector.GetRows();
-		
+
 		logger::Info(headerEilig, utils::string::Format("Vector ({} x {}):", vector.GetRows(), vector.GetCols()));
-	
+
 		for (Index i = 0; i < numberRows; ++i)
 		{
 			output += utils::string::Format("{:14.5e}\n", vector.GetValue(i));
 		}
-	
+
 		return output;
 	}
 
@@ -244,9 +260,9 @@ namespace eilig
 		String output{};
 		Index numberRows = matrix.GetRows();
 		Index numberCols = matrix.GetCols();
-		
+
 		logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
-	
+
 		for (Index i = 0; i < numberRows; ++i)
 		{
 			for (Index j = 0; j < numberCols; ++j)
@@ -257,22 +273,6 @@ namespace eilig
 		}
 		return output;
 	}
-
-#ifdef EILIG_ENABLE_OPENCL
-	Scalar NormMax(const opencl::Vector& in);
-	Scalar NormP(const opencl::Vector& in, Scalar p);
-	Scalar NormP(const opencl::Ellpack& in, Scalar p);
-	Scalar NormP2(const opencl::Vector& in);
-	Scalar NormP2(const opencl::Ellpack& in);
-
-	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
-
-	void WriteToFile(const opencl::Vector& vec, const String& fileName);
-	void WriteToFile(const opencl::Ellpack& mat, const String& file);
-
-	Status ReadFromFile(opencl::Vector& output, const String& fileName);
-	Status ReadFromFile(opencl::Ellpack& output, const String& fileName);
-#endif
 
 } /* namespace eilig */
 
