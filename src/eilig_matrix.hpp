@@ -15,7 +15,6 @@ namespace eilig
         Matrix();
         Matrix(const std::initializer_list<std::initializer_list<Scalar>>& value);
         Matrix(const Matrix& input);
-        Matrix(const Matrices& input);
         Matrix(const Ellpack& input);
         Matrix(const Vector& input);
         Matrix(NumberRows numberRows, NumberCols numberCols);

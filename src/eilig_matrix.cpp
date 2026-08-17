@@ -2,25 +2,6 @@
 
 namespace eilig
 {
-    struct Parameters
-    {
-        NumberRows numberRows{ 0 };
-        NumberCols numberCols{ 0 };
-    };
-
-    static Parameters GetParameters(const Matrices& input)
-    {
-        Parameters parameters;
-
-        for (const auto& it : input)
-        {
-            parameters.numberRows += it.GetRows();
-            parameters.numberCols = std::max(parameters.numberCols, it.GetCols());
-        }
-
-        return parameters;
-    }
-
     Matrix::Matrix()
     {
         Resize(1, 1);
@@ -54,26 +35,6 @@ namespace eilig
     Matrix::Matrix(const Matrix& input)
     {
         (*this) = input;
-    }
-    Matrix::Matrix(const Matrices& input)
-    {
-        auto [numberRows, numberCols] = GetParameters(input);
-
-        Resize(numberRows, numberCols);
-
-        Index rowOffset{ 0 };
-        for (const auto& it : input)
-        {
-            for (Index i = 0; i < it.GetRows(); ++i)
-            {
-                for (Index j = 0; j < it.GetCols(); ++j)
-                {
-                    (*this)(rowOffset + i, j) = it(i, j);
-                }
-            }
-
-            rowOffset += it.GetRows();
-        }
     }
     Matrix::Matrix(const Ellpack& input)
     {
