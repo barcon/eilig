@@ -10,8 +10,6 @@ namespace eilig
     class Matrix
     {
     public:
-        using vector_type = Vector;
-
         Matrix();
         Matrix(const std::initializer_list<std::initializer_list<Scalar>>& value);
         Matrix(const Matrix& input);
@@ -77,13 +75,6 @@ namespace eilig
         void Equal(Index row, Index col, Scalar value);
         void Equal(const Matrix& value);
         void Equal(const std::initializer_list<std::initializer_list<Scalar>>& value);
-
-        void Add(Scalar value);
-        void Add(const Matrix& value);
-        void Sub(Scalar value);
-        void Sub(const Matrix& value);
-        void Mul(Scalar value);
-        void Mul(const Matrix& value);
 
     private:
         NumberRows numberRows_{ 0 };

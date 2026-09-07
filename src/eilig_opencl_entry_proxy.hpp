@@ -10,7 +10,7 @@ namespace eilig
         class EntryProxy
         {
         public:
-            explicit EntryProxy(club::BufferPtr buffer, Index offset);
+            explicit EntryProxy(club::BufferPtr buffer, Index offset, const DeviceIndex& deviceIndex);
 
             ~EntryProxy() = default;
 
@@ -28,6 +28,7 @@ namespace eilig
             Index index_{ 0 };
             club::BufferPtr buffer_{ nullptr };
 
+			const DeviceIndex& deviceIndex_;
         };
     }
 

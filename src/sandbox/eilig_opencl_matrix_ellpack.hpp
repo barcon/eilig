@@ -4,7 +4,7 @@
 #include "eilig_types.hpp"
 #include "eilig_matrix_ellpack.hpp"
 
-#include "eilig_opencl_kernels.hpp"
+#include "eilig_opencl_kernel.hpp"
 #include "eilig_opencl_entry_proxy.hpp"
 #include "eilig_opencl_vector.hpp"
 
@@ -15,16 +15,13 @@ namespace eilig
         class Ellpack
         {
         public:
-
-			using vector_type = Vector;
-
-            Ellpack(KernelsPtr kernels);
+            Ellpack();
             Ellpack(const Ellpack& input);
-            Ellpack(KernelsPtr kernels, const std::initializer_list<std::initializer_list<Scalar>>& value);
-            Ellpack(KernelsPtr kernels, const eilig::Ellpack& input);
-            Ellpack(KernelsPtr kernels, const eilig::Matrix& input);
-            Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols);
-            Ellpack(KernelsPtr kernels, NumberRows numberRows, NumberCols numberCols, Type type);
+            Ellpack(const std::initializer_list<std::initializer_list<Scalar>>& value);
+            Ellpack(const eilig::Ellpack& input);
+            Ellpack(const eilig::Matrix& input);
+            Ellpack(NumberRows numberRows, NumberCols numberCols);
+            Ellpack(NumberRows numberRows, NumberCols numberCols, Type type);
             Ellpack(Ellpack&& input) noexcept;
 
             ~Ellpack() = default;
@@ -60,7 +57,6 @@ namespace eilig
 
             Ellpack operator*(Scalar rhs) const;
             Ellpack operator*(const Ellpack& rhs) const;
-            Ellpack operator*(const eilig::Ellpack& rhs) const;
             Vector operator*(const Vector& rhs) const;
             friend Ellpack operator*(Scalar lhs, const Ellpack& rhs);
 
@@ -85,7 +81,7 @@ namespace eilig
             NumberCols GetCols() const;
             NumberCols GetWidth() const;
             Scalar GetValue(Index row, Index col) const;
-            KernelsPtr GetKernels() const;
+            KernelPtr GetKernel() const;
             BufferPtr GetCountGPU() const;
             BufferPtr GetPositionGPU() const;
             BufferPtr GetDataGPU() const;
@@ -102,10 +98,8 @@ namespace eilig
             void Mul(Scalar value);
             void Mul(const Ellpack& rhs);
 
-            void SetKernels(KernelsPtr kernels);
-
         private:
-			Ellpack() = default;
+            void SetKernel(KernelPtr kernel);
 
             void Expand(NumberCols width);
             void Shrink();
@@ -120,7 +114,7 @@ namespace eilig
             NumberCols numberCols_{ 0 };
             NumberCols width_{ 0 };
 
-            KernelsPtr kernels_{ nullptr };
+            KernelPtr kernel_{ nullptr };
             BufferPtr countGPU_{ nullptr };
             BufferPtr positionGPU_{ nullptr };
             BufferPtr dataGPU_{ nullptr };

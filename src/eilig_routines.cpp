@@ -245,6 +245,7 @@ namespace eilig
         return res;
     }
 
+    /*
     void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
     {
         Index numberRows = A.GetRows();
@@ -417,7 +418,7 @@ namespace eilig
         DecomposeLUP(LU, A, permutation);
         DirectLUP(LU, x, b, permutation);
     }
-
+    */
     void WriteToFile(const Vector& vec, const String& fileName)
     {
         File file;
@@ -434,7 +435,7 @@ namespace eilig
 
         file.Write(output);
     }
-    void WriteToFile(const Matrix& mat, const String& fileName)
+    /*void WriteToFile(const Matrix& mat, const String& fileName)
     {
         File file;
 
@@ -465,7 +466,7 @@ namespace eilig
         auto output = ListMatrix(mat);
 
         file.Write(output);
-    }
+    }*/
 
     Status ReadFromFile(Vector& output, const String& fileName)
     {
@@ -593,22 +594,23 @@ namespace eilig
         Scalar res{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernels()->kVectorNormMax_->GetLocalSize();
+        const auto& dimension = in.GetKernel()->kVectorNormMax_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
-        in.GetKernels()->kVectorNormMax_->SetArg(0, sizeof(Index), &numberRows);
-        in.GetKernels()->kVectorNormMax_->SetArg(1, sizeof(cl_mem), &in.GetDataGPU()->Get());
-        in.GetKernels()->kVectorNormMax_->SetArg(2, sizeof(cl_mem), &partialGPU->Get());
-        in.GetKernels()->kVectorNormMax_->SetArg(3, localSize[0] * sizeof(Scalar), NULL);
+        in.GetKernel()->kVectorNormMax_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kVectorNormMax_->SetArg(1, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kVectorNormMax_->SetArg(2, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kVectorNormMax_->SetArg(3, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernels()->context_->GetQueue(),
-            in.GetKernels()->kVectorNormMax_->GetKernel(),
-            in.GetKernels()->kVectorNormMax_->GetDim(), NULL, globalSize,
-            &in.GetKernels()->kVectorNormMax_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
+            in.GetKernel()->kVectorNormMax_->GetKernel(),
+            in.GetKernel()->kVectorNormMax_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -616,7 +618,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         res = *std::max_element(partial.begin(), partial.end());
 
@@ -632,23 +634,24 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernels()->kVectorNormP_->GetLocalSize();
+        const auto& dimension = in.GetKernel()->kVectorNormP_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
-        in.GetKernels()->kVectorNormP_->SetArg(0, sizeof(Index), &numberRows);
-        in.GetKernels()->kVectorNormP_->SetArg(1, sizeof(Scalar), &p);
-        in.GetKernels()->kVectorNormP_->SetArg(2, sizeof(cl_mem), &in.GetDataGPU()->Get());
-        in.GetKernels()->kVectorNormP_->SetArg(3, sizeof(cl_mem), &partialGPU->Get());
-        in.GetKernels()->kVectorNormP_->SetArg(4, localSize[0] * sizeof(Scalar), NULL);
+        in.GetKernel()->kVectorNormP_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kVectorNormP_->SetArg(1, sizeof(Scalar), &p);
+        in.GetKernel()->kVectorNormP_->SetArg(2, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kVectorNormP_->SetArg(3, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kVectorNormP_->SetArg(4, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernels()->context_->GetQueue(),
-            in.GetKernels()->kVectorNormP_->GetKernel(),
-            in.GetKernels()->kVectorNormP_->GetDim(), NULL, globalSize,
-            &in.GetKernels()->kVectorNormP_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
+            in.GetKernel()->kVectorNormP_->GetKernel(),
+            in.GetKernel()->kVectorNormP_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -656,7 +659,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         for (Index i = 0; i < partial.size(); i++)
         {
@@ -666,7 +669,7 @@ namespace eilig
         res = std::pow(norm, 1. / p);
         return res;
     }
-    Scalar NormP(const opencl::Ellpack& in, Scalar p)
+    /*Scalar NormP(const opencl::Ellpack& in, Scalar p)
     {
         club::Error error;
         Index numberRows = in.GetRows();
@@ -678,27 +681,27 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernels()->kEllpackNormP_->GetLocalSize();
+        const auto& localSize = in.GetKernel()->kEllpackNormP_->GetLocalSize();
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernel()->context_, sizeof(Scalar) * ngroups);
 
-        in.GetKernels()->kEllpackNormP_->SetArg(0, sizeof(Index), &numberRows);
-        in.GetKernels()->kEllpackNormP_->SetArg(1, sizeof(Index), &numberCols);
-        in.GetKernels()->kEllpackNormP_->SetArg(2, sizeof(Index), &width);
-        in.GetKernels()->kEllpackNormP_->SetArg(3, sizeof(Scalar), &p);
-        in.GetKernels()->kEllpackNormP_->SetArg(4, sizeof(cl_mem), &in.GetCountGPU()->Get());
-        in.GetKernels()->kEllpackNormP_->SetArg(5, sizeof(cl_mem), &in.GetPositionGPU()->Get());
-        in.GetKernels()->kEllpackNormP_->SetArg(6, sizeof(cl_mem), &in.GetDataGPU()->Get());
-        in.GetKernels()->kEllpackNormP_->SetArg(7, sizeof(cl_mem), &partialGPU->Get());
-        in.GetKernels()->kEllpackNormP_->SetArg(8, localSize[0] * sizeof(Scalar), NULL);
+        in.GetKernel()->kEllpackNormP_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kEllpackNormP_->SetArg(1, sizeof(Index), &numberCols);
+        in.GetKernel()->kEllpackNormP_->SetArg(2, sizeof(Index), &width);
+        in.GetKernel()->kEllpackNormP_->SetArg(3, sizeof(Scalar), &p);
+        in.GetKernel()->kEllpackNormP_->SetArg(4, sizeof(cl_mem), &in.GetCountGPU()->Get());
+        in.GetKernel()->kEllpackNormP_->SetArg(5, sizeof(cl_mem), &in.GetPositionGPU()->Get());
+        in.GetKernel()->kEllpackNormP_->SetArg(6, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kEllpackNormP_->SetArg(7, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kEllpackNormP_->SetArg(8, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernels()->context_->GetQueue(),
-            in.GetKernels()->kEllpackNormP_->GetKernel(),
-            in.GetKernels()->kEllpackNormP_->GetDim(), NULL, globalSize,
-            &in.GetKernels()->kEllpackNormP_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(in.GetKernel()->context_->GetQueue(),
+            in.GetKernel()->kEllpackNormP_->GetKernel(),
+            in.GetKernel()->kEllpackNormP_->GetDim(), NULL, globalSize,
+            &in.GetKernel()->kEllpackNormP_->GetLocalSize()[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -715,7 +718,7 @@ namespace eilig
 
         res = std::pow(norm, 1. / p);
         return res;
-    }
+    }*/
     Scalar NormP2(const opencl::Vector& in)
     {
         club::Error error;
@@ -726,22 +729,23 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernels()->kVectorNormP2_->GetLocalSize();
+        const auto& dimension = in.GetKernel()->kVectorNormP2_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);;
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
-        in.GetKernels()->kVectorNormP2_->SetArg(0, sizeof(Index), &numberRows);
-        in.GetKernels()->kVectorNormP2_->SetArg(1, sizeof(cl_mem), &in.GetDataGPU()->Get());
-        in.GetKernels()->kVectorNormP2_->SetArg(2, sizeof(cl_mem), &partialGPU->Get());
-        in.GetKernels()->kVectorNormP2_->SetArg(3, localSize[0] * sizeof(Scalar), NULL);
+        in.GetKernel()->kVectorNormP2_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kVectorNormP2_->SetArg(1, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kVectorNormP2_->SetArg(2, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kVectorNormP2_->SetArg(3, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernels()->context_->GetQueue(),
-            in.GetKernels()->kVectorNormP2_->GetKernel(),
-            in.GetKernels()->kVectorNormP2_->GetDim(), NULL, globalSize,
-            &in.GetKernels()->kVectorNormP2_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
+            in.GetKernel()->kVectorNormP2_->GetKernel(),
+            in.GetKernel()->kVectorNormP2_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -749,7 +753,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         for (Index i = 0; i < partial.size(); i++)
         {
@@ -759,7 +763,7 @@ namespace eilig
         res = std::sqrt(norm);
         return res;
     }
-    Scalar NormP2(const opencl::Ellpack& in)
+    /*Scalar NormP2(const opencl::Ellpack& in)
     {
         club::Error error;
         Index numberRows = in.GetRows();
@@ -771,26 +775,26 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernels()->kEllpackNormP2_->GetLocalSize();
+        const auto& localSize = in.GetKernel()->kEllpackNormP2_->GetLocalSize();
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);;
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernel()->context_, sizeof(Scalar) * ngroups);
 
-        in.GetKernels()->kEllpackNormP2_->SetArg(0, sizeof(Index), &numberRows);
-        in.GetKernels()->kEllpackNormP2_->SetArg(1, sizeof(Index), &numberCols);
-        in.GetKernels()->kEllpackNormP2_->SetArg(2, sizeof(Index), &width);
-        in.GetKernels()->kEllpackNormP2_->SetArg(3, sizeof(cl_mem), &in.GetCountGPU()->Get());
-        in.GetKernels()->kEllpackNormP2_->SetArg(4, sizeof(cl_mem), &in.GetPositionGPU()->Get());
-        in.GetKernels()->kEllpackNormP2_->SetArg(5, sizeof(cl_mem), &in.GetDataGPU()->Get());
-        in.GetKernels()->kEllpackNormP2_->SetArg(6, sizeof(cl_mem), &partialGPU->Get());
-        in.GetKernels()->kEllpackNormP2_->SetArg(7, localSize[0] * sizeof(Scalar), NULL);
+        in.GetKernel()->kEllpackNormP2_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kEllpackNormP2_->SetArg(1, sizeof(Index), &numberCols);
+        in.GetKernel()->kEllpackNormP2_->SetArg(2, sizeof(Index), &width);
+        in.GetKernel()->kEllpackNormP2_->SetArg(3, sizeof(cl_mem), &in.GetCountGPU()->Get());
+        in.GetKernel()->kEllpackNormP2_->SetArg(4, sizeof(cl_mem), &in.GetPositionGPU()->Get());
+        in.GetKernel()->kEllpackNormP2_->SetArg(5, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kEllpackNormP2_->SetArg(6, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kEllpackNormP2_->SetArg(7, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernels()->context_->GetQueue(),
-            in.GetKernels()->kEllpackNormP2_->GetKernel(),
-            in.GetKernels()->kEllpackNormP2_->GetDim(), NULL, globalSize,
-            &in.GetKernels()->kEllpackNormP2_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(in.GetKernel()->context_->GetQueue(),
+            in.GetKernel()->kEllpackNormP2_->GetKernel(),
+            in.GetKernel()->kEllpackNormP2_->GetDim(), NULL, globalSize,
+            &in.GetKernel()->kEllpackNormP2_->GetLocalSize()[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -807,7 +811,7 @@ namespace eilig
 
         res = std::sqrt(norm);
         return res;
-    }
+    }*/
 
     Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2)
     {
@@ -818,23 +822,24 @@ namespace eilig
         Scalar res{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in1.GetKernels()->kVectorDot_->GetLocalSize();
+        const auto& dimension = in1.GetKernel()->kVectorDot_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in1.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);;
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in1.GetKernels()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
-        in1.GetKernels()->kVectorDot_->SetArg(0, sizeof(Index), &numberRows);
-        in1.GetKernels()->kVectorDot_->SetArg(1, sizeof(cl_mem), &in1.GetDataGPU()->Get());
-        in1.GetKernels()->kVectorDot_->SetArg(2, sizeof(cl_mem), &in2.GetDataGPU()->Get());
-        in1.GetKernels()->kVectorDot_->SetArg(3, sizeof(cl_mem), &partialGPU->Get());
-        in1.GetKernels()->kVectorDot_->SetArg(4, localSize[0] * sizeof(Scalar), NULL);
+        in1.GetKernel()->kVectorDot_->SetArg(0, sizeof(Index), &numberRows);
+        in1.GetKernel()->kVectorDot_->SetArg(1, sizeof(cl_mem), &in1.GetDataGPU()->Get());
+        in1.GetKernel()->kVectorDot_->SetArg(2, sizeof(cl_mem), &in2.GetDataGPU()->Get());
+        in1.GetKernel()->kVectorDot_->SetArg(3, sizeof(cl_mem), &partialGPU->Get());
+        in1.GetKernel()->kVectorDot_->SetArg(4, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in1.GetKernels()->context_->GetQueue(),
-            in1.GetKernels()->kVectorDot_->GetKernel(),
-            in1.GetKernels()->kVectorDot_->GetDim(), NULL, globalSize,
-            &in1.GetKernels()->kVectorDot_->GetLocalSize()[0], 0, NULL, NULL);
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in1.GetDeviceIndex()],
+            in1.GetKernel()->kVectorDot_->GetKernel(),
+            in1.GetKernel()->kVectorDot_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -842,7 +847,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in1.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         for (Index i = 0; i < partial.size(); i++)
         {
@@ -868,7 +873,7 @@ namespace eilig
 
         file.Write(output);
     }
-    void WriteToFile(const opencl::Ellpack& mat, const String& fileName)
+    /*void WriteToFile(const opencl::Ellpack& mat, const String& fileName)
     {
         File file;
 
@@ -883,7 +888,7 @@ namespace eilig
         auto output = ListMatrix(mat);
 
         file.Write(output);
-    }
+    }*/
 
     Status ReadFromFile(opencl::Vector& output, const String& fileName)
     {
@@ -920,7 +925,7 @@ namespace eilig
 
         return EILIG_SUCCESS;
     }
-    Status ReadFromFile(opencl::Ellpack& output, const String& fileName)
+    /*Status ReadFromFile(opencl::Ellpack& output, const String& fileName)
     {
         File file;
         String line;
@@ -959,7 +964,7 @@ namespace eilig
         }
 
         return EILIG_SUCCESS;
-    }
+    }*/
 #endif
 
 } /* namespace eilig */

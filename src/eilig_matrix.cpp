@@ -110,6 +110,7 @@ namespace eilig
     {
         (*this) = value;
     }
+    
     Scalar Matrix::operator()(Index row, Index col) const
     {
         return data_[row * numberCols_ + col];
@@ -282,6 +283,7 @@ namespace eilig
     {
         return rhs * lhs;
     }
+
     Matrix& Matrix::SwapRows(Index row1, Index row2)
     {
         Scalar temp;
@@ -371,7 +373,7 @@ namespace eilig
     }
     Vector Matrix::DiagonalVector() const
     {
-		Vector res(numberRows_);
+		Vector res(std::min(numberRows_, numberCols_));
 
         for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
         {
@@ -397,16 +399,9 @@ namespace eilig
 
         for (Index i = 0; i < numberRows_; ++i)
         {
-            for (Index j = 0; j < numberCols_; ++j)
+            for (Index j = 0; j <= i && j < numberCols_; ++j)
             {
-                if (j <= i)
-                {
-                    res(i, j) = (*this)(i, j);
-                }
-                else
-                {
-                    break;
-                }
+                res(i, j) = (*this)(i, j);
             }
         }
 
@@ -418,16 +413,9 @@ namespace eilig
 
         for (Index i = 0; i < numberRows_; ++i)
         {
-            for (Index j = 0; j < numberCols_; ++j)
+            for (Index j = 0; j < i && j < numberCols_; ++j)
             {
-                if (j < i)
-                {
-                    res(i, j) = (*this)(i, j);
-                }
-                else
-                {
-                    break;
-                }
+                res(i, j) = (*this)(i, j);
             }
         }
 
@@ -450,16 +438,9 @@ namespace eilig
 
         for (Index i = 0; i < numberRows_; ++i)
         {
-            for (Index j = numberCols_ - 1; j >= 0; --j)
+            for (Index j = i; j < numberCols_; ++j)
             {
-                if (j >= i)
-                {
-                    res(i, j) = (*this)(i, j);
-                }
-                else
-                {
-                    break;
-                }
+                res(i, j) = (*this)(i, j);
             }
         }
 
@@ -471,16 +452,9 @@ namespace eilig
 
         for (Index i = 0; i < numberRows_; ++i)
         {
-            for (Index j = numberCols_ - 1; j >= 0; --j)
+            for (Index j = i + 1; j < numberCols_; ++j)
             {
-                if (j > i)
-                {
-                    res(i, j) = (*this)(i, j);
-                }
-                else
-                {
-                    break;
-                }
+                res(i, j) = (*this)(i, j);
             }
         }
 
@@ -538,6 +512,7 @@ namespace eilig
             }
         }
     }
+
     NumberRows Matrix::GetRows() const
     {
         return numberRows_;
@@ -554,6 +529,7 @@ namespace eilig
     {
         return data_;
     }
+    
     void Matrix::Equal(Index row, Index col, Scalar value)
     {
         (*this)(row, col) = value;
@@ -584,72 +560,5 @@ namespace eilig
             ++i;
         }
     }
-    void Matrix::Add(Scalar value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < numberCols_; ++j)
-            {
-                data_[i * numberCols_ + j] += value;
-            }
-        }
-    }
-    void Matrix::Add(const Matrix& value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < numberCols_; ++j)
-            {
-                data_[i * numberCols_ + j] += value.data_[i * numberCols_ + j];
-            }
-        }
-    }
-    void Matrix::Sub(Scalar value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < numberCols_; ++j)
-            {
-                data_[i * numberCols_ + j] -= value;
-            }
-        }
-    }
-    void Matrix::Sub(const Matrix& value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < numberCols_; ++j)
-            {
-                data_[i * numberCols_ + j] -= value.data_[i * numberCols_ + j];
-            }
-        }
-    }
-    void Matrix::Mul(Scalar value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < numberCols_; ++j)
-            {
-                data_[i * numberCols_ + j] *= value;
-            }
-        }
 
-    }
-    void Matrix::Mul(const Matrix& value)
-    {
-        Matrix res(numberRows_, value.numberCols_, matrix_zeros);
-
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index k = 0; k < numberCols_; ++k)
-            {
-                for (Index j = 0; j < value.numberCols_; ++j)
-                {
-                    res(i, j) += (*this)(i, k) * value(k, j);
-                }
-            }
-        }
-
-        (*this) = std::move(res);
-    }
 } /* namespace eilig */

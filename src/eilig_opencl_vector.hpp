@@ -4,7 +4,7 @@
 #include "eilig_types.hpp"
 #include "eilig_vector.hpp"
 
-#include "eilig_opencl_kernels.hpp"
+#include "eilig_opencl_kernel.hpp"
 #include "eilig_opencl_entry_proxy.hpp"
 
 namespace eilig
@@ -14,12 +14,12 @@ namespace eilig
         class Vector
         {
         public:
+            Vector();
             Vector(const Vector& input);
-            Vector(KernelsPtr kernels);
-            Vector(KernelsPtr kernels, const std::initializer_list<Scalar>& value);
-            Vector(KernelsPtr kernels, const eilig::Vector& input);
-            Vector(KernelsPtr kernels, NumberRows numberRows);
-            Vector(KernelsPtr kernels, NumberRows numberRows, Scalar value);
+            Vector(const std::initializer_list<Scalar>& value);
+            Vector(const eilig::Vector& input);
+            Vector(NumberRows numberRows);
+            Vector(NumberRows numberRows, Scalar value);
             Vector(Vector&& input) noexcept;
 
             ~Vector() = default;
@@ -34,8 +34,8 @@ namespace eilig
 
             Vector& operator=(Scalar rhs);
             Vector& operator=(const Vector& rhs);
-            Vector& operator=(Vector&& rhs) noexcept;
-            
+            Vector& operator=(Vector&& rhs) noexcept;      
+
             Vector operator+(Scalar rhs) const;
             Vector operator+(const Vector& rhs) const;
             Vector operator+() const;
@@ -57,8 +57,9 @@ namespace eilig
             NumberRows GetRows() const;
             NumberCols GetCols() const;
             Scalar GetValue(Index row) const;
-            KernelsPtr GetKernels() const;
             BufferPtr GetDataGPU () const;
+			KernelVectorPtr GetKernel() const;
+			const DeviceIndex& GetDeviceIndex() const;
 
             void Equal(Index row, Scalar value);
             void Equal(Scalar value);
@@ -66,20 +67,15 @@ namespace eilig
             void Equal(const eilig::Vector& value);
             void Equal(const std::initializer_list<Scalar>& value);
 
-            void Add(Scalar value);
-            void Add(const Vector& value);
-            void Sub(Scalar value);
-            void Sub(const Vector& value);
-            void Mul(Scalar value);
+            void SetDevice(DeviceIndex deviceIndex);
 			
-            void SetKernels(KernelsPtr kernels);
-
-        private:
-			Vector() = default;
-
-            NumberRows numberRows_{ 0 };
+        private:         
+            void InitKernel();
             
-            KernelsPtr kernels_{ nullptr };
+            NumberRows numberRows_{ 0 };
+			DeviceIndex deviceIndex_{ 0 };
+            
+            KernelVectorPtr kernel_{ nullptr };
             BufferPtr dataGPU_{ nullptr };
         };
     }

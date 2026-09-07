@@ -4,48 +4,49 @@ namespace eilig
 {
     namespace opencl
     {
+        Vector::Vector()
+        {
+            InitKernel();
+            Resize(1);
+        }
         Vector::Vector(const Vector& input)
         {
             (*this) = input;
         }
-        Vector::Vector(KernelsPtr kernels)
+        Vector::Vector(const std::initializer_list<Scalar>& value)
         {
-            SetKernels(kernels);
-            Resize(1);
-        }
-        Vector::Vector(KernelsPtr kernels, const std::initializer_list<Scalar>& value)
-        {
-            SetKernels(kernels);
+            InitKernel();
             Resize(value.size());
 
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, std::data(value), CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows_, std::data(value), CL_TRUE);
         }
-        Vector::Vector(KernelsPtr kernels, const eilig::Vector& input)
+        Vector::Vector(const eilig::Vector& input)
         {
-            SetKernels(kernels);
+            InitKernel();
             Resize(input.GetRows());
 
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &input.data_[0], CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows_, &input.data_[0], CL_TRUE);
         }
-        Vector::Vector(KernelsPtr kernels, NumberRows numberRows)
+        Vector::Vector(NumberRows numberRows)
         {
-            SetKernels(kernels);
+            InitKernel();
             Resize(numberRows);
         }
-        Vector::Vector(KernelsPtr kernels, NumberRows numberRows, Scalar value)
+        Vector::Vector(NumberRows numberRows, Scalar value)
         {
-            SetKernels(kernels);
+            InitKernel();
             Resize(numberRows, value);
         }
         Vector::Vector(Vector&& input) noexcept
         {
             (*this) = std::move(input);
         }
+        
         eilig::Vector Vector::Convert() const
         {
 			auto res = eilig::Vector(numberRows_);
             
-            dataGPU_->Read(0, sizeof(Scalar) * numberRows_, &res.data_[0], CL_TRUE);
+            dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows_, &res.data_[0], CL_TRUE);
 
             return res;
         }
@@ -53,11 +54,11 @@ namespace eilig
         {
             club::Error error;
             club::Events events(1);
-            Scalar value{ 0.0 };
+            Scalar zero{ 0.0 };
 
             if (numberRows == 0)
             {
-                throw std::invalid_argument("Vector dimensions cannot be zero.");
+                throw std::invalid_argument("Vector dimension cannot be zero.");
             }
 
             if (numberRows_ == numberRows)
@@ -66,9 +67,9 @@ namespace eilig
             }
 
             numberRows_ = numberRows;
-            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
+            dataGPU_ = club::CreateBuffer(GetContext(), sizeof(Scalar) * numberRows_);
 
-            error = clEnqueueFillBuffer(kernels_->context_->GetQueue(), dataGPU_->Get(), &value, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_, 0, NULL, &events[0]);
+            error = clEnqueueFillBuffer(GetContext()->GetQueues()[deviceIndex_], dataGPU_->Get(), &zero, sizeof(Scalar), 0, sizeof(Scalar) * numberRows_, 0, NULL, &events[0]);
             if (error != CL_SUCCESS)
             {
                 logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
@@ -85,19 +86,47 @@ namespace eilig
         {
             (*this) = value;
         }
+        
         EntryProxy Vector::operator()(Index row)
         {
-            return EntryProxy(dataGPU_, row);
+            return EntryProxy(dataGPU_, row, deviceIndex_);
         }
+   
         Vector& Vector::operator=(Scalar rhs)
         {
-            Equal(rhs);
+            club::Error error;
+            Index globalSize[1];
+
+			const auto& dimension = kernel_->kVectorCopyS_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            kernel_->kVectorCopyS_->SetArg(0, sizeof(Index), &numberRows_);
+            kernel_->kVectorCopyS_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
+            kernel_->kVectorCopyS_->SetArg(2, sizeof(Scalar), &rhs);
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                kernel_->kVectorCopyS_->GetKernel(),
+                kernel_->kVectorCopyS_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return *this;
         }
         Vector& Vector::operator=(const Vector& rhs)
         {
-            Equal(rhs);
+			InitKernel();
+
+            numberRows_ = rhs.numberRows_;
+			deviceIndex_ = rhs.deviceIndex_;
+            dataGPU_ = club::CreateBuffer(GetContext(), sizeof(Scalar) * numberRows_);
+
+            clEnqueueCopyBuffer(GetContext()->GetQueues()[deviceIndex_], rhs.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_, 0, NULL, NULL);
 
             return *this;
         }
@@ -108,7 +137,8 @@ namespace eilig
                 return *this;
             }
 
-            kernels_ = rhs.kernels_;
+            kernel_ = rhs.kernel_;
+			deviceIndex_ = rhs.deviceIndex_;
             numberRows_ = rhs.numberRows_;
             dataGPU_ = BufferPtr(std::move(rhs.dataGPU_));
 
@@ -117,16 +147,54 @@ namespace eilig
         Vector Vector::operator+(Scalar rhs) const
         {
             Vector res(*this);
+            club::Error error;
+            Index globalSize[1];
 
-			res.Add(rhs);
+            const auto& dimension = res.kernel_->kVectorAddS_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.kernel_->kVectorAddS_->SetArg(0, sizeof(Index), &res.numberRows_);
+            res.kernel_->kVectorAddS_->SetArg(1, sizeof(cl_mem), &res.dataGPU_->Get());
+            res.kernel_->kVectorAddS_->SetArg(2, sizeof(Scalar), &rhs);
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                res.kernel_->kVectorAddS_->GetKernel(),
+                res.kernel_->kVectorAddS_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return res;
         }
         Vector Vector::operator+(const Vector& rhs) const
         {
             Vector res(*this);
+            club::Error error;
+            Index globalSize[1];
 
-            res.Add(rhs);
+            const auto& dimension = res.kernel_->kVectorAddV_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.kernel_->kVectorAddV_->SetArg(0, sizeof(Index), &res.numberRows_);
+            res.kernel_->kVectorAddV_->SetArg(1, sizeof(cl_mem), &res.dataGPU_->Get());
+            res.kernel_->kVectorAddV_->SetArg(2, sizeof(cl_mem), &rhs.dataGPU_->Get());
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                res.kernel_->kVectorAddV_->GetKernel(),
+                res.kernel_->kVectorAddV_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return res;
         }
@@ -141,16 +209,54 @@ namespace eilig
         Vector Vector::operator-(Scalar rhs) const
         {
             Vector res(*this);
+            club::Error error;
+            Index globalSize[1];
 
-            res.Sub(rhs);
+            const auto& dimension = res.kernel_->kVectorSubS_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.kernel_->kVectorSubS_->SetArg(0, sizeof(Index), &res.numberRows_);
+            res.kernel_->kVectorSubS_->SetArg(1, sizeof(cl_mem), &res.dataGPU_->Get());
+            res.kernel_->kVectorSubS_->SetArg(2, sizeof(Scalar), &rhs);
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                res.kernel_->kVectorSubS_->GetKernel(),
+                res.kernel_->kVectorSubS_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return res;
         }
         Vector Vector::operator-(const Vector& rhs) const
         {
             Vector res(*this);
+            club::Error error;
+            Index globalSize[1];
 
-            res.Sub(rhs);
+            const auto& dimension = res.kernel_->kVectorSubV_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.kernel_->kVectorSubV_->SetArg(0, sizeof(Index), &res.numberRows_);
+            res.kernel_->kVectorSubV_->SetArg(1, sizeof(cl_mem), &res.dataGPU_->Get());
+            res.kernel_->kVectorSubV_->SetArg(2, sizeof(cl_mem), &rhs.dataGPU_->Get());
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                res.kernel_->kVectorSubV_->GetKernel(),
+                res.kernel_->kVectorSubV_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return res;
         }
@@ -165,8 +271,27 @@ namespace eilig
         Vector Vector::operator*(Scalar rhs) const
         {
             Vector res(*this);
+            club::Error error;
+            Index globalSize[1];
 
-            res.Mul(rhs);
+            const auto& dimension = res.kernel_->kVectorMulS_->GetDim();
+            const auto& localSize = GetContext()->GetLocalSize(deviceIndex_, dimension);
+
+            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
+
+            res.kernel_->kVectorMulS_->SetArg(0, sizeof(Index), &res.numberRows_);
+            res.kernel_->kVectorMulS_->SetArg(1, sizeof(cl_mem), &res.dataGPU_->Get());
+            res.kernel_->kVectorMulS_->SetArg(2, sizeof(Scalar), &rhs);
+
+            error = clEnqueueNDRangeKernel(GetContext()->GetQueues()[deviceIndex_],
+                res.kernel_->kVectorMulS_->GetKernel(),
+                res.kernel_->kVectorMulS_->GetDim(), NULL, globalSize,
+                &localSize[0], 0, NULL, NULL);
+
+            if (error != CL_SUCCESS)
+            {
+                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+            }
 
             return res;
         }
@@ -174,28 +299,29 @@ namespace eilig
         {
             return rhs * lhs;
         }
+        
         Vector& Vector::SwapRows(Index row1, Index row2)
         {
             Scalar aux1;
             Scalar aux2;
 
-            dataGPU_->Read(sizeof(Scalar) * row1, sizeof(Scalar), &aux1, CL_TRUE);
-            dataGPU_->Read(sizeof(Scalar) * row2, sizeof(Scalar), &aux2, CL_TRUE);
+            dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row1, sizeof(Scalar), &aux1, CL_TRUE);
+            dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row2, sizeof(Scalar), &aux2, CL_TRUE);
 
-            dataGPU_->Write(sizeof(Scalar) * row1, sizeof(Scalar), &aux2, CL_TRUE);
-            dataGPU_->Write(sizeof(Scalar) * row2, sizeof(Scalar), &aux1, CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row1, sizeof(Scalar), &aux2, CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row2, sizeof(Scalar), &aux1, CL_TRUE);
 
             return *this;
-        }
+        }        
         Vector Vector::Region(Index row1, Index row2) const
         {
             Index aux1 = row1 <= row2 ? (row2 - row1) + 1 : (row1 - row2) + 1;
             Index aux2 = row1 <= row2 ? row1 : row2;
-            Vector res(kernels_, aux1);
+            Vector res(aux1);
             Scalars data(aux1);
 
-            dataGPU_->Read(sizeof(Scalar) * aux2, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
-            res.dataGPU_->Write(0, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
+            dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * aux2, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
+            res.dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * aux1, &data[0], CL_TRUE);
 
             return res;
         }
@@ -204,14 +330,14 @@ namespace eilig
             NumberRows numberRows = in.GetRows();
             Scalars data(numberRows);
 
-            in.dataGPU_->Read(0, sizeof(Scalar) * numberRows, &data[0], CL_TRUE);
-            dataGPU_->Write(sizeof(Scalar) * row1, sizeof(Scalar) * numberRows, &data[0], CL_TRUE);
+            in.dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows, &data[0], CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row1, sizeof(Scalar) * numberRows, &data[0], CL_TRUE);
         }
         void Vector::Replace(Index row1, const eilig::Vector& in)
         {
             NumberRows numberRows = in.GetRows();
 
-            dataGPU_->Write(sizeof(Scalar) * row1, sizeof(Scalar) * numberRows, &in.data_[0], CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row1, sizeof(Scalar) * numberRows, &in.data_[0], CL_TRUE);
         }
         NumberRows Vector::GetRows() const
         {
@@ -225,193 +351,70 @@ namespace eilig
         {
             Scalar res{ 0.0 };
 
-            dataGPU_->Read(sizeof(Scalar) * row, sizeof(Scalar), &res, CL_TRUE);
+            dataGPU_->Read(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * row, sizeof(Scalar), &res, CL_TRUE);
 
             return res;
-        }
-        KernelsPtr Vector::GetKernels() const
-        {
-            return kernels_;
         }
         BufferPtr Vector::GetDataGPU() const
         {
             return dataGPU_;
         }
+        KernelVectorPtr Vector::GetKernel() const
+        {
+            return KernelVectorPtr();
+        }
+        const DeviceIndex& Vector::GetDeviceIndex() const
+        {
+            return deviceIndex_;
+        }
+       
         void Vector::Equal(Index row, Scalar value)
         {
             (*this)(row) = value;
         }
         void Vector::Equal(Scalar value)
         {
-            club::Error error;
-            Index globalSize[1];
-
-            const auto& localSize = kernels_->kVectorCopyS_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorCopyS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorCopyS_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorCopyS_->SetArg(2, sizeof(Scalar), &value);
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorCopyS_->GetKernel(),
-                kernels_->kVectorCopyS_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorCopyS_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
-            }
+            (*this) = value;
         }
         void Vector::Equal(const Vector& value)
         {
-            kernels_ = value.kernels_;
-            numberRows_ = value.numberRows_;
-            dataGPU_ = club::CreateBuffer(kernels_->context_, sizeof(Scalar) * numberRows_);
-
-            clEnqueueCopyBuffer(kernels_->context_->GetQueue(), value.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_, 0, NULL, NULL);
+            (*this) = value;
         }
         void Vector::Equal(const eilig::Vector& value)
         {
             Resize(value.GetRows());
 
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, &value.data_[0], CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows_, &value.data_[0], CL_TRUE);
         }
         void Vector::Equal(const std::initializer_list<Scalar>& value)
         {
             Resize(value.size());
 
-            dataGPU_->Write(0, sizeof(Scalar) * numberRows_, std::data(value), CL_TRUE);
+            dataGPU_->Write(GetContext()->GetQueues()[deviceIndex_], 0, sizeof(Scalar) * numberRows_, std::data(value), CL_TRUE);
         }
-        void Vector::Add(Scalar value)
+        
+        void Vector::SetDevice(DeviceIndex deviceIndex)
         {
-            club::Error error;
-            Index globalSize[1];
-
-            const auto& localSize = kernels_->kVectorAddS_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorAddS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorAddS_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorAddS_->SetArg(2, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorAddS_->SetArg(3, sizeof(Scalar), &value);
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorAddS_->GetKernel(),
-                kernels_->kVectorAddS_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorAddS_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
+            if (deviceIndex >= GetContext()->GetDevices().size())
             {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+                throw std::out_of_range("Device index is out of range.");
+            }
+
+			deviceIndex_ = deviceIndex;
+
+            if (dataGPU_)
+            {
+			    clEnqueueMigrateMemObjects(GetContext()->GetQueues()[deviceIndex_], 1, &dataGPU_->Get(), 0, 0, NULL, NULL);
             }
         }
-        void Vector::Add(const Vector& value)
+        void Vector::InitKernel()
         {
-            club::Error error;
-            Index globalSize[1];
+			kernel_ = CreateKernelVector();
 
-            const auto& localSize = kernels_->kVectorAddV_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorAddV_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorAddV_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorAddV_->SetArg(2, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorAddV_->SetArg(3, sizeof(cl_mem), &value.dataGPU_->Get());
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorAddV_->GetKernel(),
-                kernels_->kVectorAddV_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorAddV_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
+            if(!kernel_)
             {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+                throw std::runtime_error("Failed to create kernel.");
             }
-        }
-        void Vector::Sub(Scalar value)
-        {
-            club::Error error;
-            Index globalSize[1];
-
-            const auto& localSize = kernels_->kVectorSubS_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorSubS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorSubS_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorSubS_->SetArg(2, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorSubS_->SetArg(3, sizeof(Scalar), &value);
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorSubS_->GetKernel(),
-                kernels_->kVectorSubS_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorSubS_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
-            }
-        }
-        void Vector::Sub(const Vector& value)
-        {
-            club::Error error;
-            Index globalSize[1];
-
-            const auto& localSize = kernels_->kVectorSubV_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorSubV_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorSubV_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorSubV_->SetArg(2, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorSubV_->SetArg(3, sizeof(cl_mem), &value.dataGPU_->Get());
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorSubV_->GetKernel(),
-                kernels_->kVectorSubV_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorSubV_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
-            }
-        }
-        void Vector::Mul(Scalar value)
-        {
-            club::Error error;
-            Index globalSize[1];
-
-            const auto& localSize = kernels_->kVectorMulS_->GetLocalSize();
-
-            globalSize[0] = GlobalSize(numberRows_, localSize[0]);
-
-            kernels_->kVectorMulS_->SetArg(0, sizeof(Index), &numberRows_);
-            kernels_->kVectorMulS_->SetArg(1, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorMulS_->SetArg(2, sizeof(cl_mem), &dataGPU_->Get());
-            kernels_->kVectorMulS_->SetArg(3, sizeof(Scalar), &value);
-
-            error = clEnqueueNDRangeKernel(kernels_->context_->GetQueue(),
-                kernels_->kVectorMulS_->GetKernel(),
-                kernels_->kVectorMulS_->GetDim(), NULL, globalSize,
-                &kernels_->kVectorMulS_->GetLocalSize()[0], 0, NULL, NULL);
-
-            if (error != CL_SUCCESS)
-            {
-                logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
-            }
-        }
-        void Vector::SetKernels(KernelsPtr kernels)
-        {
-            if(kernels == nullptr)
-            {
-                throw std::invalid_argument("Kernels cannot be null.");
-			}
-
-			kernels_ = kernels;
         }
     }
 } /* namespace eilig */

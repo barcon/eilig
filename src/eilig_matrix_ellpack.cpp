@@ -358,7 +358,24 @@ namespace eilig
     }
     Ellpack& Ellpack::operator=(Scalar rhs)
     {
-        Equal(rhs);
+        if (utils::math::IsAlmostEqual(rhs, 0.0, 5))
+        {
+            Clear();
+            Shrink();
+            return *this;
+        }
+
+        Expand(numberCols_);
+
+        for (Index i = 0; i < numberRows_; ++i)
+        {
+            count_[i] = numberCols_;
+            for (Index j = 0; j < count_[i]; ++j)
+            {
+                data_[i * width_ + j] = rhs;
+                position_[i * width_ + j] = j;
+            }
+        }
 
         return *this;
     }
@@ -654,7 +671,7 @@ namespace eilig
     }
     Vector  Ellpack::DiagonalVector() const
     {
-        Vector res(numberRows_);
+        Vector res(std::min(numberRows_, numberCols_));
 
         for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
         {
@@ -929,119 +946,6 @@ namespace eilig
 
             ++i;
         }
-    }
-    
-    void Ellpack::Add(Scalar value)
-    {
-        Ellpack res;
-
-        if (utils::math::IsAlmostEqual(value, 0.0, 5))
-        {
-            return;
-        }
-
-        res.Resize(numberRows_, numberCols_, value);
-
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < count_[i]; ++j)
-            {
-                auto col = position_[i * width_ + j];
-                res.data_[i * res.width_ + col] += data_[i * width_ + j];
-            }
-        }
-
-		(*this) = std::move(res);
-    }
-    void Ellpack::Add(const Ellpack& value)
-    {
-        Ellpack res(*this);
-
-        for (Index i = 0; i < value.numberRows_; ++i)
-        {
-            for (Index j = 0; j < value.count_[i]; ++j)
-            {
-                auto col = value.position_[i * value.width_ + j];
-                auto val = value.data_[i * value.width_ + j];
-
-                res(i, col) += val;
-            }
-        }
-
-		(*this) = std::move(res);
-    }
-    void Ellpack::Sub(Scalar value)
-    {
-        Ellpack res;
-
-        if (utils::math::IsAlmostEqual(value, 0.0, 5))
-        {
-            return;
-        }
-
-        res.Resize(numberRows_, numberCols_, -value);
-
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < count_[i]; ++j)
-            {
-                auto col = position_[i * width_ + j];
-                res.data_[i * res.width_ + col] += data_[i * width_ + j];
-            }
-        }
-
-        (*this) = std::move(res);
-    }
-    void Ellpack::Sub(const Ellpack& value)
-    {
-        Ellpack res(*this);
-
-        for (Index i = 0; i < res.numberRows_; ++i)
-        {
-            for (Index j = 0; j < value.count_[i]; ++j)
-            {
-                auto col = value.position_[i * value.width_ + j];
-                auto val = value.data_[i * value.width_ + j];
-
-                res(i, col) -= val;
-            }
-        }
-
-        (*this) = std::move(res);
-    }
-    void Ellpack::Mul(Scalar value)
-    {
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < count_[i]; ++j)
-            {
-                data_[i * width_ + j] *= value;
-            }
-        }
-    }
-    void Ellpack::Mul(const Ellpack& rhs)
-    {
-        Ellpack res(numberRows_, rhs.numberCols_);
-
-        for (Index i = 0; i < numberRows_; ++i)
-        {
-            for (Index j = 0; j < rhs.numberCols_; ++j)
-            {
-                Scalar sum{ 0. };
-
-                for (Index k = 0; k < count_[i]; ++k)
-                {
-                    sum += data_[i * width_ + k] * rhs(position_[i * width_ + k], j);
-                }
-
-                if (!utils::math::IsAlmostEqual(sum, 0.0, 5))
-                {
-                    (*this)(i, j) = sum;
-                }
-            }
-        }
-
-		(*this) = std::move(res);
     }
     
 } /* namespace eilig */

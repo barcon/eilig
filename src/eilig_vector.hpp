@@ -57,12 +57,6 @@ namespace eilig
         void Equal(const Vector& value);
         void Equal(const std::initializer_list<Scalar>& value);
 
-		void Add(Scalar value);
-		void Add(const Vector& value);
-		void Sub(Scalar value);
-		void Sub(const Vector& value);
-		void Mul(Scalar value);
-
 #ifdef EILIG_ENABLE_OPENCL
         friend opencl::Vector;
 #endif

@@ -171,6 +171,34 @@ __kernel void VectorDot(const EILIG_SIZE_T rows, __global EILIG_SCALAR* y, __glo
 	}
 };
 
+__kernel void MatrixTrace(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* partial)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		partial[i] = 0.0;
+
+		if (i < cols)
+		{
+			partial[i] = data[i * cols + i];
+		}
+	}
+};
+__kernel void MatrixSum(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* partial)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		partial[i] = 0.0;
+
+		for (size_t k = 0; k < cols; k++)
+		{
+			partial[i] += data[i * cols + k];
+		}
+	}
+};
 __kernel void MatrixCopyS(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, const EILIG_SCALAR alpha)
 {
 	size_t i = get_global_id(0);
@@ -235,56 +263,49 @@ __kernel void MatrixMulScalar(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, 
 __kernel void MatrixMulVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* vector, __global EILIG_SCALAR* dataRes)
 {
 	size_t i = get_global_id(0);
-	/*size_t n;
-	size_t k;
 
 	EILIG_SCALAR sum = 0.0;
 
 	if (i < rows)
 	{
-		n = count[i];
-
-		for (size_t j = 0; j < n; j++)
+		for (size_t j = 0; j < cols; j++)
 		{
-			k = position[i * width + j];
-			sum += data[i * width + j] * vector[k];
+			sum += data[i * cols + j] * vector[j];
 		}
 
 		dataRes[i] = sum;
-	}*/
+	}
 };
 __kernel void MatrixMulMatrix(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, const EILIG_SIZE_T rowsTrans, const EILIG_SIZE_T colsTrans, __global EILIG_SCALAR* dataTrans, __global EILIG_SCALAR* dataRes, __local size_t* localMem)
 {
-	size_t i = get_global_id(0);
-
+	size_t i = get_global_id(0);	
+	
 	EILIG_SCALAR sum;
 
-	for (size_t j = 0; j < rowsTrans; j++)
+	if (i < rows)
 	{
-		if (i == 0)
+		for (size_t j = 0; j < rowsTrans; j++)
 		{
+			if (i == 0)
+			{
+				for (size_t k = 0; k < colsTrans; k++)
+				{
+					localMem[k] = dataTrans[j * colsTrans + k];
+				}
+			}
+
+			barrier(CLK_LOCAL_MEM_FENCE);
+
+			sum = 0.0;
 			for (size_t k = 0; k < cols; k++)
 			{
-				localMem[k] = 0.0;
+				sum += data[i * cols + k] * localMem[k];
 			}
 
-			for (size_t k = 0; k < colsTrans; k++)
-			{
-				localMem[k] = dataTrans[j * colsTrans + k];
-			}
+			dataRes[i * rowsTrans + j] = sum;
+
+			barrier(CLK_LOCAL_MEM_FENCE);
 		}
-
-		barrier(CLK_LOCAL_MEM_FENCE);
-
-		sum = 0.0;
-		for (size_t k = 0; k < cols; k++)
-		{
-			sum += data[i * cols + k] * localMem[k];
-		}
-
-		dataRes[i * cols + j] = sum;
-
-		barrier(CLK_LOCAL_MEM_FENCE);
 	}
 };
 __kernel void MatrixTranspose(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
@@ -296,6 +317,130 @@ __kernel void MatrixTranspose(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, 
 		for (size_t i = 0; i < rows; i++)
 		{
 			dataRes[j * rows + i] = data[i * cols + j];
+		}
+	}
+};
+__kernel void MatrixSwapRows(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, const EILIG_SIZE_T row1, const EILIG_SIZE_T row2)
+{
+	size_t i = get_global_id(0);
+
+	EILIG_SCALAR dataT;
+
+	if (i < cols)
+	{
+		dataT = data[row1 * cols + i];
+		data[row1 * cols + i] = data[row2 * cols + i];
+		data[row2 * cols + i] = dataT;
+	}
+};
+__kernel void MatrixSwapCols(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, const EILIG_SIZE_T col1, const EILIG_SIZE_T col2)
+{
+	size_t i = get_global_id(0);
+
+	EILIG_SCALAR dataT;
+
+	if (i < rows)
+	{
+		dataT = data[i * cols + col1];
+		data[i * cols + col1] = data[i * cols + col2];
+		data[i * cols + col2] = dataT;
+	}
+};
+__kernel void MatrixDiagonal(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows && i < cols)
+	{
+		dataRes[i * cols + i] = data[i * cols + i];
+	}
+};
+__kernel void MatrixDiagonalScale(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, const EILIG_SCALAR factor)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows && i < cols)
+	{
+		data[i * cols + i] *= factor;
+	}
+};
+__kernel void MatrixDiagonalVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+	size_t n;
+
+	if (i < min(rows, cols))
+	{
+		dataRes[i] = data[i * cols + i];
+	}
+};
+__kernel void MatrixRegion(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes, const EILIG_SIZE_T aux1, const EILIG_SIZE_T aux2, const EILIG_SIZE_T aux3, const EILIG_SIZE_T aux4)
+{
+	size_t i = get_global_id(0);
+
+	if (i < aux1)
+	{
+		for (size_t j = 0; j < aux2; j++)
+		{
+			dataRes[i * aux2 + j] = data[(aux3 + i) * cols + (aux4 + j)];
+		}
+	}
+
+	/*
+	    for (Index i = 0; i < aux1; ++i)
+        {
+            for (Index j = 0; j < aux2; ++j)
+            {
+                res(i, j) = (*this)(aux3 + i, aux4 + j);
+            }
+        }
+	*/
+};
+__kernel void MatrixLower1(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		for (size_t j = 0; j <= i && j < cols; j++)
+		{
+			dataRes[i * cols + j] = data[i * cols + j];
+		}
+	}
+};
+__kernel void MatrixLower2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		for (size_t j = 0; j < i && j < cols; j++)
+		{
+			dataRes[i * cols + j] = data[i * cols + j];
+		}
+	}
+};
+__kernel void MatrixUpper1(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		for (size_t j = i; j < cols; j++)
+		{
+			dataRes[i * cols + j] = data[i * cols + j];
+		}
+	}
+};
+__kernel void MatrixUpper2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* dataRes)
+{
+	size_t i = get_global_id(0);
+
+	if (i < rows)
+	{
+		for (size_t j = i + 1; j < cols; j++)
+		{
+			dataRes[i * cols + j] = data[i * cols + j];
 		}
 	}
 };
@@ -846,7 +991,7 @@ __kernel void EllpackDiagonalVector(const EILIG_SIZE_T rows, const EILIG_SIZE_T 
 	size_t i = get_global_id(0);
 	size_t n;
 	
-	if(i < rows)
+	if(i < min(rows, cols))
 	{
 		n = count[i];
 		

@@ -137,8 +137,8 @@
     <ClInclude Include="..\src\eilig_matrix.hpp" />
     <ClInclude Include="..\src\eilig_matrix_ellpack.hpp" />
     <ClInclude Include="..\src\eilig_opencl_entry_proxy.hpp" />
-    <ClInclude Include="..\src\eilig_opencl_kernels.hpp" />
-    <ClInclude Include="..\src\eilig_opencl_matrix_ellpack.hpp" />
+    <ClInclude Include="..\src\eilig_opencl_kernel.hpp" />
+    <ClInclude Include="..\src\eilig_opencl_matrix.hpp" />
     <ClInclude Include="..\src\eilig_opencl_vector.hpp" />
     <ClInclude Include="..\src\eilig_routines.hpp" />
     <ClInclude Include="..\src\eilig_status.hpp" />
@@ -153,11 +153,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\src\eilig_opencl_kernels.cpp">
+    <ClCompile Include="..\src\eilig_opencl_kernel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\src\eilig_opencl_matrix_ellpack.cpp">
+    <ClCompile Include="..\src\eilig_opencl_matrix.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>

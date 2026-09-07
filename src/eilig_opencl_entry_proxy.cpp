@@ -1,10 +1,11 @@
 #include "eilig_opencl_entry_proxy.hpp"
+#include "eilig_opencl_kernel.hpp"
 
 namespace eilig
 {
     namespace opencl
     {
-        EntryProxy::EntryProxy(club::BufferPtr buffer, Index index)
+		EntryProxy::EntryProxy(club::BufferPtr buffer, Index index, const DeviceIndex& deviceIndex) : deviceIndex_(deviceIndex)
         {
             SetBuffer(buffer);
             SetIndex(index);
@@ -47,13 +48,13 @@ namespace eilig
         {
             Scalar res{ 0.0 };
 
-            buffer_->Read(sizeof(Scalar) * index_, sizeof(Scalar), &res, CL_TRUE);
+            buffer_->Read(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * index_, sizeof(Scalar), &res, CL_TRUE);
 
             return res;
         }
         void EntryProxy::Write(Scalar value)
         {
-            buffer_->Write(sizeof(Scalar) * index_, sizeof(Scalar), &value, CL_TRUE);
+            buffer_->Write(GetContext()->GetQueues()[deviceIndex_], sizeof(Scalar) * index_, sizeof(Scalar), &value, CL_TRUE);
         }
     }
 } /* namespace eilig */
