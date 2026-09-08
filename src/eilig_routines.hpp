@@ -64,10 +64,6 @@ namespace eilig
 	//void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
 	//void Direct(const Matrix& A, Vector& x, const Vector& b);
 	
-	void WriteToFile(const Vector& vec, const String& fileName);
-	//void WriteToFile(const Matrix& mat, const String& fileName);
-	//void WriteToFile(const Ellpack& mat, const String& fileName);
-
 	Status ReadFromFile(Vector& output, const String& fileName);
 	//Status ReadFromFile(Matrix& output, const String& fileName);
 	//Status ReadFromFile(Ellpack& output, const String& fileName);
@@ -75,17 +71,14 @@ namespace eilig
 #ifdef EILIG_ENABLE_OPENCL
 	Scalar NormMax(const opencl::Vector& in);
 	Scalar NormP(const opencl::Vector& in, Scalar p);
+	Scalar NormP(const opencl::Matrix& in, Scalar p);
 	//Scalar NormP(const opencl::Ellpack& in, Scalar p);
 	Scalar NormP2(const opencl::Vector& in);
+	Scalar NormP2(const opencl::Matrix& in);
 	//Scalar NormP2(const opencl::Ellpack& in);
 
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
-	void WriteToFile(const opencl::Vector& vec, const String& fileName);
-	//void WriteToFile(const opencl::Ellpack& mat, const String& file);
-
-	Status ReadFromFile(opencl::Vector& output, const String& fileName);
-	//Status ReadFromFile(opencl::Ellpack& output, const String& fileName);
 #endif
 
 	template <typename T, typename U>
@@ -246,8 +239,6 @@ namespace eilig
 		String output{};
 		Index numberRows = vector.GetRows();
 
-		logger::Info(headerEilig, utils::string::Format("Vector ({} x {}):", vector.GetRows(), vector.GetCols()));
-
 		for (Index i = 0; i < numberRows; ++i)
 		{
 			output += utils::string::Format("{:14.5e}\n", vector.GetValue(i));
@@ -263,8 +254,6 @@ namespace eilig
 		Index numberRows = matrix.GetRows();
 		Index numberCols = matrix.GetCols();
 
-		logger::Info(headerEilig, utils::string::Format("Matrix ({} x {}):", numberRows, numberCols));
-
 		for (Index i = 0; i < numberRows; ++i)
 		{
 			for (Index j = 0; j < numberCols; ++j)
@@ -274,6 +263,94 @@ namespace eilig
 			output += "\n";
 		}
 		return output;
+	}
+
+	template <typename T>
+	Status ReadFromFile(const String& fileName, T& output)
+	{
+		File file;
+		String line;
+		Status status;
+
+		file.SetName(fileName);
+		file.SetMode(utils::file::Read);
+
+		status = file.Open();
+		if (status != utils::file::UTILS_SUCCESS)
+		{
+			logger::Error(headerEilig, "File could not be opened");
+			return EILIG_INVALID_FILE;
+		}
+
+		auto stream = static_cast<std::istringstream>(file.GetFull());
+		
+		if constexpr (std::is_same<T, Vector>::value || std::is_same<T, opencl::Vector>::value)
+		{
+			Strings table;
+
+			while (std::getline(stream, line))
+			{
+				if (!utils::string::IsEmpty(line))
+				{
+					table.push_back(line);
+				}
+			}
+
+			output.Resize(table.size());
+
+			for (Index i = 0; i < output.GetRows(); i++)
+			{
+				output(i) = utils::string::ConvertTo<Scalar>(table[i]);
+			}
+		}
+		else if constexpr (std::is_same<T, Matrix>::value || std::is_same<T, Ellpack>::value || std::is_same<T, opencl::Matrix>::value || std::is_same<T, opencl::Ellpack>::value)
+		{
+			std::vector<Strings> table;
+			Strings split;
+
+			while (std::getline(stream, line))
+			{
+				if (!utils::string::IsEmpty(line))
+				{
+					split = utils::string::Split(line, { ' ', ';', '\t' });
+					table.push_back(split);
+				}
+			}
+
+			output.Resize(table.size(), table[0].size());
+
+			for (Index i = 0; i < output.GetRows(); i++)
+			{
+				for (Index j = 0; j < output.GetCols(); j++)
+				{
+					output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
+				}
+			}
+		}
+
+		return EILIG_SUCCESS;
+	}
+
+	template <typename T>
+	void WriteToFile(const String& fileName, const T& input)
+	{
+		File file;
+		String output;
+
+		file.SetName(fileName);
+		file.SetMode(utils::file::Write);
+
+		if (file.Open() != utils::file::UTILS_SUCCESS)
+		{
+			logger::Error(headerEilig, "File could not be created");
+		}
+
+		if constexpr (std::is_same<T, Vector>::value || std::is_same<T, opencl::Vector>::value)
+			output = ListVector(input);
+		else if constexpr (std::is_same<T, Matrix>::value || std::is_same<T, Ellpack>::value || std::is_same<T, opencl::Matrix>::value || std::is_same<T, opencl::Ellpack>::value)
+			output = ListMatrix(input);
+
+		file.Write(output);
 	}
 
 } /* namespace eilig */

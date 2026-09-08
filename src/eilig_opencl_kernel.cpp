@@ -95,6 +95,8 @@ namespace eilig
         }
         KernelMatrix::KernelMatrix()
         {
+            kMatrixNormP_ = club::CreateKernel(program, kMatrixNormP, 1);
+            kMatrixNormP2_ = club::CreateKernel(program, kMatrixNormP2, 1);
             kMatrixCopyS_ = club::CreateKernel(program, kMatrixCopyS, 2);
             kMatrixAddS_ = club::CreateKernel(program, kMatrixAddS, 2);
             kMatrixAddM_ = club::CreateKernel(program, kMatrixAddM, 2);

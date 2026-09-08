@@ -361,7 +361,7 @@ namespace eilig
         }
         KernelVectorPtr Vector::GetKernel() const
         {
-            return KernelVectorPtr();
+            return kernel_;
         }
         const DeviceIndex& Vector::GetDeviceIndex() const
         {

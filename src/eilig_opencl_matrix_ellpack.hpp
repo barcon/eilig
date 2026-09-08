@@ -91,13 +91,6 @@ namespace eilig
             void Equal(const Ellpack& value);
             void Equal(const std::initializer_list<std::initializer_list<Scalar>>& value);
 
-            void Add(Scalar value);
-            void Add(const Ellpack& value);
-            void Sub(Scalar value);
-            void Sub(const Ellpack& value);
-            void Mul(Scalar value);
-            void Mul(const Ellpack& rhs);
-
         private:
             void SetKernel(KernelPtr kernel);
 

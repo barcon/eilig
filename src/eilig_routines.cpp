@@ -419,54 +419,6 @@ namespace eilig
         DirectLUP(LU, x, b, permutation);
     }
     */
-    void WriteToFile(const Vector& vec, const String& fileName)
-    {
-        File file;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Write);
-
-        if (file.Open() != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be created");
-        }
-        
-        auto output = ListVector(vec);
-
-        file.Write(output);
-    }
-    /*void WriteToFile(const Matrix& mat, const String& fileName)
-    {
-        File file;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Write);
-
-        if (file.Open() != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be created");
-        }
-
-        auto output = ListMatrix(mat);
-
-        file.Write(output);
-    }
-    void WriteToFile(const Ellpack& mat, const String& fileName)
-    {
-        File file;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Write);
-
-        if (file.Open() != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be created");
-        }
-
-        auto output = ListMatrix(mat);
-
-        file.Write(output);
-    }*/
 
     Status ReadFromFile(Vector& output, const String& fileName)
     {
@@ -669,6 +621,53 @@ namespace eilig
         res = std::pow(norm, 1. / p);
         return res;
     }
+    Scalar NormP(const opencl::Matrix& in, Scalar p)
+    {
+        club::Error error;
+        Index numberRows = in.GetRows();
+        Index numberCols = in.GetCols();
+        Index globalSize[1];
+        Index ngroups{ 0 };
+        Scalar res{ 0.0 };
+        Scalar norm{ 0.0 };
+        Scalars partial;
+
+        const auto& dimension = in.GetKernel()->kMatrixNormP_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
+
+        globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
+        ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);
+
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
+
+        in.GetKernel()->kMatrixNormP_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kMatrixNormP_->SetArg(1, sizeof(Index), &numberCols);
+        in.GetKernel()->kMatrixNormP_->SetArg(2, sizeof(Scalar), &p);
+        in.GetKernel()->kMatrixNormP_->SetArg(3, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kMatrixNormP_->SetArg(4, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kMatrixNormP_->SetArg(5, localSize[0] * sizeof(Scalar), NULL);
+
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
+            in.GetKernel()->kMatrixNormP_->GetKernel(),
+            in.GetKernel()->kMatrixNormP_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
+
+        if (error != CL_SUCCESS)
+        {
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+        }
+
+        partial.resize(ngroups);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+
+        for (Index i = 0; i < partial.size(); i++)
+        {
+            norm += partial[i];
+        }
+
+        res = std::pow(norm, 1. / p);
+        return res;
+    }
     /*Scalar NormP(const opencl::Ellpack& in, Scalar p)
     {
         club::Error error;
@@ -745,6 +744,52 @@ namespace eilig
         error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
             in.GetKernel()->kVectorNormP2_->GetKernel(),
             in.GetKernel()->kVectorNormP2_->GetDim(), NULL, globalSize,
+            &localSize[0], 0, NULL, NULL);
+
+        if (error != CL_SUCCESS)
+        {
+            logger::Error(headerEilig, utils::string::Format("Enqueueing kernel: {}", club::messages.at(error)));
+        }
+
+        partial.resize(ngroups);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+
+        for (Index i = 0; i < partial.size(); i++)
+        {
+            norm += partial[i];
+        }
+
+        res = std::sqrt(norm);
+        return res;
+    }
+    Scalar NormP2(const opencl::Matrix& in)
+    {
+        club::Error error;
+        Index numberRows = in.GetRows();
+        Index numberCols = in.GetCols();
+        Index globalSize[1];
+        Index ngroups{ 0 };
+        Scalar res{ 0.0 };
+        Scalar norm{ 0.0 };
+        Scalars partial;
+
+        const auto& dimension = in.GetKernel()->kMatrixNormP2_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
+
+        globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
+        ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);;
+
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
+
+        in.GetKernel()->kMatrixNormP2_->SetArg(0, sizeof(Index), &numberRows);
+        in.GetKernel()->kMatrixNormP2_->SetArg(1, sizeof(Index), &numberCols);
+        in.GetKernel()->kMatrixNormP2_->SetArg(2, sizeof(cl_mem), &in.GetDataGPU()->Get());
+        in.GetKernel()->kMatrixNormP2_->SetArg(3, sizeof(cl_mem), &partialGPU->Get());
+        in.GetKernel()->kMatrixNormP2_->SetArg(4, localSize[0] * sizeof(Scalar), NULL);
+
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
+            in.GetKernel()->kMatrixNormP2_->GetKernel(),
+            in.GetKernel()->kMatrixNormP2_->GetDim(), NULL, globalSize,
             &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
@@ -857,114 +902,6 @@ namespace eilig
         return res;
     }
 
-    void WriteToFile(const opencl::Vector& vec, const String& fileName)
-    {
-        File file;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Write);
-
-        if (file.Open() != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be created");
-        }
-
-        auto output = ListVector(vec);
-
-        file.Write(output);
-    }
-    /*void WriteToFile(const opencl::Ellpack& mat, const String& fileName)
-    {
-        File file;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Write);
-
-        if (file.Open() != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be created");
-        }
-
-        auto output = ListMatrix(mat);
-
-        file.Write(output);
-    }*/
-
-    Status ReadFromFile(opencl::Vector& output, const String& fileName)
-    {
-        File file;
-        String line;
-        Status status;
-        Strings table;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Read);
-
-        status = file.Open();
-        if (status != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be opened");
-            return EILIG_INVALID_FILE;
-        }
-
-        auto stream = static_cast<std::istringstream>(file.GetFull());
-        while (std::getline(stream, line))
-        {
-            if (!utils::string::IsEmpty(line))
-            {
-                table.push_back(line);
-            }
-        }
-
-        output.Resize(table.size());
-
-        for (Index i = 0; i < output.GetRows(); i++)
-        {
-            output(i) = utils::string::ConvertTo<Scalar>(table[i]);
-        }
-
-        return EILIG_SUCCESS;
-    }
-    /*Status ReadFromFile(opencl::Ellpack& output, const String& fileName)
-    {
-        File file;
-        String line;
-        Status status;
-        std::vector<Strings> table;
-        Strings split;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Read);
-
-        status = file.Open();
-        if (status != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be opened");
-            return EILIG_INVALID_FILE;
-        }
-
-        auto stream = static_cast<std::istringstream>(file.GetFull());
-        while (std::getline(stream, line))
-        {
-            if (!utils::string::IsEmpty(line))
-            {
-                split = utils::string::Split(line, { ' ', ';', '\t' });
-                table.push_back(split);
-            }
-        }
-
-        output.Resize(table.size(), table[0].size());
-
-        for (Index i = 0; i < output.GetRows(); i++)
-        {
-            for (Index j = 0; j < output.GetCols(); j++)
-            {
-                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
-            }
-        }
-
-        return EILIG_SUCCESS;
-    }*/
 #endif
 
 } /* namespace eilig */

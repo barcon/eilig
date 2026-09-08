@@ -171,6 +171,74 @@ __kernel void VectorDot(const EILIG_SIZE_T rows, __global EILIG_SCALAR* y, __glo
 	}
 };
 
+__kernel void MatrixNormP(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, const EILIG_SCALAR p, __global EILIG_SCALAR* data, __global EILIG_SCALAR* partial, __local EILIG_SCALAR* localMem)
+{
+	size_t i = get_global_id(0);
+	size_t local_id = get_local_id(0);
+	size_t local_size = get_local_size(0);
+	EILIG_SCALAR partial_sum;
+
+	if (i < rows)
+	{
+		partial_sum = 0.0;
+		for (size_t j = 0; j < cols; j++)
+		{
+			partial_sum += pow(fabs(data[i * cols + j]), p);
+		}
+
+		localMem[local_id] = partial_sum;
+	}
+	else
+	{
+		localMem[local_id] = 0.0;
+	}
+	work_group_barrier(CLK_LOCAL_MEM_FENCE);
+
+	if (local_id == 0)
+	{
+		partial_sum = 0.0;
+		for (size_t j = 0; j < local_size; j++)
+		{
+			partial_sum += localMem[j];
+		}
+
+		partial[get_group_id(0)] = partial_sum;
+	}
+};
+__kernel void MatrixNormP2(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* partial, __local EILIG_SCALAR* localMem)
+{
+	size_t i = get_global_id(0);
+	size_t local_id = get_local_id(0);
+	size_t local_size = get_local_size(0);
+	EILIG_SCALAR partial_sum;
+
+	if (i < rows)
+	{
+		partial_sum = 0.0;
+		for (size_t j = 0; j < cols; j++)
+		{
+			partial_sum += data[i * cols + j] * data[i * cols + j];
+		}
+
+		localMem[local_id] = partial_sum;
+	}
+	else
+	{
+		localMem[local_id] = 0.0;
+	}
+	work_group_barrier(CLK_LOCAL_MEM_FENCE);
+
+	if (local_id == 0)
+	{
+		partial_sum = 0.0;
+		for (size_t j = 0; j < local_size; j++)
+		{
+			partial_sum += localMem[j];
+		}
+
+		partial[get_group_id(0)] = partial_sum;
+	}
+};
 __kernel void MatrixTrace(const EILIG_SIZE_T rows, const EILIG_SIZE_T cols, __global EILIG_SCALAR* data, __global EILIG_SCALAR* partial)
 {
 	size_t i = get_global_id(0);

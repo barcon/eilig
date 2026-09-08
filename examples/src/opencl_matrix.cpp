@@ -17,6 +17,8 @@ int main()
 
 		std::cout << matrix1.Trace() << std::endl;
 		std::cout << matrix1.Sum() << std::endl;
+		std::cout << eilig::NormP(matrix1, 2.0) << std::endl;
+		std::cout << eilig::NormP2(matrix1) << std::endl;
 
 		std::cout << eilig::ListMatrix(matrix1) << std::endl;
 		std::cout << eilig::ListMatrix(matrix1.Transpose()) << std::endl;
@@ -46,6 +48,7 @@ int main()
 		std::cout << eilig::ListMatrix(matrix3) << std::endl;
 		std::cout << eilig::ListMatrix(matrix1 * matrix3) << std::endl;
 		std::cout << eilig::ListVector(matrix1 * vector1) << std::endl;
+
 		//
   //      std::cout << eilig::ListMatrix(matrix1.Region(0, 0, 1, 1)) << std::endl;
   //      std::cout << eilig::ListMatrix(matrix1.Region(0, 0, 0, 2)) << std::endl;

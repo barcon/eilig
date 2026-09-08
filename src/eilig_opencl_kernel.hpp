@@ -51,6 +51,8 @@ namespace eilig
             KernelVector& operator=(KernelVector&& copy) = delete;
         };
 
+        static const String kMatrixNormP = "MatrixNormP";
+        static const String kMatrixNormP2 = "MatrixNormP2";
         static const String kMatrixCopyS = "MatrixCopyS";
         static const String kMatrixAddS = "MatrixAddS";
         static const String kMatrixAddM = "MatrixAddM";
@@ -82,6 +84,8 @@ namespace eilig
 
             static KernelMatrixPtr Create();
 
+            club::KernelPtr kMatrixNormP_{ nullptr };
+            club::KernelPtr kMatrixNormP2_{ nullptr };
             club::KernelPtr kMatrixCopyS_{ nullptr };
             club::KernelPtr kMatrixAddS_{ nullptr };
             club::KernelPtr kMatrixAddM_{ nullptr };

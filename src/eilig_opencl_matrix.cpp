@@ -912,7 +912,7 @@ namespace eilig
         }
         KernelMatrixPtr Matrix::GetKernel() const
         {
-            return KernelMatrixPtr();
+            return kernel_;
         }
         const DeviceIndex& Matrix::GetDeviceIndex() const
         {
