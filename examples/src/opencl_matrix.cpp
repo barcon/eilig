@@ -7,9 +7,9 @@ int main()
 
 		eilig::opencl::Initialize("kernels.c", 0, { 0 });
 
-        auto matrix1 = eilig::opencl::Matrix({ {1.0, 2.0, 3.0}, {4.0, 5.0, 6.0} , {7.0, 8.0, 9.0} });
-        auto matrix2 = eilig::opencl::Matrix({ {1.0, 2.0}, {4.0, 5.0} , {7.0, 8.0} });
-        auto matrix3 = eilig::opencl::Matrix(3, 3, eilig::matrix_diagonal);
+        auto matrix1 = eilig::opencl::Ellpack({ {1.0, 2.0, 3.0}, {4.0, 5.0, 6.0} , {7.0, 8.0, 9.0} });
+        auto matrix2 = eilig::opencl::Ellpack({ {1.0, 2.0}, {4.0, 5.0} , {7.0, 8.0} });
+        auto matrix3 = eilig::opencl::Ellpack(3, 3, eilig::matrix_diagonal);
 		auto vector1 = eilig::opencl::Vector({1.0, 2.0, 3.0});
   //      auto matrix4 = eilig::opencl::Matrix({ {1.0, 2.0}, {4.0, 5.0} , {7.0, 8.0} });
 
@@ -46,7 +46,7 @@ int main()
 
 		std::cout << "-----------------------------------------------------------------" << std::endl;
 		std::cout << eilig::ListMatrix(matrix3) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1 * matrix3) << std::endl;
+		//std::cout << eilig::ListMatrix(matrix1 * matrix3) << std::endl;
 		std::cout << eilig::ListVector(matrix1 * vector1) << std::endl;
 
 		//

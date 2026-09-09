@@ -179,6 +179,7 @@ namespace eilig
             numberRows_ = rhs.numberRows_;
             numberCols_ = rhs.numberCols_;
             deviceIndex_ = rhs.deviceIndex_;
+            
             dataGPU_ = club::CreateBuffer(GetContext(), sizeof(Scalar) * numberRows_ * numberCols_);
 
             error = clEnqueueCopyBuffer(GetContext()->GetQueues()[deviceIndex_], rhs.dataGPU_->Get(), dataGPU_->Get(), 0, 0, sizeof(Scalar) * numberRows_ * numberCols_, 0, NULL, &events[0]);
@@ -202,6 +203,7 @@ namespace eilig
             deviceIndex_ = rhs.deviceIndex_;
             numberRows_ = rhs.numberRows_;
             numberCols_ = rhs.numberCols_;
+
             dataGPU_ = BufferPtr(std::move(rhs.dataGPU_));
 
             return *this;

@@ -10,7 +10,7 @@
 	#include "eilig_opencl_kernel.hpp"
 	#include "eilig_opencl_vector.hpp"
 	#include "eilig_opencl_matrix.hpp"
-	//#include "eilig_opencl_matrix_ellpack.hpp"
+	#include "eilig_opencl_matrix_ellpack.hpp"
 #endif
 
 namespace eilig
@@ -55,27 +55,14 @@ namespace eilig
 	Matrix Inverse3x3(const Matrix& A);
 	Matrix ScaleByVector(const Matrix& A, const Vector& alpha);
 	
-	//void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);
-	//void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
-	//void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b);
-	//void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
-	//void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation);
-	//void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation);
-	//void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
-	//void Direct(const Matrix& A, Vector& x, const Vector& b);
-	
-	Status ReadFromFile(Vector& output, const String& fileName);
-	//Status ReadFromFile(Matrix& output, const String& fileName);
-	//Status ReadFromFile(Ellpack& output, const String& fileName);
-
 #ifdef EILIG_ENABLE_OPENCL
 	Scalar NormMax(const opencl::Vector& in);
 	Scalar NormP(const opencl::Vector& in, Scalar p);
 	Scalar NormP(const opencl::Matrix& in, Scalar p);
-	//Scalar NormP(const opencl::Ellpack& in, Scalar p);
+	Scalar NormP(const opencl::Ellpack& in, Scalar p);
 	Scalar NormP2(const opencl::Vector& in);
 	Scalar NormP2(const opencl::Matrix& in);
-	//Scalar NormP2(const opencl::Ellpack& in);
+	Scalar NormP2(const opencl::Ellpack& in);
 
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
@@ -356,3 +343,14 @@ namespace eilig
 } /* namespace eilig */
 
 #endif /* EILIG_ROUTINES_HPP_ */
+
+/*
+void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);
+void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
+void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b);
+void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
+void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation);
+void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation);
+void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
+void Direct(const Matrix& A, Vector& x, const Vector& b);
+*/

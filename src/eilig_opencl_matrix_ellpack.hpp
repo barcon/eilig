@@ -81,18 +81,20 @@ namespace eilig
             NumberCols GetCols() const;
             NumberCols GetWidth() const;
             Scalar GetValue(Index row, Index col) const;
-            KernelPtr GetKernel() const;
             BufferPtr GetCountGPU() const;
             BufferPtr GetPositionGPU() const;
             BufferPtr GetDataGPU() const;
+            KernelEllpackPtr GetKernel() const;
+            const DeviceIndex& GetDeviceIndex() const;
 
             void Equal(Index row, Index col, Scalar value);
-            void Equal(Scalar value);
             void Equal(const Ellpack& value);
             void Equal(const std::initializer_list<std::initializer_list<Scalar>>& value);
 
+            void SetDevice(DeviceIndex deviceIndex);
+
         private:
-            void SetKernel(KernelPtr kernel);
+            void InitKernel();
 
             void Expand(NumberCols width);
             void Shrink();
@@ -107,7 +109,9 @@ namespace eilig
             NumberCols numberCols_{ 0 };
             NumberCols width_{ 0 };
 
-            KernelPtr kernel_{ nullptr };
+            DeviceIndex deviceIndex_{ 0 };
+
+            KernelEllpackPtr kernel_{ nullptr };
             BufferPtr countGPU_{ nullptr };
             BufferPtr positionGPU_{ nullptr };
             BufferPtr dataGPU_{ nullptr };

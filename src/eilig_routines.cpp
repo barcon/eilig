@@ -245,297 +245,6 @@ namespace eilig
         return res;
     }
 
-    /*
-    void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            x(i) = b(i) / A(i, i);
-        }
-    }
-    void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            x(i) = b(i) / A(i, i);
-        }
-    }
-    void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Scalar dot;
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            dot = 0.0;
-
-            for (Index j = 0; j < numberCols; ++j)
-            {
-                dot += A(i, j) * x(j);
-            }
-
-            x(i) = (b(i) - dot) / A(i, i);
-        }
-    }
-    void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
-    {
-        Index numberRows = A.GetRows();
-        Index numberCols = A.GetCols();
-        Scalar dot;
-
-        for (Index i = 0; i < numberRows; ++i)
-        {
-            dot = 0.0;
-
-            for (Index j = 0; j < numberCols; ++j)
-            {
-                dot += A(i, j) * x(j);
-            }
-
-            x(i) = (b(i) - dot) / A(i, i);
-        }
-    }
-    void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation)
-    {
-        Index numberRows{ A.GetRows() };
-        Scalar maxA;
-        Scalar absA;
-
-        Index imax{ 0 };
-        Index temp{ 0 };
-        
-        LU = A;
-		permutation.resize(numberRows + 1);
-
-        for (Index i = 0; i <= numberRows; i++)
-        {
-            permutation[i] = i;
-        }
-
-        for (Index i = 0; i < numberRows; i++)
-        {
-            maxA = 0.0;
-            imax = 0;
-
-            for (Index k = i; k < numberRows; k++)
-            {
-                absA = std::abs(A(k, i));
-                if (absA > maxA)
-                {
-                    maxA = absA;
-                    imax = k;
-                }
-            }
-
-            if (imax != i)
-            {
-                temp = permutation[i];
-                permutation[i] = permutation[imax];
-                permutation[imax] = temp;
-
-                LU.SwapRows(i, imax);
-
-                permutation[numberRows]++;
-            }
-
-            for (Index j = i + 1; j < numberRows; j++)
-            {
-                LU(j, i) /= LU(i, i);
-
-                for (Index k = i + 1; k < numberRows; k++)
-                {
-                    LU(j, k) -= LU(j, i) * LU(i, k);
-                }
-            }
-        }
-    }
-    void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation)
-    {
-        Index numberRows{ LU.GetRows() };
-
-        for (Index j = 0; j < numberRows; j++) 
-        {
-            for (Index i = 0; i < numberRows; i++)
-            {
-                IA(i, j) = permutation[i] == j ? 1.0 : 0.0;
-
-                for (Index k = 0; k < i; k++)
-                {
-                    IA(i, j) -= LU(i, k) * IA(k, j);
-                }
-            }
-
-            for (Index i = numberRows - 1 + 1; i > 0; i--) 
-            {
-                for (Index k = i; k < numberRows; k++)
-                {
-                    IA(i - 1, j) -= LU(i - 1, k) * IA(k, j);
-                }
-
-                IA(i - 1, j) /= LU(i - 1, i - 1);
-            }
-        }
-    }
-    void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation)
-    {
-        Index numberRows = LU.GetRows();
-
-        for (Index i = 0; i < numberRows; i++)
-        {
-            x(i) = b(permutation[i]);
-
-            for (Index k = 0; k < i; k++)
-            {
-                x(i) -= LU(i, k) * x(k);
-            }
-        }
-
-        for (Index i = numberRows; i > 0; i--)
-        {
-            for (Index k = i; k < numberRows; k++)
-            {
-                x(i - 1) -= LU(i - 1, k) * x(k);
-            }
-
-            x(i - 1) /= LU(i - 1, i - 1);
-        }
-    }
-    void Direct(const Matrix& A, Vector& x, const Vector& b)
-    {
-        Index numberRows{ A.GetRows() };
-        Index numberCols{ A.GetCols() };
-
-        Matrix LU(numberRows, numberCols);
-        Indices permutation(numberRows + 1);
-
-        x.Resize(numberRows);
-
-        DecomposeLUP(LU, A, permutation);
-        DirectLUP(LU, x, b, permutation);
-    }
-    */
-
-    Status ReadFromFile(Vector& output, const String& fileName)
-    {
-        File file;
-        String line;
-        Status status;
-        Strings table;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Read);
-        
-        status = file.Open();
-        if (status != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be opened");
-            return EILIG_INVALID_FILE;
-        }
-
-        auto stream = static_cast<std::istringstream>(file.GetFull());
-        while (std::getline(stream, line))
-        {
-            if (!utils::string::IsEmpty(line))
-            {
-                table.push_back(line);
-            }
-        }
-
-        output.Resize(table.size());
-
-        for (Index i = 0; i < output.GetRows(); i++)
-        {
-            output(i) = utils::string::ConvertTo<Scalar>(table[i]);
-        }
-
-        return EILIG_SUCCESS;
-    }
-    Status ReadFromFile(Matrix& output, const String& fileName)
-    {
-        File file;
-        String line;
-        Status status;
-        Strings split;
-        std::vector<Strings> table;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Read);
-
-        status = file.Open();
-        if (status != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be opened");
-            return EILIG_INVALID_FILE;
-        }
-        
-        auto stream = static_cast<std::istringstream>(file.GetFull());
-        while (std::getline(stream, line))
-        {
-            if (!utils::string::IsEmpty(line))
-            {
-                split = utils::string::Split(line, {' ', ';', '\t'});
-                table.push_back(split);
-            }
-        }
-
-        output.Resize(table.size(), table[0].size());
-
-        for (Index i = 0; i < output.GetRows(); i++)
-        {
-            for (Index j = 0; j < output.GetCols(); j++)
-            {
-                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
-            }
-        }
-
-        return EILIG_SUCCESS;
-    }
-    Status ReadFromFile(Ellpack& output, const String& fileName)
-    {
-        File file;
-        String line;
-        Status status;
-        std::vector<Strings> table;
-        Strings split;
-
-        file.SetName(fileName);
-        file.SetMode(utils::file::Read);
-
-        status = file.Open();
-        if (status != utils::file::UTILS_SUCCESS)
-        {
-            logger::Error(headerEilig, "File could not be opened");
-            return EILIG_INVALID_FILE;
-        }
-
-        auto stream = static_cast<std::istringstream>(file.GetFull());
-        while (std::getline(stream, line))
-        {
-            if (!utils::string::IsEmpty(line))
-            {
-                split = utils::string::Split(line, { ' ', ';', '\t' });
-                table.push_back(split);
-            }
-        }
-
-        output.Resize(table.size(), table[0].size());
-
-        for (Index i = 0; i < output.GetRows(); i++)
-        {
-            for (Index j = 0; j < output.GetCols(); j++)
-            {
-                output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
-            }
-        }
-
-        return EILIG_SUCCESS;
-    }
-
 #ifdef EILIG_ENABLE_OPENCL
     Scalar NormMax(const opencl::Vector& in)
     {
@@ -668,7 +377,7 @@ namespace eilig
         res = std::pow(norm, 1. / p);
         return res;
     }
-    /*Scalar NormP(const opencl::Ellpack& in, Scalar p)
+    Scalar NormP(const opencl::Ellpack& in, Scalar p)
     {
         club::Error error;
         Index numberRows = in.GetRows();
@@ -680,12 +389,13 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernel()->kEllpackNormP_->GetLocalSize();
+        const auto& dimension = in.GetKernel()->kEllpackNormP_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernel()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
         in.GetKernel()->kEllpackNormP_->SetArg(0, sizeof(Index), &numberRows);
         in.GetKernel()->kEllpackNormP_->SetArg(1, sizeof(Index), &numberCols);
@@ -697,10 +407,10 @@ namespace eilig
         in.GetKernel()->kEllpackNormP_->SetArg(7, sizeof(cl_mem), &partialGPU->Get());
         in.GetKernel()->kEllpackNormP_->SetArg(8, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernel()->context_->GetQueue(),
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
             in.GetKernel()->kEllpackNormP_->GetKernel(),
             in.GetKernel()->kEllpackNormP_->GetDim(), NULL, globalSize,
-            &in.GetKernel()->kEllpackNormP_->GetLocalSize()[0], 0, NULL, NULL);
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -708,7 +418,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         for (Index i = 0; i < partial.size(); i++)
         {
@@ -717,7 +427,7 @@ namespace eilig
 
         res = std::pow(norm, 1. / p);
         return res;
-    }*/
+    }
     Scalar NormP2(const opencl::Vector& in)
     {
         club::Error error;
@@ -808,7 +518,7 @@ namespace eilig
         res = std::sqrt(norm);
         return res;
     }
-    /*Scalar NormP2(const opencl::Ellpack& in)
+    Scalar NormP2(const opencl::Ellpack& in)
     {
         club::Error error;
         Index numberRows = in.GetRows();
@@ -820,12 +530,13 @@ namespace eilig
         Scalar norm{ 0.0 };
         Scalars partial;
 
-        const auto& localSize = in.GetKernel()->kEllpackNormP2_->GetLocalSize();
+        const auto& dimension = in.GetKernel()->kEllpackNormP2_->GetDim();
+        const auto& localSize = opencl::GetContext()->GetLocalSize(in.GetDeviceIndex(), dimension);
 
         globalSize[0] = localSize[0] * (numberRows / localSize[0] + (numberRows % localSize[0] != 0 ? 1 : 0));
         ngroups = (numberRows % localSize[0]) > 0 ? (numberRows / localSize[0] + 1) : (numberRows / localSize[0]);;
 
-        opencl::BufferPtr partialGPU = club::CreateBuffer(in.GetKernel()->context_, sizeof(Scalar) * ngroups);
+        opencl::BufferPtr partialGPU = club::CreateBuffer(opencl::GetContext(), sizeof(Scalar) * ngroups);
 
         in.GetKernel()->kEllpackNormP2_->SetArg(0, sizeof(Index), &numberRows);
         in.GetKernel()->kEllpackNormP2_->SetArg(1, sizeof(Index), &numberCols);
@@ -836,10 +547,10 @@ namespace eilig
         in.GetKernel()->kEllpackNormP2_->SetArg(6, sizeof(cl_mem), &partialGPU->Get());
         in.GetKernel()->kEllpackNormP2_->SetArg(7, localSize[0] * sizeof(Scalar), NULL);
 
-        error = clEnqueueNDRangeKernel(in.GetKernel()->context_->GetQueue(),
+        error = clEnqueueNDRangeKernel(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()],
             in.GetKernel()->kEllpackNormP2_->GetKernel(),
             in.GetKernel()->kEllpackNormP2_->GetDim(), NULL, globalSize,
-            &in.GetKernel()->kEllpackNormP2_->GetLocalSize()[0], 0, NULL, NULL);
+            &localSize[0], 0, NULL, NULL);
 
         if (error != CL_SUCCESS)
         {
@@ -847,7 +558,7 @@ namespace eilig
         }
 
         partial.resize(ngroups);
-        partialGPU->Read(0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
+        partialGPU->Read(opencl::GetContext()->GetQueues()[in.GetDeviceIndex()], 0, sizeof(Scalar) * ngroups, &partial[0], CL_TRUE);
 
         for (Index i = 0; i < partial.size(); i++)
         {
@@ -856,7 +567,7 @@ namespace eilig
 
         res = std::sqrt(norm);
         return res;
-    }*/
+    }
 
     Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2)
     {
@@ -905,3 +616,179 @@ namespace eilig
 #endif
 
 } /* namespace eilig */
+
+
+/*
+void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
+{
+    Index numberRows = A.GetRows();
+
+    for (Index i = 0; i < numberRows; ++i)
+    {
+        x(i) = b(i) / A(i, i);
+    }
+}
+void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
+{
+    Index numberRows = A.GetRows();
+
+    for (Index i = 0; i < numberRows; ++i)
+    {
+        x(i) = b(i) / A(i, i);
+    }
+}
+void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b)
+{
+    Index numberRows = A.GetRows();
+    Index numberCols = A.GetCols();
+    Scalar dot;
+
+    for (Index i = 0; i < numberRows; ++i)
+    {
+        dot = 0.0;
+
+        for (Index j = 0; j < numberCols; ++j)
+        {
+            dot += A(i, j) * x(j);
+        }
+
+        x(i) = (b(i) - dot) / A(i, i);
+    }
+}
+void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b)
+{
+    Index numberRows = A.GetRows();
+    Index numberCols = A.GetCols();
+    Scalar dot;
+
+    for (Index i = 0; i < numberRows; ++i)
+    {
+        dot = 0.0;
+
+        for (Index j = 0; j < numberCols; ++j)
+        {
+            dot += A(i, j) * x(j);
+        }
+
+        x(i) = (b(i) - dot) / A(i, i);
+    }
+}
+void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation)
+{
+    Index numberRows{ A.GetRows() };
+    Scalar maxA;
+    Scalar absA;
+
+    Index imax{ 0 };
+    Index temp{ 0 };
+
+    LU = A;
+    permutation.resize(numberRows + 1);
+
+    for (Index i = 0; i <= numberRows; i++)
+    {
+        permutation[i] = i;
+    }
+
+    for (Index i = 0; i < numberRows; i++)
+    {
+        maxA = 0.0;
+        imax = 0;
+
+        for (Index k = i; k < numberRows; k++)
+        {
+            absA = std::abs(A(k, i));
+            if (absA > maxA)
+            {
+                maxA = absA;
+                imax = k;
+            }
+        }
+
+        if (imax != i)
+        {
+            temp = permutation[i];
+            permutation[i] = permutation[imax];
+            permutation[imax] = temp;
+
+            LU.SwapRows(i, imax);
+
+            permutation[numberRows]++;
+        }
+
+        for (Index j = i + 1; j < numberRows; j++)
+        {
+            LU(j, i) /= LU(i, i);
+
+            for (Index k = i + 1; k < numberRows; k++)
+            {
+                LU(j, k) -= LU(j, i) * LU(i, k);
+            }
+        }
+    }
+}
+void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation)
+{
+    Index numberRows{ LU.GetRows() };
+
+    for (Index j = 0; j < numberRows; j++)
+    {
+        for (Index i = 0; i < numberRows; i++)
+        {
+            IA(i, j) = permutation[i] == j ? 1.0 : 0.0;
+
+            for (Index k = 0; k < i; k++)
+            {
+                IA(i, j) -= LU(i, k) * IA(k, j);
+            }
+        }
+
+        for (Index i = numberRows - 1 + 1; i > 0; i--)
+        {
+            for (Index k = i; k < numberRows; k++)
+            {
+                IA(i - 1, j) -= LU(i - 1, k) * IA(k, j);
+            }
+
+            IA(i - 1, j) /= LU(i - 1, i - 1);
+        }
+    }
+}
+void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation)
+{
+    Index numberRows = LU.GetRows();
+
+    for (Index i = 0; i < numberRows; i++)
+    {
+        x(i) = b(permutation[i]);
+
+        for (Index k = 0; k < i; k++)
+        {
+            x(i) -= LU(i, k) * x(k);
+        }
+    }
+
+    for (Index i = numberRows; i > 0; i--)
+    {
+        for (Index k = i; k < numberRows; k++)
+        {
+            x(i - 1) -= LU(i - 1, k) * x(k);
+        }
+
+        x(i - 1) /= LU(i - 1, i - 1);
+    }
+}
+void Direct(const Matrix& A, Vector& x, const Vector& b)
+{
+    Index numberRows{ A.GetRows() };
+    Index numberCols{ A.GetCols() };
+
+    Matrix LU(numberRows, numberCols);
+    Indices permutation(numberRows + 1);
+
+    x.Resize(numberRows);
+
+    DecomposeLUP(LU, A, permutation);
+    DirectLUP(LU, x, b, permutation);
+}
+*/
