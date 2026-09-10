@@ -147,17 +147,17 @@ namespace eilig
 		Index numberRows = A.GetRows();
 		Index iteration{ 0 };
 
-		Vector x0(b);
-		Vector r0(b);
-		Vector p0(b);
-		Vector s0(b);
-		Vector h0(b);
-		Vector t0(b);
-		Vector v0(b);
-		Vector x1(b);
-		Vector p1(b);
-		Vector r1(b);
-		Vector r2(b);
+		U x0(b);
+		U r0(b);
+		U p0(b);
+		U s0(b);
+		U h0(b);
+		U t0(b);
+		U v0(b);
+		U x1(b);
+		U p1(b);
+		U r1(b);
+		U r2(b);
 
 		if (callbackIterative == nullptr)
 		{
