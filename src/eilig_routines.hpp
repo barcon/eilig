@@ -13,6 +13,8 @@
 	#include "eilig_opencl_matrix_ellpack.hpp"
 #endif
 
+#include <concepts>
+
 namespace eilig
 {
 	using CallbackIterative = long long int (*)(std::size_t, double);
@@ -67,6 +69,20 @@ namespace eilig
 	Scalar Dot(const opencl::Vector& in1, const opencl::Vector& in2);
 
 #endif
+
+	template <typename T>
+	concept IsVector = requires (T a, Index i, Scalar value)
+	{
+		{ a.Equal(i, value) };
+		{ a.GetValue(i) } -> std::convertible_to<Scalar>;
+	};
+
+	template <typename T>
+	concept IsMatrix = requires (T a, Index i, Index j, Scalar value)
+	{
+		{ a.Equal(i, j, value) };
+		{ a.GetValue(i, j) } -> std::convertible_to<Scalar>;
+	};
 
 	template <typename T, typename U>
 	Status IterativeCG(const T& A, U& x, const U& b, CallbackIterative callbackIterative = nullptr)
@@ -220,8 +236,9 @@ namespace eilig
 		return EILIG_NOT_CONVERGED;
 	}
 
-	template <typename T>
-	String ListVector(const T& vector)
+	template <typename T> 
+		requires IsVector<T>
+	String List(const T& vector)
 	{
 		String output{};
 		Index numberRows = vector.GetRows();
@@ -235,7 +252,8 @@ namespace eilig
 	}
 
 	template <typename T>
-	String ListMatrix(const T& matrix)
+		requires IsMatrix<T>
+	String List(const T& matrix)
 	{
 		String output{};
 		Index numberRows = matrix.GetRows();
@@ -252,7 +270,8 @@ namespace eilig
 		return output;
 	}
 
-	template <typename T>
+	template <typename T> 
+		requires IsVector<T>
 	Status ReadFromFile(const String& fileName, T& output)
 	{
 		File file;
@@ -271,47 +290,65 @@ namespace eilig
 
 		auto stream = static_cast<std::istringstream>(file.GetFull());
 		
-		if constexpr (std::is_same<T, Vector>::value || std::is_same<T, opencl::Vector>::value)
+		Strings table;
+
+		while (std::getline(stream, line))
 		{
-			Strings table;
-
-			while (std::getline(stream, line))
+			if (!utils::string::IsEmpty(line))
 			{
-				if (!utils::string::IsEmpty(line))
-				{
-					table.push_back(line);
-				}
-			}
-
-			output.Resize(table.size());
-
-			for (Index i = 0; i < output.GetRows(); i++)
-			{
-				output(i) = utils::string::ConvertTo<Scalar>(table[i]);
+				table.push_back(line);
 			}
 		}
-		else if constexpr (std::is_same<T, Matrix>::value || std::is_same<T, Ellpack>::value || std::is_same<T, opencl::Matrix>::value || std::is_same<T, opencl::Ellpack>::value)
+
+		output.Resize(table.size());
+
+		for (Index i = 0; i < output.GetRows(); i++)
 		{
-			std::vector<Strings> table;
-			Strings split;
+			output(i) = utils::string::ConvertTo<Scalar>(table[i]);
+		}
 
-			while (std::getline(stream, line))
+		return EILIG_SUCCESS;
+	}
+
+	template <typename T> 
+		requires IsMatrix<T>
+	Status ReadFromFile(const String& fileName, T& output)
+	{
+		File file;
+		String line;
+		Status status;
+
+		file.SetName(fileName);
+		file.SetMode(utils::file::Read);
+
+		status = file.Open();
+		if (status != utils::file::UTILS_SUCCESS)
+		{
+			logger::Error(headerEilig, "File could not be opened");
+			return EILIG_INVALID_FILE;
+		}
+
+		auto stream = static_cast<std::istringstream>(file.GetFull());
+
+		std::vector<Strings> table;
+		Strings split;
+
+		while (std::getline(stream, line))
+		{
+			if (!utils::string::IsEmpty(line))
 			{
-				if (!utils::string::IsEmpty(line))
-				{
-					split = utils::string::Split(line, { ' ', ';', '\t' });
-					table.push_back(split);
-				}
+				split = utils::string::Split(line, { ' ', ';', '\t' });
+				table.push_back(split);
 			}
+		}
 
-			output.Resize(table.size(), table[0].size());
+		output.Resize(table.size(), table[0].size());
 
-			for (Index i = 0; i < output.GetRows(); i++)
+		for (Index i = 0; i < output.GetRows(); i++)
+		{
+			for (Index j = 0; j < output.GetCols(); j++)
 			{
-				for (Index j = 0; j < output.GetCols(); j++)
-				{
-					output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
-				}
+				output.Equal(i, j, utils::string::ConvertTo<Scalar>(table[i][j]));
 			}
 		}
 
@@ -332,10 +369,7 @@ namespace eilig
 			logger::Error(headerEilig, "File could not be created");
 		}
 
-		if constexpr (std::is_same<T, Vector>::value || std::is_same<T, opencl::Vector>::value)
-			output = ListVector(input);
-		else if constexpr (std::is_same<T, Matrix>::value || std::is_same<T, Ellpack>::value || std::is_same<T, opencl::Matrix>::value || std::is_same<T, opencl::Ellpack>::value)
-			output = ListMatrix(input);
+		output = List(input);
 
 		file.Write(output);
 	}
@@ -343,14 +377,3 @@ namespace eilig
 } /* namespace eilig */
 
 #endif /* EILIG_ROUTINES_HPP_ */
-
-/*
-void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b);
-void DiagonalLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
-void ForwardLinearSystem(const Matrix& A, Vector& x, const Vector& b);
-void ForwardLinearSystem(const Ellpack& A, Vector& x, const Vector& b);
-void DecomposeLUP(Matrix& LU, const Matrix& A, Indices& permutation);
-void InverseLUP(Matrix& IA, const Matrix& LU, const Indices& permutation);
-void DirectLUP(const Matrix& LU, Vector& x, const Vector& b, const Indices& permutation);
-void Direct(const Matrix& A, Vector& x, const Vector& b);
-*/

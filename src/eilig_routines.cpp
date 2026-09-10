@@ -617,7 +617,6 @@ namespace eilig
 
 } /* namespace eilig */
 
-
 /*
 void DiagonalLinearSystem(const Matrix& A, Vector& x, const Vector& b)
 {

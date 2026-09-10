@@ -10,13 +10,12 @@ int main()
 		auto vector1 = eilig::opencl::Vector({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0});
 		auto vector2 = eilig::opencl::Vector({1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0});
 	
-		std::cout << eilig::ListVector( vector1 + 1.0) << std::endl;
-		std::cout << eilig::ListVector( vector1 - 1.0) << std::endl;
-		std::cout << eilig::ListVector(-vector1) << std::endl;
-		std::cout << eilig::ListVector( 2.0 * vector1) << std::endl;
-		std::cout << eilig::ListVector(vector1.Region(7,8)) << std::endl;
-		std::cout << eilig::ListVector(vector1.Region(0,5)) << std::endl;
-
+		std::cout << eilig::List( vector1 + 1.0) << std::endl;
+		std::cout << eilig::List( vector1 - 1.0) << std::endl;
+		std::cout << eilig::List(-vector1) << std::endl;
+		std::cout << eilig::List( 2.0 * vector1) << std::endl;
+		std::cout << eilig::List(vector1.Region(7,8)) << std::endl;
+		std::cout << eilig::List(vector1.Region(0,5)) << std::endl;
 		auto vector3 = eilig::opencl::Vector(9);
 		auto vector4 = eilig::opencl::Vector(9);
 
@@ -24,7 +23,7 @@ int main()
 		vector4(1) = 1.23456;
 
 		vector3 = vector4;
-		std::cout << eilig::ListVector(vector3) << std::endl;
+		std::cout << eilig::List(vector3) << std::endl;
 		
 
 

@@ -20,34 +20,34 @@ int main()
 		std::cout << eilig::NormP(matrix1, 2.0) << std::endl;
 		std::cout << eilig::NormP2(matrix1) << std::endl;
 
-		std::cout << eilig::ListMatrix(matrix1) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.Transpose()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.Diagonal()) << std::endl;
-		std::cout << eilig::ListVector(matrix1.DiagonalVector()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.LowerWithDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.LowerWithoutDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.UpperWithDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.UpperWithoutDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.Region(1, 1, 1, 1)) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.Region(0, 0, 1, 1)) << std::endl;
-		std::cout << eilig::ListMatrix(matrix1.Region(1, 1, 2, 2)) << std::endl;
+		std::cout << eilig::List(matrix1) << std::endl;
+		std::cout << eilig::List(matrix1.Transpose()) << std::endl;
+		std::cout << eilig::List(matrix1.Diagonal()) << std::endl;
+		std::cout << eilig::List(matrix1.DiagonalVector()) << std::endl;
+		std::cout << eilig::List(matrix1.LowerWithDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix1.LowerWithoutDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix1.UpperWithDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix1.UpperWithoutDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix1.Region(1, 1, 1, 1)) << std::endl;
+		std::cout << eilig::List(matrix1.Region(0, 0, 1, 1)) << std::endl;
+		std::cout << eilig::List(matrix1.Region(1, 1, 2, 2)) << std::endl;
 
 		std::cout << "-----------------------------------------------------------------" << std::endl;
 
-		std::cout << eilig::ListMatrix(matrix2) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.Transpose()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.Diagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.DiagonalScale(2.0)) << std::endl;
-		std::cout << eilig::ListVector(matrix2.DiagonalVector()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.LowerWithDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.LowerWithoutDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.UpperWithDiagonal()) << std::endl;
-		std::cout << eilig::ListMatrix(matrix2.UpperWithoutDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix2) << std::endl;
+		std::cout << eilig::List(matrix2.Transpose()) << std::endl;
+		std::cout << eilig::List(matrix2.Diagonal()) << std::endl;
+		std::cout << eilig::List(matrix2.DiagonalScale(2.0)) << std::endl;
+		std::cout << eilig::List(matrix2.DiagonalVector()) << std::endl;
+		std::cout << eilig::List(matrix2.LowerWithDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix2.LowerWithoutDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix2.UpperWithDiagonal()) << std::endl;
+		std::cout << eilig::List(matrix2.UpperWithoutDiagonal()) << std::endl;
 
 		std::cout << "-----------------------------------------------------------------" << std::endl;
-		std::cout << eilig::ListMatrix(matrix3) << std::endl;
-		//std::cout << eilig::ListMatrix(matrix1 * matrix3) << std::endl;
-		std::cout << eilig::ListVector(matrix1 * vector1) << std::endl;
+		std::cout << eilig::List(matrix3) << std::endl;
+		//std::cout << eilig::List(matrix1 * matrix3) << std::endl;
+		std::cout << eilig::List(matrix1 * vector1) << std::endl;
 
 		//
   //      std::cout << eilig::ListMatrix(matrix1.Region(0, 0, 1, 1)) << std::endl;
