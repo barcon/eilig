@@ -5,7 +5,7 @@ namespace eilig
 {
     namespace opencl
     {
-		EntryProxy::EntryProxy(club::BufferPtr buffer, Index index, const DeviceIndex& deviceIndex) : deviceIndex_(deviceIndex)
+		EntryProxy::EntryProxy(BufferPtr buffer, Index index, const DeviceIndex& deviceIndex) : deviceIndex_(deviceIndex)
         {
             SetBuffer(buffer);
             SetIndex(index);

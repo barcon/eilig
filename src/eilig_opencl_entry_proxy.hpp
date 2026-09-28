@@ -2,6 +2,7 @@
 #define EILIG_OPENCL_ENTRY_PROXY_HPP_
 
 #include "eilig_types.hpp"
+#include "eilig_opencl_kernel.hpp"
 
 namespace eilig
 {
@@ -10,7 +11,7 @@ namespace eilig
         class EntryProxy
         {
         public:
-            explicit EntryProxy(club::BufferPtr buffer, Index offset, const DeviceIndex& deviceIndex);
+            explicit EntryProxy(BufferPtr buffer, Index offset, const DeviceIndex& deviceIndex);
 
             ~EntryProxy() = default;
 

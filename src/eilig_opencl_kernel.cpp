@@ -4,9 +4,9 @@ namespace eilig
 {
     namespace opencl
     {
-        static PlatformPtr platform{ nullptr };
-        static ContextPtr context{ nullptr };
         static ProgramPtr program{ nullptr };
+        static ContextPtr context{ nullptr };
+        static PlatformPtr platform{ nullptr };
 
         void InitPlatform()
         {

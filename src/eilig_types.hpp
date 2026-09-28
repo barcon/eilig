@@ -50,31 +50,15 @@ namespace eilig
 
 #ifdef EILIG_ENABLE_OPENCL
 	namespace opencl
-	{
-		using BufferPtr = std::shared_ptr<club::Buffer>;
-
-		class EntryProxy;
+	{	
 		class Vector;
+		class Matrix;
 		class Ellpack;
-		
-		using PlatformPtr = club::PlatformPtr;
-		using ContextPtr = club::ContextPtr;
-		using ProgramPtr = club::ProgramPtr;
-		using DeviceIndex = club::DeviceIndex;
 
-		class KernelVector;
-		using KernelVectorPtr = std::shared_ptr<KernelVector>;
-
-		class KernelMatrix;
-		using KernelMatrixPtr = std::shared_ptr<KernelMatrix>;
-
-		class KernelEllpack;
-		using KernelEllpackPtr = std::shared_ptr<KernelEllpack>;
-
-		constexpr Index GlobalSize(Index num1, Index num2)
-		{
-			return num2 * (num1 / num2 + (num1 % num2 != 0));
-		}
+		using Sparse = Ellpack;
+		using Vectors = std::vector<Vector>;
+		using Matrices = std::vector<Matrix>;
+		using Sparses = std::vector<Sparse>;
 	}
 #endif
 

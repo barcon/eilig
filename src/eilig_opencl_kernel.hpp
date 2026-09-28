@@ -7,6 +7,26 @@ namespace eilig
 {
     namespace opencl
     {
+        using BufferPtr = club::BufferPtr;
+        using PlatformPtr = club::PlatformPtr;
+        using ContextPtr = club::ContextPtr;
+        using ProgramPtr = club::ProgramPtr;
+        using DeviceIndex = club::DeviceIndex;
+
+        class KernelVector;
+        using KernelVectorPtr = std::shared_ptr<KernelVector>;
+
+        class KernelMatrix;
+        using KernelMatrixPtr = std::shared_ptr<KernelMatrix>;
+
+        class KernelEllpack;
+        using KernelEllpackPtr = std::shared_ptr<KernelEllpack>;
+
+        constexpr Index GlobalSize(Index num1, Index num2)
+        {
+            return num2 * (num1 / num2 + (num1 % num2 != 0));
+        }
+
 		void Initialize(const String& fileName, const club::PlatformIndex& platformIndex, const club::DeviceIndices& deviceIndices);
 		
         ContextPtr GetContext();
