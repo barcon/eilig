@@ -74,16 +74,16 @@ namespace eilig
             InitKernel();
             Resize(numberRows, numberCols);
         }
-        Ellpack::Ellpack(NumberRows numberRows, NumberCols numberCols, Type type)
+        Ellpack::Ellpack(NumberRows numberRows, NumberCols numberCols, MatrixType type)
         {            
             InitKernel();
 
             switch (type)
             {
-            case matrix_ones:
+            case MatrixType::ones:
                 Resize(numberRows, numberCols, 1.0);
                 break;
-            case matrix_diagonal:
+            case MatrixType::diagonal:
                 Resize(numberRows, numberCols, 0.0);
 
                 for (Index i = 0; (i < numberRows) && (i < numberCols); ++i)
@@ -91,7 +91,7 @@ namespace eilig
                     (*this)(i, i) = 1.0;
                 }
                 break;
-            case matrix_zeros:
+            case MatrixType::zeros:
             default:
                 Resize(numberRows, numberCols, 0.0);
             }

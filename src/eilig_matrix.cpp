@@ -64,14 +64,14 @@ namespace eilig
     {
         Resize(numberRows, numberCols);
     }
-    Matrix::Matrix(NumberRows numberRows, NumberRows numberCols, Type type)
+    Matrix::Matrix(NumberRows numberRows, NumberRows numberCols, MatrixType type)
     {
         switch (type)
         {
-        case matrix_ones:
+        case MatrixType::ones:
             Resize(numberRows, numberCols, 1.0);
             break;
-        case matrix_diagonal:
+        case MatrixType::diagonal:
             Resize(numberRows, numberCols, 0.0);
 
             for (Index i = 0; (i < numberRows) && (i < numberCols); ++i)
@@ -79,7 +79,7 @@ namespace eilig
                 (*this)(i, i) = 1.0;
             }
             break;
-        case matrix_zeros:
+        case MatrixType::zeros:
         default:
             Resize(numberRows, numberCols, 0.0);
         }
@@ -248,7 +248,7 @@ namespace eilig
     }
     Matrix Matrix::operator*(const Matrix& rhs) const
     {
-        Matrix res(numberRows_, rhs.numberCols_, matrix_zeros);
+        Matrix res(numberRows_, rhs.numberCols_, MatrixType::zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -351,7 +351,7 @@ namespace eilig
     }
     Matrix Matrix::Diagonal() const
     {
-        Matrix res(numberRows_, numberCols_, matrix_zeros);
+        Matrix res(numberRows_, numberCols_, MatrixType::zeros);
 
         for (Index i = 0; (i < numberRows_) && (i < numberCols_); ++i)
         {
@@ -395,7 +395,7 @@ namespace eilig
     }
     Matrix Matrix::LowerWithDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, matrix_zeros);
+        Matrix res(numberRows_, numberCols_, MatrixType::zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -409,7 +409,7 @@ namespace eilig
     }
     Matrix Matrix::LowerWithoutDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, matrix_zeros);
+        Matrix res(numberRows_, numberCols_, MatrixType::zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -434,7 +434,7 @@ namespace eilig
     }
     Matrix Matrix::UpperWithDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, matrix_zeros);
+        Matrix res(numberRows_, numberCols_, MatrixType::zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {
@@ -448,7 +448,7 @@ namespace eilig
     }
     Matrix Matrix::UpperWithoutDiagonal() const
     {
-        Matrix res(numberRows_, numberCols_, matrix_zeros);
+        Matrix res(numberRows_, numberCols_, MatrixType::zeros);
 
         for (Index i = 0; i < numberRows_; ++i)
         {

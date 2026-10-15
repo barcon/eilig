@@ -22,7 +22,7 @@ namespace eilig
             Matrix(const eilig::Matrix& input);
             Matrix(const eilig::Ellpack& input);
             Matrix(NumberRows numberRows, NumberCols numberCols);
-            Matrix(NumberRows numberRows, NumberCols numberCols, Type type);
+            Matrix(NumberRows numberRows, NumberCols numberCols, MatrixType type);
             Matrix(Matrix&& input) noexcept;
 
             ~Matrix() = default;

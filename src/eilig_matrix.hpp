@@ -16,7 +16,7 @@ namespace eilig
         Matrix(const Ellpack& input);
         Matrix(const Vector& input);
         Matrix(NumberRows numberRows, NumberCols numberCols);
-        Matrix(NumberRows numberRows, NumberCols numberCols, Type type);
+        Matrix(NumberRows numberRows, NumberCols numberCols, MatrixType type);
         Matrix(Matrix&& input) noexcept;
 
         ~Matrix() = default;

@@ -24,20 +24,19 @@ namespace eilig
 	using File = utils::file::Text;	
 	using Status = long long int;
 	using Number = std::size_t;
-
-	static const String headerEilig = "EILIG";
-
 	using Tag = std::size_t;
 
-	using Type = std::size_t;	
-	static const Type matrix_ones{ 1 };
-	static const Type matrix_zeros{ 2 };
-	static const Type matrix_diagonal{ 3 };	
+	enum class MatrixType {
+		ones = 1,
+		zeros = 2,
+		diagonal = 3
+	};
 
-	using Axis = std::size_t;
-	static const Axis axis_x{ 0 };
-	static const Axis axis_y{ 1 };
-	static const Axis axis_z{ 2 };
+	enum class Axis {
+		x = 0,
+		y = 1,
+		z = 2
+	};
 
 	class Vector;
 	class Matrix;
@@ -47,6 +46,8 @@ namespace eilig
 	using Vectors = std::vector<Vector>;
 	using Matrices = std::vector<Matrix>;
 	using Sparses = std::vector<Sparse>;
+
+	static const String headerEilig = "EILIG";
 
 #ifdef EILIG_ENABLE_OPENCL
 	namespace opencl

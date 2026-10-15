@@ -24,11 +24,11 @@ namespace eilig
 		}
 		Matrix RotationMatrix(Axis axis, Scalar radians)
 		{
-			Matrix rot(3, 3, matrix_zeros);
+			Matrix rot(3, 3, MatrixType::zeros);
 
 			switch (axis)
 			{
-			case axis_x:
+			case Axis::x:
 				rot(0, 0) = 1.0;
 
 				rot(1, 1) = cos(radians);
@@ -37,7 +37,7 @@ namespace eilig
 				rot(2, 1) = sin(radians);
 				rot(2, 2) = cos(radians);
 				break;
-			case axis_y:
+			case Axis::y:
 				rot(0, 0) = cos(radians);
 				rot(0, 2) = sin(radians);
 
@@ -46,7 +46,7 @@ namespace eilig
 				rot(2, 0) = -sin(radians);
 				rot(2, 2) = cos(radians);
 				break;
-			case axis_z:
+			case Axis::z:
 				rot(0, 0) = cos(radians);
 				rot(0, 1) = -sin(radians);
 
@@ -71,7 +71,7 @@ namespace eilig
 		{
 			Vector output(point);
 
-			output(axis) = point(axis) + value;
+			output(static_cast<Index>(axis)) = point(static_cast<Index>(axis)) + value;
 
 			return output;
 		}
@@ -79,7 +79,7 @@ namespace eilig
 		{
 			Vector output(point);
 
-			output(axis) = -point(axis);
+			output(static_cast<Index>(axis)) = -point(static_cast<Index>(axis));
 
 			return output;
 		}
