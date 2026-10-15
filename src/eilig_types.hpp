@@ -15,6 +15,7 @@ namespace eilig
 {
 	using Scalar = double;
 	using Scalars = std::vector<Scalar>;
+	using Number = std::size_t;
 	using NumberRows = std::size_t;
 	using NumberCols = std::size_t;
 	using Index = std::size_t;
@@ -23,7 +24,6 @@ namespace eilig
 	using Strings = utils::Strings;
 	using File = utils::file::Text;	
 	using Status = long long int;
-	using Number = std::size_t;
 	using Tag = std::size_t;
 
 	enum class MatrixType {
